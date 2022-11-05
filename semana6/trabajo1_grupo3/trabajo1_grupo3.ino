@@ -2,6 +2,10 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 
 #ifdef ESP32
 #pragma message(THIS EXAMPLE IS FOR ESP8266 ONLY!)
@@ -10,13 +14,17 @@
 
 #define TAMANHO_MENSAJE 128
 #define send_time 30000
+#define LSIZ 128
+#define RSIZ 10
 
 DHTesp dht;
 WiFiClient wClient;
 PubSubClient mqtt_client(wClient);
 
-const char* ssid = "infind";
-const char* password = "1518wifi";
+/* const char* ssid = "infind"; */
+/* const char* password = "1518wifi"; */
+const char* ssid = "MiFibra-278E";
+const char* password = "e7oVWkYw";
 const char* mqtt_server = "iot.ac.uma.es";
 const char* mqtt_user = "infind";
 const char* mqtt_pass = "zancudo";
@@ -44,6 +52,13 @@ int LED2 = 16;
 ADC_MODE(ADC_VCC);
 
 
+/* Forma fácil de agregar topics para suscripción, es necesario
+   modoficar el nombre de las variables y dentro del código formatear
+   las variables, al menos funciona. Respecto a la tarea, esta
+   modificación no cumple lo establecido en la tarea en grupo REVISAR*/
+#define total 2
+const char *options[total] = { "infind/GRUPO3/led/cmd4", "infind/GRUPO3/led/cmd5" };
+
 /* ----------------------------------------------------- */
 void conecta_wifi() {
 
@@ -63,14 +78,17 @@ void conecta_wifi() {
 
 /* ----------------------------------------------------- */
 void conecta_mqtt() {
-
+  int i;
   // Loop until we're reconnected
   while (!mqtt_client.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
     if (mqtt_client.connect(ID_PLACA, mqtt_user, mqtt_pass)) {
       Serial.printf(" conectado a broker: %s\n",mqtt_server);
-      mqtt_client.subscribe(topic_SUB);
+      for(i = 0; i < total; ++i)
+        {
+          mqtt_client.subscribe(options[i]);
+        }
     } else {
       Serial.printf("failed, rc=%d  try again in 5s\n", mqtt_client.state());
       // Wait 5 seconds before retrying
@@ -97,10 +115,9 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   strncpy(mensaje, (char*)payload, length);
 
   mensaje[length]='\0'; // caracter cero marca el final de la cadena
-  Serial.printf("Mensaje recibido [%s] %s\n", topic, mensaje);
+  //  Serial.printf("Mensaje recibido [%s] %s\n", topic, mensaje);
 
-  if(strcmp(topic, topic_SUB)==0)
-    {
+  if(strcmp(topic, topic_SUB)==0){
 
       deserializeJson(doc2,mensaje);
 
@@ -120,6 +137,12 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
         mqtt_client.publish(topic_PUB, mensaje);
       }
     }
+  if(strcmp(topic, "infind/GRUPO3/led/cmd5")==0){
+    Serial.printf("Mensaje recibido [%s] %s\n", topic, mensaje);
+  }
+  if(strcmp(topic, "infind/GRUPO3/led/cmd4")==0){
+    Serial.printf("Mensaje recibido [%s] %s\n", topic, mensaje);
+  }
   doc2.clear();
   free(mensaje);
 }
@@ -129,6 +152,8 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
 /* SETUP                                                                  */
 /**************************************************************************/
 void setup() {
+  int i;
+  //strcpy(ID_PLACA,"ESP_00000001");
   Serial.begin(115200);
   pinMode(LED1, OUTPUT);    // inicializa GPIO como salida
   pinMode(LED2, OUTPUT);
@@ -137,12 +162,9 @@ void setup() {
 
   /* crea topics usando id de la placa */
   sprintf(ID_PLACA, "ESP_%d", ESP.getChipId());
-  sprintf(topic_SUB, "infind/GRUPO3/led/cmd");
-
 
   conecta_wifi();
   mqtt_client.setServer(mqtt_server, 1883);
-
   /* para poder enviar mensajes de hasta X bytes */
   mqtt_client.setBufferSize(512);
   mqtt_client.setCallback(procesa_mensaje);
@@ -150,7 +172,14 @@ void setup() {
 
   Serial.printf("Identificador placa: %s\n", ID_PLACA );
   Serial.printf("Topic publicacion  : %s\n", topic_PUB);
-  Serial.printf("Topic subscripcion : %s\n", topic_SUB);
+
+  /* Meter en una funcion void este trozo del código */
+  Serial.printf("Topic subscripcion : ");
+  for(i=0;i<total;i++){
+    Serial.printf("%s, ",options[i]);
+  }
+  Serial.printf("\n");
+
   Serial.printf("Termina setup en %lu ms\n\n",millis());
 
   /* Conectamos el sensor al GPIO2 */
