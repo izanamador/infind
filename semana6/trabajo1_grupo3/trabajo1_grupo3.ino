@@ -38,7 +38,7 @@ char output[300];
 
 char ID_PLACA[16];
 char topic_PUB[256];
-char topic_SUB[256];
+// char topic_SUB[256];
 
 int LED1 = 2;
 int LED2 = 16;
@@ -52,12 +52,8 @@ int LED2 = 16;
 ADC_MODE(ADC_VCC);
 
 
-/* Forma fácil de agregar topics para suscripción, es necesario
-   modoficar el nombre de las variables y dentro del código formatear
-   las variables, al menos funciona. Respecto a la tarea, esta
-   modificación no cumple lo establecido en la tarea en grupo REVISAR*/
-#define total 2
-const char *options[total] = { "infind/GRUPO3/led/cmd4", "infind/GRUPO3/led/cmd5" };
+#define totalTopicSubs 1
+const char *topicSubs[totalTopicSubs] = { "infind/GRUPO3/led/cmd"};
 
 /* ----------------------------------------------------- */
 void conecta_wifi() {
@@ -77,22 +73,33 @@ void conecta_wifi() {
 }
 
 /* ----------------------------------------------------- */
+/* conecta_mqtt()
+   Realiza la conexión con el broker MQTT y se suscribe a los topics
+   especificados en la variable topicssubs */
 void conecta_mqtt() {
+
   int i;
+
   // Loop until we're reconnected
   while (!mqtt_client.connected()) {
+
     Serial.print("Attempting MQTT connection...");
+
     // Attempt to connect
-    if (mqtt_client.connect(ID_PLACA, mqtt_user, mqtt_pass)) {
+    if (mqtt_client.connect(ID_PLACA, mqtt_user, mqtt_pass,"infind/GRUPO3/conexion",1,true,"{\"online\":false}")) {
+
       Serial.printf(" conectado a broker: %s\n",mqtt_server);
-      for(i = 0; i < total; ++i)
-        {
-          mqtt_client.subscribe(options[i]);
-        }
+      for(i = 0; i < totalTopicSubs; ++i){
+        mqtt_client.subscribe(topicSubs[i]);
+
+      }
     } else {
+
       Serial.printf("failed, rc=%d  try again in 5s\n", mqtt_client.state());
+
       // Wait 5 seconds before retrying
       delay(5000);
+
     }
   }
 
@@ -117,7 +124,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   mensaje[length]='\0'; // caracter cero marca el final de la cadena
   //  Serial.printf("Mensaje recibido [%s] %s\n", topic, mensaje);
 
-  if(strcmp(topic, topic_SUB)==0){
+  if(strcmp(topic, "infind/GRUPO3/led/cmd")==0){
 
       deserializeJson(doc2,mensaje);
 
@@ -132,17 +139,13 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
         doc2.clear();
         doc2["led"] = level_externo;
         serializeJson(doc2,output);
+
         snprintf(mensaje, 300, output);
+
         sprintf(topic_PUB, "infind/GRUPO3/led/status");
         mqtt_client.publish(topic_PUB, mensaje);
       }
     }
-  if(strcmp(topic, "infind/GRUPO3/led/cmd5")==0){
-    Serial.printf("Mensaje recibido [%s] %s\n", topic, mensaje);
-  }
-  if(strcmp(topic, "infind/GRUPO3/led/cmd4")==0){
-    Serial.printf("Mensaje recibido [%s] %s\n", topic, mensaje);
-  }
   doc2.clear();
   free(mensaje);
 }
@@ -153,11 +156,13 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
 /**************************************************************************/
 void setup() {
   int i;
+
   //strcpy(ID_PLACA,"ESP_00000001");
   Serial.begin(115200);
   pinMode(LED1, OUTPUT);    // inicializa GPIO como salida
   pinMode(LED2, OUTPUT);
 
+  analogWrite(LED1, level_interno);
   analogWrite(LED2, level_interno);
 
   /* crea topics usando id de la placa */
@@ -165,6 +170,7 @@ void setup() {
 
   conecta_wifi();
   mqtt_client.setServer(mqtt_server, 1883);
+
   /* para poder enviar mensajes de hasta X bytes */
   mqtt_client.setBufferSize(512);
   mqtt_client.setCallback(procesa_mensaje);
@@ -175,8 +181,8 @@ void setup() {
 
   /* Meter en una funcion void este trozo del código */
   Serial.printf("Topic subscripcion : ");
-  for(i=0;i<total;i++){
-    Serial.printf("%s, ",options[i]);
+  for(i=0;i<totalTopicSubs;i++){
+    Serial.printf("%s ",topicSubs[i]);
   }
   Serial.printf("\n");
 
@@ -231,7 +237,7 @@ void loop() {
     ultimo_mensaje = ahora;
 
     snprintf(mensaje, 300, output);
-    Serial.println(output);
+
     sprintf(topic_PUB, "infind/GRUPO3/datos");
     mqtt_client.publish(topic_PUB, mensaje);
 
