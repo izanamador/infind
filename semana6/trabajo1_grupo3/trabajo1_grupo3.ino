@@ -21,10 +21,9 @@ DHTesp dht;
 WiFiClient wClient;
 PubSubClient mqtt_client(wClient);
 
-/* const char* ssid = "infind"; */
-/* const char* password = "1518wifi"; */
-const char* ssid = "MiFibra-278E";
-const char* password = "e7oVWkYw";
+ const char* ssid = "infind"; 
+ const char* password = "1518wifi"; 
+
 const char* mqtt_server = "iot.ac.uma.es";
 const char* mqtt_user = "infind";
 const char* mqtt_pass = "zancudo";
@@ -190,6 +189,8 @@ void setup() {
 
   /* Conectamos el sensor al GPIO2 */
   dht.setup(2, DHTesp::DHT11);
+  mqtt_client.publish("infind/GRUPO3/conexion","{\"online\":true}",true);
+
 }
 
 
