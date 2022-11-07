@@ -1,0 +1,3295 @@
+[
+    {
+        "id": "9a2c567d.c9bc58",
+        "type": "tab",
+        "label": "FOTA",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "13df9ad25c9618e4",
+        "type": "tab",
+        "label": "Tarea ESP826",
+        "disabled": false,
+        "info": "# Tarea de grupo ESP826\n\n## Grupo 3\n- Izan Amador Bustos\n- Irene Guijarro Molina\n- Jorge Luis Benavides Macías\n- Ricardo Panero Lamothe\n\n## Descripción de la práctica\n\nHay que programar usando el IDE Arduino la placa de desarrollo ESP8266 NodeMCU Dev Kit para que realice las siguientes funciones.\n\n1. Conexión \n2. Envío periódico de datos\n3. Escritura en LED\n4. Lectura del LED\n\nHay dos opciones para usar como servidor MQTT, el de vuestra máquina virtual. Hay que usar como IP del servidor la del PC que estáis usando. También podéis usar el servidor iot.ac.uma.es usando como usuario y clave: infind / zancudo . Siempre que se use este servidor los topics tienen que empezar obligatoriamente por infind/\n\nEn los topics hay que usar el nombre del grupo, por ejemplo GRUPO5 si se trata del prototipo del grupo 5. Si dentro del mismo grupo hay varios prototipos en marcha añadir otro nivel intermedio al topic con el nombre propio del programador si se quiere evitar interferencias.\n\nImplementar flujos Node-RED para que sean funcionales con este nuevo prototipo. Se deben recibir los datos de sensores y estado para visualizarlos en el Dashboard y permitir configurar el nivel de brillo del LED.\n\nEntregar en grupo el programa Arduino y flujo NodeRED desarrollados.\nLibrerías de interés\n\nPara configurar la conexión MQTT, LWT, publicar y suscribirse a topics, ... usamos la librería PubSubClient. Consultar referencia en: https://pubsubclient.knolleary.net/ \n\nPara manejar las cadenas formateadas con JSON se recomienda utilizar la librería ArduinoJson (https://arduinojson.org/) instalable desde el gestor de librerías de la herramienta. O imprimir las cadenas con el formato adecuado usando funciones de C como sprintf().\n\n\n## 1. Conexión \n\nConectar usando el punto de acceso WiFi con SSID: infind  y password: 1518wifi si estamos en el laboratorio y vuestra WiFi si estáis en casa.\n\n\n\n## 2. Envío periódico de datos\n\nEl dispositivo debe leer un sensor de humedad y tempertaura DHT11, también la entrada analógica para controlar el nivel de la batería/alimentación (ver https://arduino-esp8266.readthedocs.io/en/latest/reference.html#analog-input) y enviar periodicamente (cada 30 segundos) los valores mediante MQTT.  \n\nEn este envío periódico se incluirá también información de la conexión WiFi (SSid), IP asignada y potencia de señal (RSSI). \n\nHabrá que realizar el conexionado del sensor DHT11 como vimos en tareas anteriores. Para la lectura del nivel de voltaje (Vcc) hay que usar las indicaciones del enlace en el párrafo anterior, la función para leer ESP.getVcc() devolverá los milivoltios observados en la entrada de alimentación (https://arduino-esp8266.readthedocs.io/en/latest/libraries.html#esp-specific-apis).\n\nPara el campo \"Uptime\", enviaremos el número de milisegundos desde que inició la placa.\n\nLa información sobre la conexión WiFi del dispositivo se podrá consultar mediante la clases disponibles en la librería WiFi (https://www.arduino.cc/en/Reference/WiFi). Algunas particularidades para ESP8266 estarán mejor descritas en la librería ESP8266WiFi (https://arduino-esp8266.readthedocs.io/en/latest/esp8266wifi/station-class.html)  y en el API de la librería  ( https://links2004.github.io/Arduino/df/d1c/class_e_s_p8266_wi_fi_scan_class.html).\n\n\n\n\n## 3. Escritura en LED\n\nTambién mediante el mismo protocolo debe recibir ordenes para actuar sobre la salida GPIO2 (conectada a un LED azul sobre la placa), informando de los cambios realizados.\n\nEl control del LED (GPIO2) esta vez lo haremos usando PWM (https://arduino-esp8266.readthedocs.io/en/latest/reference.html#analog-output) de forma que se configurará su funcionamiento con un número entero entre 0 y 100, que representará el nivel de brillo del LED en tanto por ciento. \n\nLos valores 0 y 100 deben funcionar como hasta ahora apagando y encendiendo totalmente el LED y los valores intermedios deben encenderlo con la atenuación indicada usando PWM.\n\nPosiblemente el rango de actuación de analogWrite() sea de [0-1023] o [0-255], dependerá de la versión que estemos usando del soporte para ESP8266 en Arduino.\n\n## 4. Lectura del LED\n\n\n\n## 1 Envío periódico de datos\n\nEl dispositivo debe leer un sensor de humedad y tempertaura DHT11, también la entrada analógica para controlar el nivel de la batería/alimentación ( ver https://arduino-esp8266.readthedocs.io/en/latest/reference.html#analog-input) y enviar periodicamente (cada 30 segundos) los valores mediante MQTT.  \n\nEn este envío periódico se incluirá también información de la conexión WiFi (SSid), IP asignada y potencia de señal (RSSI). También mediante el mismo protocolo debe recibir ordenes para actuar sobre la salida GPIO2 (conectada a un LED azul sobre la placa), informando de los cambios realizados."
+    },
+    {
+        "id": "fdd7c65ba1a5069c",
+        "type": "subflow",
+        "name": "Json-Parametros",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 240,
+                "y": 180,
+                "wires": [
+                    {
+                        "id": "71ba75b72b7234b8"
+                    },
+                    {
+                        "id": "b773e97cd5f76603"
+                    },
+                    {
+                        "id": "9c279125c66e2684"
+                    },
+                    {
+                        "id": "cfe9e9670f94e200"
+                    },
+                    {
+                        "id": "0e30be54155829fc"
+                    },
+                    {
+                        "id": "b3caa66dacc9cde9"
+                    },
+                    {
+                        "id": "6b1fb6380754fec8"
+                    },
+                    {
+                        "id": "cfd1fb817de3e49e"
+                    },
+                    {
+                        "id": "94c986120fdbff25"
+                    },
+                    {
+                        "id": "ec8819ffb2e3a53c"
+                    },
+                    {
+                        "id": "3abd2138cf75f029"
+                    },
+                    {
+                        "id": "be78632fae9d07fb"
+                    },
+                    {
+                        "id": "d80d561f8aba7ffb"
+                    },
+                    {
+                        "id": "b6ec35be0630f7eb"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 700,
+                "y": 60,
+                "wires": [
+                    {
+                        "id": "71ba75b72b7234b8",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 100,
+                "wires": [
+                    {
+                        "id": "b773e97cd5f76603",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 140,
+                "wires": [
+                    {
+                        "id": "9c279125c66e2684",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 180,
+                "wires": [
+                    {
+                        "id": "cfe9e9670f94e200",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 220,
+                "wires": [
+                    {
+                        "id": "0e30be54155829fc",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 260,
+                "wires": [
+                    {
+                        "id": "b3caa66dacc9cde9",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 300,
+                "wires": [
+                    {
+                        "id": "6b1fb6380754fec8",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 340,
+                "wires": [
+                    {
+                        "id": "cfd1fb817de3e49e",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 380,
+                "wires": [
+                    {
+                        "id": "94c986120fdbff25",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 420,
+                "wires": [
+                    {
+                        "id": "ec8819ffb2e3a53c",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 460,
+                "wires": [
+                    {
+                        "id": "3abd2138cf75f029",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 500,
+                "wires": [
+                    {
+                        "id": "be78632fae9d07fb",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 540,
+                "wires": [
+                    {
+                        "id": "d80d561f8aba7ffb",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 580,
+                "wires": [
+                    {
+                        "id": "b6ec35be0630f7eb",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [
+            {
+                "name": "entrada",
+                "type": "str",
+                "value": "salida"
+            }
+        ],
+        "meta": {},
+        "color": "#3FADB5",
+        "inputLabels": [
+            "json"
+        ],
+        "outputLabels": [
+            "SSID",
+            "RSSI",
+            "localIP",
+            "macAddress",
+            "uptime_ms",
+            "interval_s",
+            "ChipID",
+            "Des",
+            "Rojo",
+            "Verde",
+            "Temperatura",
+            "Humedad",
+            "Presion",
+            "Illuminacion"
+        ],
+        "icon": "node-red/parser-json.svg"
+    },
+    {
+        "id": "2f2d6fcd70cbfe4a",
+        "type": "group",
+        "z": "13df9ad25c9618e4",
+        "name": "Estado y LWT",
+        "style": {
+            "fill": "#e3f3d3",
+            "label": true
+        },
+        "nodes": [
+            "dfaadf3ab199e00c",
+            "1eaec8b318944fc3",
+            "56640648f318fb19",
+            "631359044b52c8b1",
+            "b5d1dddf4e575f4e",
+            "d5b5d13671439e9a",
+            "06e1a8509d49c5a1",
+            "89c9e5866eeb4402",
+            "02738aad3e6d70d4"
+        ],
+        "x": 14,
+        "y": 19,
+        "w": 692,
+        "h": 202,
+        "info": "# Estado y LWT\n\n- Topic: infind/GRUPOX/conexion\n- Acción: Publicar\n- Descripción: Estado de conexión del dispositivo (mensaje retenido). Usar últimas voluntades (LWT) para enviar la notificación desconexión\n- Ejemplos: {\"online\":true}  {\"online\":false}"
+    },
+    {
+        "id": "31d7abf2d95de80e",
+        "type": "group",
+        "z": "13df9ad25c9618e4",
+        "name": "Sensores",
+        "style": {
+            "fill": "#e3f3d3",
+            "label": true
+        },
+        "nodes": [
+            "a30adc92797161ad",
+            "e4e313be7cf72272",
+            "204e8951dbb09c53",
+            "fd4c253fa4036aa9",
+            "7873a2401884d320",
+            "ecccce0a5594afdb",
+            "39d6fac3b45b36ea",
+            "2a35eff3801fbdb8",
+            "cdeea9f974f54573",
+            "495dd803d5128cd4",
+            "bee0e551b2c2a3bf",
+            "30fc991dc7523ddb",
+            "34d884309e9afa81"
+        ],
+        "x": 14,
+        "y": 239,
+        "w": 692,
+        "h": 362,
+        "info": "# Sensores\n\n- Topic: infind/GRUPOX/datos\n- Acción: Publicar\n- Descripción: Actualización periódica (30s) de información de sensores y más\n- Ejemplo:\n\n\n{\n\n\"Uptime\":12300,\n\n\"Vcc\":2.97,\n\n\"DHT11\":{\"temp\":26.0,\"hum\":37.0},\n\n\"LED\":100,\n\n\"Wifi\":{\"SSId\":\"infind\",\"IP\":\"192.168.0.100\",\"RSSI\":56}\n\n}\n"
+    },
+    {
+        "id": "5cba6c5db0d46559",
+        "type": "group",
+        "z": "13df9ad25c9618e4",
+        "name": "Estado Led",
+        "style": {
+            "fill": "#e3f3d3",
+            "label": true
+        },
+        "nodes": [
+            "9beb600c63b60280",
+            "93107118806b4b86",
+            "29d5550a23b4d981",
+            "5ae2c99e08b2c418"
+        ],
+        "x": 14,
+        "y": 859,
+        "w": 532,
+        "h": 202,
+        "info": "# Sensores\n\n- Topic: infind/GRUPOX/datos\n- Acción: Publicar\n- Descripción: Actualización periódica (30s) de información de sensores y más\n- Ejemplo:\n\n\n{\n\n\"Uptime\":12300,\n\n\"Vcc\":2.97,\n\n\"DHT11\":{\"temp\":26.0,\"hum\":37.0},\n\n\"LED\":100,\n\n\"Wifi\":{\"SSId\":\"infind\",\"IP\":\"192.168.0.100\",\"RSSI\":56}\n\n}\n"
+    },
+    {
+        "id": "c59e69ccdd22540f",
+        "type": "group",
+        "z": "13df9ad25c9618e4",
+        "name": "Cambio LED",
+        "style": {
+            "fill": "#ffbfbf",
+            "label": true
+        },
+        "nodes": [
+            "0fc0b1c73d0162a9",
+            "02e9f915f64990b0",
+            "e741bb926c073ddc",
+            "1031733d058764be",
+            "612853001cbb9f90"
+        ],
+        "x": 14,
+        "y": 619,
+        "w": 612,
+        "h": 222,
+        "info": "# Intensidad\n\n- Topic: infind/GRUPOX/led/cmd\n- Acción: Suscribir\n- Descripción: El dispositivo recibe la configuración de intensidad del LED [0-100]\n- Ejemplo: { \"level\":75 }"
+    },
+    {
+        "id": "6ddaab1a97220a7d",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "df853f134c305ee4",
+        "type": "ui_group",
+        "name": "datos",
+        "tab": "12dd9bcea4dfa099",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "4a2139ed813bfe35",
+        "type": "ui_group",
+        "name": "Default",
+        "tab": "89cc76e41ce73f6c",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "12dd9bcea4dfa099",
+        "type": "ui_tab",
+        "name": "elquequerais",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "89cc76e41ce73f6c",
+        "type": "ui_tab",
+        "name": "LEDs",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "cc3bb0365b59106a",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-light",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#56bbe6",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#ffffff",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "customTheme": {
+                "name": "Untitled Theme 1",
+                "default": "#4B7930",
+                "baseColor": "#4cd65c",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "reset": false
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#0094CE",
+                    "value": "#56bbe6",
+                    "edited": true
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#56bbe6",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#fafafa",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#99d6f0",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "widget-textColor": {
+                    "value": "#111111",
+                    "edited": true
+                },
+                "widget-backgroundColor": {
+                    "value": "#56bbe6",
+                    "edited": false
+                },
+                "widget-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "base-font": {
+                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+                }
+            },
+            "angularTheme": {
+                "primary": "indigo",
+                "accents": "blue",
+                "warn": "red",
+                "background": "grey",
+                "palette": "light"
+            }
+        },
+        "site": {
+            "name": "Node-RED Dashboard",
+            "hideToolbar": "false",
+            "allowSwipe": "false",
+            "lockMenu": "false",
+            "allowTempTheme": "true",
+            "dateFormat": "DD/MM/YYYY",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
+    },
+    {
+        "id": "96d7b634fbe25751",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "0c552cf21f8c54ec",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "dd263ba689c3cca8",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "798feb5e6b5ffd42",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "dd263ba689c3cca8",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9ff8455e4877d275",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "aef662cc245f250d",
+        "type": "ui_group",
+        "name": "Estado LEDs",
+        "tab": "dd263ba689c3cca8",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "dd263ba689c3cca8",
+        "type": "ui_tab",
+        "name": "Dashboard Principal",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "96815dc81ac960de",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "f91f43a3e7c5e0d1",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "034e7da0802973c3",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b0a8bbce07163fdb",
+        "type": "ui_group",
+        "name": "Histórico",
+        "tab": "034e7da0802973c3",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "4879df4594bb1632",
+        "type": "ui_group",
+        "name": "LEDs",
+        "tab": "034e7da0802973c3",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "034e7da0802973c3",
+        "type": "ui_tab",
+        "name": "Grupo1",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "c192465e97d424c6",
+        "type": "ui_tab",
+        "name": "Información Completa",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "bb57291584844db8",
+        "type": "ui_group",
+        "name": "Conexiones",
+        "tab": "c192465e97d424c6",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "03e42b3f3166dafd",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "c192465e97d424c6",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "8b3e6238f182e60b",
+        "type": "ui_group",
+        "name": "Datos del Dispositivo",
+        "tab": "c192465e97d424c6",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "01491cf8bdd8915c",
+        "type": "ui_group",
+        "name": "LEDs",
+        "tab": "c192465e97d424c6",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b2e90fa0a65ea01f",
+        "type": "ui_group",
+        "name": "Control LEDs",
+        "tab": "dd263ba689c3cca8",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "0e67874246324209",
+        "type": "ui_group",
+        "name": "Conexiones",
+        "tab": "dd263ba689c3cca8",
+        "order": 5,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "d783cb980c3979fc",
+        "type": "ui_group",
+        "name": "ESP82",
+        "tab": "abf705ceb627b91c",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "46d329654bb57340",
+        "type": "ui_group",
+        "name": "Control LEDs JSON",
+        "tab": "dd263ba689c3cca8",
+        "order": 6,
+        "disp": true,
+        "width": "4",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9d73cb054e5cb8e9",
+        "type": "ui_group",
+        "name": "Estado LEDs (sin bugs JSON)",
+        "tab": "dd263ba689c3cca8",
+        "order": 7,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "963359d89a555855",
+        "type": "ui_group",
+        "name": "Datos Dispositivo 2.0",
+        "tab": "dd263ba689c3cca8",
+        "order": 8,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "c7afe1108e71f509",
+        "type": "mongodb",
+        "hostname": "127.0.0.1",
+        "topology": "direct",
+        "connectOptions": "",
+        "port": "27017",
+        "db": "pruebas",
+        "name": ""
+    },
+    {
+        "id": "546dfcbaaeca6460",
+        "type": "ui_tab",
+        "name": "MongoDB",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "b339868c8e221d71",
+        "type": "ui_group",
+        "name": "Default",
+        "tab": "546dfcbaaeca6460",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "819581010d48bfd0",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "f605fa69.8f5008",
+        "type": "mongodb",
+        "hostname": "127.0.0.1",
+        "connectOptions": "",
+        "port": "27017",
+        "db": "ejercicio",
+        "name": ""
+    },
+    {
+        "id": "45a7d5cc.b3cb3c",
+        "type": "ui_group",
+        "name": "Consulta",
+        "tab": "ff6ad649.003498",
+        "order": 1,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ff6ad649.003498",
+        "type": "ui_tab",
+        "name": "Ejemplo Mongo",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "abf705ceb627b91c",
+        "type": "ui_tab",
+        "name": "ESP82",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "e7d471dcdf6318d4",
+        "type": "ui_tab",
+        "name": "Demo",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "b02d955b14d74d6f",
+        "type": "ui_group",
+        "name": "Controles Consulta",
+        "tab": "ff6ad649.003498",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "3df418612dbbac9f",
+        "type": "ui_group",
+        "name": "Datos Sensor",
+        "tab": "abf705ceb627b91c",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "6ffb679d7d6ebbd5",
+        "type": "ui_group",
+        "name": "Consulta Tiempo",
+        "tab": "ff6ad649.003498",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "64cdcf7a3b4cd223",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "d20b3cd14e645d48",
+        "type": "ui_group",
+        "name": "Humedad",
+        "tab": "498b706769fb5160",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "8a548b476cc419b4",
+        "type": "ui_group",
+        "name": "Temperatura",
+        "tab": "498b706769fb5160",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "e968a1c70a34a463",
+        "type": "ui_group",
+        "name": "Sensación térmica",
+        "tab": "498b706769fb5160",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "498b706769fb5160",
+        "type": "ui_tab",
+        "name": "Tarea 4",
+        "icon": "dashboard",
+        "order": 3,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "c1b5ff0fb8bbf360",
+        "type": "ui_group",
+        "name": "Gráfica",
+        "tab": "ff6ad649.003498",
+        "order": 5,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "19c8856e9fe1d4aa",
+        "type": "ui_group",
+        "name": "Mensaje",
+        "tab": "abf705ceb627b91c",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "8b67b1bd51c43347",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "b8b5fb6b4bfeb434",
+        "type": "ui_group",
+        "name": "Estado y LWT",
+        "tab": "4a06ba0a96f6d1fb",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "27e360b8dee7f0ae",
+        "type": "ui_group",
+        "name": "G3 Datos",
+        "tab": "4a06ba0a96f6d1fb",
+        "order": 5,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "4a06ba0a96f6d1fb",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "b6ec35be0630f7eb",
+        "type": "change",
+        "z": "fdd7c65ba1a5069c",
+        "name": "Iluminacion",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.ADC.Iluminacion",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 510,
+        "y": 680,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3abd2138cf75f029",
+        "type": "change",
+        "z": "fdd7c65ba1a5069c",
+        "name": "Temperatura",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.BME280.Temperatura",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 510,
+        "y": 520,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "be78632fae9d07fb",
+        "type": "change",
+        "z": "fdd7c65ba1a5069c",
+        "name": "Humedad",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.BME280.Humedad",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 500,
+        "y": 560,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d80d561f8aba7ffb",
+        "type": "change",
+        "z": "fdd7c65ba1a5069c",
+        "name": "Presion",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.BME280.Presion",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 500,
+        "y": 600,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "94c986120fdbff25",
+        "type": "change",
+        "z": "fdd7c65ba1a5069c",
+        "name": "Rojo",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.LEDs.Rojo",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ec8819ffb2e3a53c",
+        "type": "change",
+        "z": "fdd7c65ba1a5069c",
+        "name": "Verde",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.LEDs.Verde",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6b1fb6380754fec8",
+        "type": "change",
+        "z": "fdd7c65ba1a5069c",
+        "name": "ChipID",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.nodeID.ChipID",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "cfd1fb817de3e49e",
+        "type": "change",
+        "z": "fdd7c65ba1a5069c",
+        "name": "Des",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.Des",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "71ba75b72b7234b8",
+        "type": "change",
+        "z": "fdd7c65ba1a5069c",
+        "name": "SSID",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.conexion.SSID",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 40,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b773e97cd5f76603",
+        "type": "change",
+        "z": "fdd7c65ba1a5069c",
+        "name": "RSSI",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.conexion.RSSI",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9c279125c66e2684",
+        "type": "change",
+        "z": "fdd7c65ba1a5069c",
+        "name": "localIP",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.conexion.localIP",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "cfe9e9670f94e200",
+        "type": "change",
+        "z": "fdd7c65ba1a5069c",
+        "name": "macAddress",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.conexion.macAddress",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 510,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "0e30be54155829fc",
+        "type": "change",
+        "z": "fdd7c65ba1a5069c",
+        "name": "uptime_ms",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.conexion.uptime_ms",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 510,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b3caa66dacc9cde9",
+        "type": "change",
+        "z": "fdd7c65ba1a5069c",
+        "name": "interval_s",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.conexion.interval_s",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 500,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "59b175c6.ffb24c",
+        "type": "http response",
+        "z": "9a2c567d.c9bc58",
+        "name": "OTA Response",
+        "statusCode": "",
+        "headers": {},
+        "x": 2772.559814453125,
+        "y": 663.1071910858154,
+        "wires": []
+    },
+    {
+        "id": "d9beced3.f6add",
+        "type": "http in",
+        "z": "9a2c567d.c9bc58",
+        "name": "OTA Manager",
+        "url": "/esp8266-ota",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 88.05558013916016,
+        "y": 648.2856712341309,
+        "wires": [
+            [
+                "55397768.5b71a8"
+            ]
+        ]
+    },
+    {
+        "id": "e5efaa43.17c6c8",
+        "type": "file",
+        "z": "9a2c567d.c9bc58",
+        "name": "Save md5 Checksum",
+        "filename": "",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "true",
+        "x": 1539.9998168945312,
+        "y": 845.8333740234375,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e7e37fb.655cc8",
+        "type": "file in",
+        "z": "9a2c567d.c9bc58",
+        "name": "Read firmware",
+        "filename": "",
+        "format": "",
+        "x": 842.0833740234375,
+        "y": 846.6666870117188,
+        "wires": [
+            [
+                "c9190866.93be58"
+            ]
+        ]
+    },
+    {
+        "id": "72df3eab.91578",
+        "type": "change",
+        "z": "9a2c567d.c9bc58",
+        "name": "Extract filename",
+        "rules": [
+            {
+                "t": "set",
+                "p": "filename",
+                "pt": "msg",
+                "to": "firmware.directory",
+                "tot": "flow"
+            },
+            {
+                "t": "change",
+                "p": "filename",
+                "pt": "msg",
+                "from": "$",
+                "fromt": "re",
+                "to": "req.files.firmware[0].originalname",
+                "tot": "msg"
+            },
+            {
+                "t": "delete",
+                "p": "req",
+                "pt": "msg"
+            },
+            {
+                "t": "delete",
+                "p": "res",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 619.375,
+        "y": 847.9166870117188,
+        "wires": [
+            [
+                "e7e37fb.655cc8"
+            ]
+        ]
+    },
+    {
+        "id": "bc5757c4.370a48",
+        "type": "change",
+        "z": "9a2c567d.c9bc58",
+        "name": "",
+        "rules": [
+            {
+                "t": "change",
+                "p": "filename",
+                "pt": "msg",
+                "from": "bin$",
+                "fromt": "re",
+                "to": "md5",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1225.625,
+        "y": 846.25,
+        "wires": [
+            [
+                "e5efaa43.17c6c8"
+            ]
+        ]
+    },
+    {
+        "id": "201e5caa.58ba44",
+        "type": "comment",
+        "z": "9a2c567d.c9bc58",
+        "name": "Firmware Upgrade",
+        "info": "The system determines which firmware to send based\non the MAC address, version, and MD5 headers in the\nrequest from the ESP8266.\n\nFirstly, it checks if a firmware hash file with \nthe MAC address as the name exists, or else if a \nfirmware file with the version as the name exists.\nIf neither exist then no update is available.\n\nIt then reads the corresponding MD5 hash from the\nhash file and compares to the MD5 hash in the\nrequest.  If they match then the firmware is up\nto date and no update is required.\n\nOtherwise, it sends the contents of the firmware\nbin file and the MD5 hash value.",
+        "x": 103.5,
+        "y": 46,
+        "wires": []
+    },
+    {
+        "id": "b938fd54.3b00c",
+        "type": "comment",
+        "z": "9a2c567d.c9bc58",
+        "name": "Firmware Management",
+        "info": "",
+        "x": 110.5,
+        "y": 542,
+        "wires": []
+    },
+    {
+        "id": "fa324c37.ad4ea",
+        "type": "template",
+        "z": "9a2c567d.c9bc58",
+        "name": "Firmware Manager",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "html",
+        "syntax": "mustache",
+        "template": "<html>\n    <head>\n        <title>ESP8266 OTA Firmware Manager</title>\n        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n        <link rel=\"stylesheet\" href=\"http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css\">\n        <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js\"></script>\n        <script src=\"http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js\"></script>\n        <style>\n            .file-btn-grp {\n                display: none;\n            }\n            body {\n                background-color: #f6f6f6;\n            }\n            .text_holder {\n                display: block;\n                max-width: 100%;\n                word-wrap: break-word;\n                line-height: 30px;\n            }\n            #main {\n                margin-top: 50px;\n                background-color: #ffffff;\n                border-radius: 5px;\n                width: 70%;\n                min-width: 500px;\n                border: 1px solid #545454;\n            }\n            .alert {\n                margin-top: 10px;\n                margin-bottom: 5px;\n            }\n            .link {\n                font-style: italic;\n            }\n            .listentry {\n                display: none;\n                list-style-type: none;\n            }\n        </style>\n\n    </head>\n    <body>\n        <div class=\"container\" id=\"main\">\n            <h1><small>ESP8266 OTA Firmware Manager</small></h1>\n            <h2><small>Upload New Firmware</small></h2>\n\n            <form role =\"form\" id=\"main_input_box\" action=\"esp8266-ota\" method=\"POST\" enctype=\"multipart/form-data\" class=\"form-inline\">\n                <input type=\"file\" accept=\".bin\" class=\"hidden\" id=\"fileUpload\" name=\"firmware\" placeholder=\"firmware.bin\">\n                <div class=\"form-group\">\n                <div class=\"input-group\">\n                    <span class=\"input-group-btn\">\n                        <button id=\"browse\" type=\"button\" class=\"btn btn-primary\">Browse...</button>\n                    </span>\n                    <input id=\"filename\" size=100 readonly=\"\" class=\"form-control\" placeholder=\"Firmware.bin\">\n                    <span class=\"input-group-btn\">\n                        <input type=\"submit\" value=\"Upload\" class=\"btn btn-primary add_button\">\n                    </span>\n                </div>\n                </div>\n            </form>\n\n            <h2><small>Current Firmware</small></h2>\n            <ul class=\"list-group\" id=\"list_of_items\">\n            </ul>\n        </div>\n\n        <div id=\"linkModal\" class=\"modal fade\" role=\"dialog\">\n            <div class=\"modal-dialog\">\n        \n                <!-- Modal content-->\n                <div class=\"modal-content\">\n                    <div class=\"modal-header\">\n                        <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\n                        <h4 class=\"modal-title\">Create Symbolic Link</h4>\n                    </div>\n                    <div class=\"modal-body\">\n                        <form class=\"form-horizontal\" id=\"linkForm\" role=\"form\" action=\"#\" method=\"POST\">\n                            <div class=\"form-group\">\n                                <label class=\"control-label  col-sm-2\" for=\"linkName\">Link:</label> \n                                <div class=\"col-sm-10\">\n                                    <input id=\"linkName\" name=\"linkName\" class=\"form-control\"/>\n                                </div>\n                            </div>\n                            <div class=\"form-group\">\n                                <label class=\"control-label  col-sm-2\" for=\"linkFile\">To:</label> \n                                <div class=\"col-sm-10\">\n                                    <input class=\"form-control\" id=\"linkFile\" name=\"linkFile\"/>\n                                </div>\n                            </div>\n                        </form>\n                    </div>\n                    <div class=\"modal-footer\">\n                        <button type=\"submit\" class=\"btn btn-success link-create\">Create</button>\n                        <button type=\"button\" class=\"btn btn-warning\" data-dismiss=\"modal\">Cancel</button>\n                    </div>\n                </div>\n            </div>\n        </div>\n        \n        <script>\n\n            var deleteButton = \"<button id='delete' class='btn btn-warning'>Delete</button>\";\n            var linkButton = \"<button id='link' class='btn btn-success'>Link</button>\";\n            var oneButton = \"<div class='file-btn-grp btn-group pull-right'>\" + deleteButton + \"</div>\";\n            var twoButtons = \"<div class='file-btn-grp btn-group pull-right'>\" + deleteButton + linkButton + \"</div>\";\n            \n            function addListEntry(list, filename, linkname) {\n            \n                var entry;\n                \n                if (linkname === undefined) {\n                    entry = $(\"<li class='listentry list-group-item'><div class='text_holder'><span>\" \n                    + filename + \"</span>\" + twoButtons + \"</div></li>\");\n                } else {\n                    entry = $(\"<li class='listentry list-group-item'><div class='text_holder'><span class='link'>\" \n                    + filename + \"</span> <span class='glyphicon glyphicon-arrow-right'></span> \" \n                    + linkname + oneButton + \"</div></li>\");\n                }\n                \n                entry.mouseover(function(){\n                    $(this).find(\".btn-group\").fadeIn(\"fast\");\n                });\n                entry.mouseleave(function(){\n                    $(this).find(\".btn-group\").fadeOut(\"slow\");\n                });\n                \n                entry.on(\"click\", \"button#delete\", function(){\n                    var listItem = this.parentElement.parentElement.parentElement;\n                    var file = this.parentElement.parentElement.childNodes[0].childNodes[0].data;\n                    $.ajax({\n                        type: 'DELETE',\n                        data: {\"filename\": file},\n                        success: function(result) {\n                            $(listItem).fadeOut(\"slow\", function(){\n                                listItem.remove();\n                            });\n                        },\n                        error: function(result) {\n                            $(listItem).append(\"<div class='alert alert-danger'>\"\n                                + \"<a href='#' class='close' data-dismiss='alert'\"\n                                + \"aria-label='close'>&times;</a>\"\n                                + result.responseText + \"</div>\");\n                        }\n                    });\n                });\n           \n                entry.on(\"click\", \"button#link\", function(){\n                    var file = this.parentElement.parentElement.childNodes[0].childNodes[0].data;\n                    $(\"#linkName\").val(\"\");\n                    $(\"#linkFile\").prop(\"disabled\", true).val(file);\n                    $(\"#linkName\").parent().removeClass(\"has-error\");\n                    $(\"#linkModal\").modal();\n                    $('#linkModal').on('shown.bs.modal', function () {\n                        $('#linkName').focus();\n                    });\n                });\n                \n                if (list.children().length == 0) {\n                    list.append(entry);\n                    entry.fadeIn(\"slow\");\n                    return;\n                }\n\n                if (filename < $(\"li:first span:first\", list).text()) {\n                    $(\"li:first\", list).before(entry);\n                    entry.fadeIn(\"slow\");\n                    return;\n                }\n                if (filename > $(\"li:last span:first\", list).text()) {\n                    $(\"li:last\", list).after(entry);\n                    entry.fadeIn(\"slow\");\n                    return;\n                }\n                \n                var count = 0;\n                var $li = $(\"li\", list);\n                do {\n                    var index = parseInt($li.length / 2);\n                    var $compare = $li.eq(index);\n                    var compare = $(\"span:first\",$compare).text();\n                    if (filename === compare) {\n                        break;\n                    }\n                    else if (filename > compare) {\n                        $li = $li.slice(index, $li.length);\n                    } else {\n                        $li = $li.slice(0, index);\n                    }\n                } while ($li.length > 1);\n\n                if (filename === compare) {\n                    $compare.slideUp(\"fast\").slideDown(\"slow\");\n                    return;\n                } else if (filename < compare) { \n                    entry.insertBefore($compare); \n                } else { \n                    entry.insertAfter($compare); \n                }\n                entry.slideDown(\"slow\");\n            }\n            \n            \n            var files = String(\"{{payload.files}}\").split(',');\n            var links = String(\"{{payload.links}}\").split(',');\n            \n            var list_of_items = $(\"#list_of_items\");\n            \n            files.forEach(function(file,index) {\n                if (links[index] == \"\") {\n                    addListEntry(this, file.slice(0,-4));\n                } else {\n                    addListEntry(this, file.slice(0,-4), links[index].slice(0,-4));\n                }\n            },list_of_items);\n           \n           \n            $(\"#linkModal\").on(\"click\", \"button.link-create\", function(event){\n               event.preventDefault();\n               if ($(\"#linkName\").val() == \"\") {\n                    $('#linkName').focus();\n                    $('#linkName').parent().addClass(\"has-error\");\n                    return false;\n               }\n               $(\"#linkFile\").prop(\"disabled\",false);               \n               $.ajax({\n                    type: 'PUT',\n                    data: $(\"#linkForm\").serialize(),\n                    success: function(result) {\n                        $(\"#linkModal\").modal('hide');\n                        addListEntry(list_of_items, $('#linkName').val(), $('#linkFile').val());\n                    },\n                    error: function(result) {\n                        $(\"#linkFile\").prop(\"disabled\", true);\n                        $('#linkName').focus();\n                        $('#linkName').parent().addClass(\"has-error\");\n                        $(linkForm).append(\"<div id='linkError' class='alert alert-danger'>\"\n                             + \"<a href='#' class='close' data-dismiss='alert'\"\n                             + \"aria-label='close'>&times;</a>\"\n                             + result.responseText + \"</div>\");\n                    }\n                });\n            });\n            \n            $(\"#browse\").on('click', function () {\n                fileUpload.click();\n            });\n            \n            $(\"#fileUpload\").on('change', function () {\n                $(\"#filename\").val($(\"#fileUpload\").val().split('/').pop().split('\\\\').pop());\n            });\n            \n            var frm = $(\"#main_input_box\");\n            \n            frm.submit( function( e ) {\n                e.preventDefault();\n                if ($('#fileUpload').val() == \"\") return null;\n                $.ajax( {\n                    url: frm.attr('action'),\n                    type: frm.attr('method'),\n                    data: new FormData( this ),\n                    processData: false,\n                    contentType: false,\n                    success: function(result) {\n                        addListEntry(list_of_items, $('#fileUpload').val().slice(0,-4).split('\\\\').pop());\n                        $('#fileUpload').val('');\n                        $(':text').val('');\n                    },\n                    error: function(result) {\n                        $(\"#main_input_box\").append(\"<div class='alert alert-danger'>\"\n                             + \"<a href='#' class='close' data-dismiss='alert'\"\n                             + \"aria-label='close'>&times;</a>\"\n                             + result.responseText + \"</div>\");\n                    }\n\n                });\n            });\n        </script>\n    </body>\n</html>",
+        "output": "str",
+        "x": 1381.3333740234375,
+        "y": 645.8135375976562,
+        "wires": [
+            [
+                "59b175c6.ffb24c"
+            ]
+        ]
+    },
+    {
+        "id": "7a811173.c43d7",
+        "type": "http in",
+        "z": "9a2c567d.c9bc58",
+        "name": "OTA Delete",
+        "url": "/esp8266-ota",
+        "method": "delete",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 83.125,
+        "y": 933.75,
+        "wires": [
+            [
+                "f0cda1c9.0bf1a"
+            ]
+        ]
+    },
+    {
+        "id": "dd1a2d9.e77aed",
+        "type": "catch",
+        "z": "9a2c567d.c9bc58",
+        "name": "File Error",
+        "scope": [
+            "6207dc25.8aa654",
+            "1ba75f98.24816",
+            "4e19de83.e138",
+            "bfd327b9.3de7b8",
+            "2d0ef949.779706"
+        ],
+        "x": 1870.6665573120117,
+        "y": 805.3333158493042,
+        "wires": [
+            [
+                "67a7dc2f.518594"
+            ]
+        ]
+    },
+    {
+        "id": "67a7dc2f.518594",
+        "type": "change",
+        "z": "9a2c567d.c9bc58",
+        "name": "Error",
+        "rules": [
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "500",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "error.message",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2159,
+        "y": 791,
+        "wires": [
+            [
+                "59b175c6.ffb24c"
+            ]
+        ]
+    },
+    {
+        "id": "b80436a5.5baa88",
+        "type": "change",
+        "z": "9a2c567d.c9bc58",
+        "name": "Change to MD5 filename",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload.filename",
+                "pt": "msg",
+                "from": "bin",
+                "fromt": "str",
+                "to": "md5",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1879.1666564941406,
+        "y": 936.6666269302368,
+        "wires": [
+            [
+                "1ba75f98.24816"
+            ]
+        ]
+    },
+    {
+        "id": "3abafd11.36eea2",
+        "type": "http in",
+        "z": "9a2c567d.c9bc58",
+        "name": "OTA Link",
+        "url": "/esp8266-ota",
+        "method": "put",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 84,
+        "y": 1041.5,
+        "wires": [
+            [
+                "4c043353.d88a2c"
+            ]
+        ]
+    },
+    {
+        "id": "4c043353.d88a2c",
+        "type": "change",
+        "z": "9a2c567d.c9bc58",
+        "name": "Extract filename",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload.linkName",
+                "pt": "msg",
+                "from": "$",
+                "fromt": "re",
+                "to": ".bin",
+                "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "payload.linkFile",
+                "pt": "msg",
+                "from": "$",
+                "fromt": "re",
+                "to": ".bin",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1385,
+        "y": 1044,
+        "wires": [
+            [
+                "4e19de83.e138"
+            ]
+        ]
+    },
+    {
+        "id": "e72c4816.4a4988",
+        "type": "change",
+        "z": "9a2c567d.c9bc58",
+        "name": "Change to MD5 Filename",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload.linkName",
+                "pt": "msg",
+                "from": "bin$",
+                "fromt": "re",
+                "to": "md5",
+                "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "payload.linkFile",
+                "pt": "msg",
+                "from": "bin$",
+                "fromt": "re",
+                "to": "md5",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1908,
+        "y": 1045,
+        "wires": [
+            [
+                "bfd327b9.3de7b8"
+            ]
+        ]
+    },
+    {
+        "id": "f0cda1c9.0bf1a",
+        "type": "change",
+        "z": "9a2c567d.c9bc58",
+        "name": "Extract filename",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload.filename",
+                "pt": "msg",
+                "from": "$",
+                "fromt": "re",
+                "to": ".bin",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1382.5,
+        "y": 937.5,
+        "wires": [
+            [
+                "6207dc25.8aa654"
+            ]
+        ]
+    },
+    {
+        "id": "5065ff85.4b455",
+        "type": "http response",
+        "z": "9a2c567d.c9bc58",
+        "name": "OTA Response",
+        "x": 3210.059814453125,
+        "y": 366.06256103515625,
+        "wires": []
+    },
+    {
+        "id": "30cc65a7.c9413a",
+        "type": "file in",
+        "z": "9a2c567d.c9bc58",
+        "name": "Load Firmware",
+        "filename": "",
+        "format": "",
+        "sendError": false,
+        "x": 2586.999786376953,
+        "y": 399.88400077819824,
+        "wires": [
+            [
+                "5065ff85.4b455",
+                "83dcae00.efc07"
+            ]
+        ]
+    },
+    {
+        "id": "bcc38d43.d6a6d",
+        "type": "change",
+        "z": "9a2c567d.c9bc58",
+        "name": "No Update",
+        "rules": [
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "304",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2956.107421875,
+        "y": 258.52682304382324,
+        "wires": [
+            [
+                "5065ff85.4b455"
+            ]
+        ]
+    },
+    {
+        "id": "441b3198.1ba9b",
+        "type": "change",
+        "z": "9a2c567d.c9bc58",
+        "name": "Forbidden",
+        "rules": [
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "403",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "Forbidden",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2933.999755859375,
+        "y": 135.84826469421387,
+        "wires": [
+            [
+                "5065ff85.4b455"
+            ]
+        ]
+    },
+    {
+        "id": "83dcae00.efc07",
+        "type": "debug",
+        "z": "9a2c567d.c9bc58",
+        "name": "Update sent",
+        "active": true,
+        "console": "false",
+        "complete": "req.headers.x-esp8266-sta-mac",
+        "x": 2932.0000610351562,
+        "y": 405.955472946167,
+        "wires": []
+    },
+    {
+        "id": "ffae2a7c.345a38",
+        "type": "change",
+        "z": "9a2c567d.c9bc58",
+        "name": "Save MD5 Hash",
+        "rules": [
+            {
+                "t": "set",
+                "p": "headers.x-MD5",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "change",
+                "p": "filename",
+                "pt": "msg",
+                "from": "md5",
+                "fromt": "str",
+                "to": "bin",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2375.785789489746,
+        "y": 387.0268669128418,
+        "wires": [
+            [
+                "30cc65a7.c9413a"
+            ]
+        ]
+    },
+    {
+        "id": "7c5e29fb.0c9e38",
+        "type": "switch",
+        "z": "9a2c567d.c9bc58",
+        "name": "Update type",
+        "property": "req.headers.x-esp8266-mode",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "spiffs",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "sketch",
+                "vt": "str"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 474.5179748535156,
+        "y": 228.52685356140137,
+        "wires": [
+            [
+                "bcc38d43.d6a6d"
+            ],
+            [
+                "2c6c7c1f.1859a4"
+            ]
+        ]
+    },
+    {
+        "id": "83889006.7d8a3",
+        "type": "switch",
+        "z": "9a2c567d.c9bc58",
+        "name": "Compare MD5 hash",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "req.headers.x-esp8266-sketch-md5",
+                "vt": "msg"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "outputs": 2,
+        "x": 1945.41064453125,
+        "y": 342.13403129577637,
+        "wires": [
+            [
+                "bcc38d43.d6a6d",
+                "aa40f0d6.18501"
+            ],
+            [
+                "ffae2a7c.345a38",
+                "356049da.b71496"
+            ]
+        ]
+    },
+    {
+        "id": "e1d02c45.1ad83",
+        "type": "catch",
+        "z": "9a2c567d.c9bc58",
+        "name": "File error",
+        "scope": [
+            "30cc65a7.c9413a",
+            "2fa044cb.9d727c"
+        ],
+        "x": 2628.3572387695312,
+        "y": 348.52682304382324,
+        "wires": [
+            [
+                "bcc38d43.d6a6d",
+                "8bf70d0a.ea88"
+            ]
+        ]
+    },
+    {
+        "id": "1cc7ae82.4814d1",
+        "type": "switch",
+        "z": "9a2c567d.c9bc58",
+        "name": "Check user agent",
+        "property": "req.headers.user-agent",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "ESP8266-http-Update",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 311.21436309814453,
+        "y": 134.95541191101074,
+        "wires": [
+            [
+                "441b3198.1ba9b"
+            ],
+            [
+                "7c5e29fb.0c9e38"
+            ]
+        ]
+    },
+    {
+        "id": "2c6c7c1f.1859a4",
+        "type": "change",
+        "z": "9a2c567d.c9bc58",
+        "name": "Get MAC hash filename",
+        "rules": [
+            {
+                "t": "set",
+                "p": "filename",
+                "pt": "msg",
+                "to": "firmware.directory",
+                "tot": "flow"
+            },
+            {
+                "t": "change",
+                "p": "filename",
+                "pt": "msg",
+                "from": "$",
+                "fromt": "re",
+                "to": "req.headers.x-esp8266-sta-mac",
+                "tot": "msg"
+            },
+            {
+                "t": "change",
+                "p": "filename",
+                "pt": "msg",
+                "from": "$",
+                "fromt": "re",
+                "to": ".md5",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 703.6428451538086,
+        "y": 354.9554100036621,
+        "wires": [
+            [
+                "1ab2632f.8b6cfd"
+            ]
+        ]
+    },
+    {
+        "id": "2fa044cb.9d727c",
+        "type": "file in",
+        "z": "9a2c567d.c9bc58",
+        "name": "Load Hash",
+        "filename": "",
+        "format": "utf8",
+        "sendError": false,
+        "x": 1734.410629272461,
+        "y": 341.7768840789795,
+        "wires": [
+            [
+                "83889006.7d8a3"
+            ]
+        ]
+    },
+    {
+        "id": "3e452e93.f8c502",
+        "type": "change",
+        "z": "9a2c567d.c9bc58",
+        "name": "Get Version hash filename",
+        "rules": [
+            {
+                "t": "set",
+                "p": "filename",
+                "pt": "msg",
+                "to": "firmware.directory",
+                "tot": "flow"
+            },
+            {
+                "t": "change",
+                "p": "filename",
+                "pt": "msg",
+                "from": "$",
+                "fromt": "re",
+                "to": "req.headers.x-esp8266-version",
+                "tot": "msg"
+            },
+            {
+                "t": "change",
+                "p": "filename",
+                "pt": "msg",
+                "from": "$",
+                "fromt": "re",
+                "to": ".md5",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1183.7857666015625,
+        "y": 459.5982036590576,
+        "wires": [
+            [
+                "97d98a42.adaa58",
+                "bb982f89.a1316"
+            ]
+        ]
+    },
+    {
+        "id": "8bf70d0a.ea88",
+        "type": "debug",
+        "z": "9a2c567d.c9bc58",
+        "name": "Firmware file error",
+        "active": false,
+        "console": "false",
+        "complete": "error",
+        "x": 2891.2142944335938,
+        "y": 347.09826469421387,
+        "wires": []
+    },
+    {
+        "id": "d0080f07.24e4d",
+        "type": "http in",
+        "z": "9a2c567d.c9bc58",
+        "name": "OTA Request",
+        "url": "/esp8266-ota/update",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 75,
+        "y": 134.95541191101074,
+        "wires": [
+            [
+                "1cc7ae82.4814d1",
+                "fec83a29.cbb558"
+            ]
+        ]
+    },
+    {
+        "id": "a3bf5c34.aa108",
+        "type": "switch",
+        "z": "9a2c567d.c9bc58",
+        "name": "",
+        "property": "req.headers.x-esp8266-version",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nnull"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 2,
+        "x": 687.4642333984375,
+        "y": 466.74108695983887,
+        "wires": [
+            [
+                "3e452e93.f8c502"
+            ],
+            [
+                "3cae9c88.db30a4"
+            ]
+        ]
+    },
+    {
+        "id": "3cae9c88.db30a4",
+        "type": "change",
+        "z": "9a2c567d.c9bc58",
+        "name": "Version in Request",
+        "rules": [
+            {
+                "t": "set",
+                "p": "req.headers.x-esp8266-version",
+                "pt": "msg",
+                "to": "req.params.version",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 896.9285278320312,
+        "y": 532.8125286102295,
+        "wires": [
+            [
+                "3e452e93.f8c502"
+            ]
+        ]
+    },
+    {
+        "id": "fec83a29.cbb558",
+        "type": "debug",
+        "z": "9a2c567d.c9bc58",
+        "name": "Update req",
+        "active": true,
+        "console": "false",
+        "complete": "true",
+        "x": 246.2144012451172,
+        "y": 235.66967582702637,
+        "wires": []
+    },
+    {
+        "id": "50e66cdf.532e44",
+        "type": "debug",
+        "z": "9a2c567d.c9bc58",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "false",
+        "x": 1291.773494720459,
+        "y": 382.1797161102295,
+        "wires": []
+    },
+    {
+        "id": "4da6dc07.a7a994",
+        "type": "debug",
+        "z": "9a2c567d.c9bc58",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "false",
+        "x": 1315.0234375,
+        "y": 294.0390625,
+        "wires": []
+    },
+    {
+        "id": "bb982f89.a1316",
+        "type": "debug",
+        "z": "9a2c567d.c9bc58",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "filename",
+        "x": 1393.0234375,
+        "y": 555.0390625,
+        "wires": []
+    },
+    {
+        "id": "2642b78e.e21848",
+        "type": "debug",
+        "z": "9a2c567d.c9bc58",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "filename",
+        "x": 1770.0234375,
+        "y": 524.0390625,
+        "wires": []
+    },
+    {
+        "id": "669e61f3.97669",
+        "type": "debug",
+        "z": "9a2c567d.c9bc58",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "filename",
+        "x": 1789.0234375,
+        "y": 407.0390625,
+        "wires": []
+    },
+    {
+        "id": "aa40f0d6.18501",
+        "type": "debug",
+        "z": "9a2c567d.c9bc58",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "filename",
+        "x": 2148.0234375,
+        "y": 279.0390625,
+        "wires": []
+    },
+    {
+        "id": "356049da.b71496",
+        "type": "debug",
+        "z": "9a2c567d.c9bc58",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "filename",
+        "x": 2170.0234375,
+        "y": 506.0390625,
+        "wires": []
+    },
+    {
+        "id": "2d0ef949.779706",
+        "type": "fs-ops-move",
+        "z": "9a2c567d.c9bc58",
+        "name": "Store firmware",
+        "sourcePath": "req.files.firmware[0].destination",
+        "sourcePathType": "msg",
+        "sourceFilename": "req.files.firmware[0].filename",
+        "sourceFilenameType": "msg",
+        "destPath": "firmware.directory",
+        "destPathType": "flow",
+        "destFilename": "req.files.firmware[0].originalname",
+        "destFilenameType": "msg",
+        "link": false,
+        "x": 365.89284896850586,
+        "y": 818.3332557678223,
+        "wires": [
+            [
+                "72df3eab.91578",
+                "59b175c6.ffb24c"
+            ]
+        ]
+    },
+    {
+        "id": "4e19de83.e138",
+        "type": "fs-ops-move",
+        "z": "9a2c567d.c9bc58",
+        "name": "Link firmware",
+        "sourcePath": "",
+        "sourcePathType": "str",
+        "sourceFilename": "payload.linkFile",
+        "sourceFilenameType": "msg",
+        "destPath": "firmware.directory",
+        "destPathType": "flow",
+        "destFilename": "payload.linkName",
+        "destFilenameType": "msg",
+        "link": true,
+        "x": 1644.5,
+        "y": 1044,
+        "wires": [
+            [
+                "e72c4816.4a4988"
+            ]
+        ]
+    },
+    {
+        "id": "bfd327b9.3de7b8",
+        "type": "fs-ops-move",
+        "z": "9a2c567d.c9bc58",
+        "name": "Link MD5",
+        "sourcePath": "",
+        "sourcePathType": "str",
+        "sourceFilename": "payload.linkFile",
+        "sourceFilenameType": "msg",
+        "destPath": "firmware.directory",
+        "destPathType": "flow",
+        "destFilename": "payload.linkName",
+        "destFilenameType": "msg",
+        "link": true,
+        "x": 2152.5,
+        "y": 1044,
+        "wires": [
+            [
+                "59b175c6.ffb24c"
+            ]
+        ]
+    },
+    {
+        "id": "6207dc25.8aa654",
+        "type": "fs-ops-delete",
+        "z": "9a2c567d.c9bc58",
+        "name": "Delete firmware",
+        "path": "firmware.directory",
+        "pathType": "flow",
+        "filename": "payload.filename",
+        "filenameType": "msg",
+        "x": 1628.6250457763672,
+        "y": 936.5832777023315,
+        "wires": [
+            [
+                "b80436a5.5baa88"
+            ]
+        ]
+    },
+    {
+        "id": "1ba75f98.24816",
+        "type": "fs-ops-delete",
+        "z": "9a2c567d.c9bc58",
+        "name": "Delete MD5 Hash",
+        "path": "firmware.directory",
+        "pathType": "flow",
+        "filename": "payload.filename",
+        "filenameType": "msg",
+        "x": 2170.833206176758,
+        "y": 936.6665878295898,
+        "wires": [
+            [
+                "59b175c6.ffb24c"
+            ]
+        ]
+    },
+    {
+        "id": "97d98a42.adaa58",
+        "type": "fs-ops-access",
+        "z": "9a2c567d.c9bc58",
+        "name": "Check for MD5 file exists",
+        "path": "",
+        "pathType": "str",
+        "filename": "filename",
+        "filenameType": "msg",
+        "read": true,
+        "write": false,
+        "throwerror": false,
+        "x": 1497.2857055664062,
+        "y": 459.6696147918701,
+        "wires": [
+            [
+                "2fa044cb.9d727c",
+                "669e61f3.97669"
+            ],
+            [
+                "bcc38d43.d6a6d",
+                "2642b78e.e21848"
+            ]
+        ]
+    },
+    {
+        "id": "1ab2632f.8b6cfd",
+        "type": "fs-ops-access",
+        "z": "9a2c567d.c9bc58",
+        "name": "Check for MD5 file exists",
+        "path": "",
+        "pathType": "str",
+        "filename": "filename",
+        "filenameType": "msg",
+        "read": true,
+        "write": false,
+        "throwerror": false,
+        "x": 1009.357177734375,
+        "y": 349.09826469421387,
+        "wires": [
+            [
+                "2fa044cb.9d727c",
+                "4da6dc07.a7a994"
+            ],
+            [
+                "a3bf5c34.aa108",
+                "50e66cdf.532e44"
+            ]
+        ]
+    },
+    {
+        "id": "3b4b06ed.61028a",
+        "type": "fs-ops-link",
+        "z": "9a2c567d.c9bc58",
+        "name": "Get Links",
+        "path": "firmware.directory",
+        "pathType": "flow",
+        "filename": "payload.files",
+        "filenameType": "msg",
+        "link": "payload.links",
+        "linkType": "msg",
+        "x": 776.4999923706055,
+        "y": 648.3333110809326,
+        "wires": [
+            [
+                "fa324c37.ad4ea"
+            ]
+        ]
+    },
+    {
+        "id": "55397768.5b71a8",
+        "type": "fs-ops-dir",
+        "z": "9a2c567d.c9bc58",
+        "name": "Firmware listing",
+        "path": "firmware.directory",
+        "pathType": "flow",
+        "filter": "*.bin",
+        "filterType": "str",
+        "dir": "payload.files",
+        "dirType": "msg",
+        "x": 493.0355987548828,
+        "y": 647.8015928268433,
+        "wires": [
+            [
+                "3b4b06ed.61028a"
+            ]
+        ]
+    },
+    {
+        "id": "c9190866.93be58",
+        "type": "md5",
+        "z": "9a2c567d.c9bc58",
+        "name": "",
+        "fieldToHash": "payload",
+        "hashField": "payload",
+        "hashFieldType": "msg",
+        "x": 1031.6668090820312,
+        "y": 846.6666259765625,
+        "wires": [
+            [
+                "bc5757c4.370a48"
+            ]
+        ]
+    },
+    {
+        "id": "c2cbaac2.b38c58",
+        "type": "config",
+        "z": "9a2c567d.c9bc58",
+        "name": "Firmware Config",
+        "properties": [
+            {
+                "p": "firmware.directory",
+                "pt": "flow",
+                "to": "/home/ubuntu/OTA/",
+                "tot": "str"
+            }
+        ],
+        "active": true,
+        "x": 123.0714111328125,
+        "y": 360.1428527832031,
+        "wires": []
+    },
+    {
+        "id": "f0729e15.c31c3",
+        "type": "httpInMultipart",
+        "z": "9a2c567d.c9bc58",
+        "name": "OTA Upload",
+        "url": "/esp8266-ota",
+        "method": "post",
+        "fields": "[{ \"name\": \"firmware\"}]",
+        "swaggerDoc": "",
+        "x": 79.7857437133789,
+        "y": 812.4286108016968,
+        "wires": [
+            [
+                "2d0ef949.779706"
+            ]
+        ]
+    },
+    {
+        "id": "dfaadf3ab199e00c",
+        "type": "mqtt in",
+        "z": "13df9ad25c9618e4",
+        "g": "2f2d6fcd70cbfe4a",
+        "name": "Estado y LWT",
+        "topic": "infind/GRUPO3/conexion",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "8b67b1bd51c43347",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "x": 110,
+        "y": 180,
+        "wires": [
+            [
+                "d5b5d13671439e9a"
+            ]
+        ]
+    },
+    {
+        "id": "1eaec8b318944fc3",
+        "type": "debug",
+        "z": "13df9ad25c9618e4",
+        "g": "2f2d6fcd70cbfe4a",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 590,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "56640648f318fb19",
+        "type": "inject",
+        "z": "13df9ad25c9618e4",
+        "g": "2f2d6fcd70cbfe4a",
+        "name": "Online",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"online\":true}",
+        "payloadType": "str",
+        "x": 110,
+        "y": 60,
+        "wires": [
+            [
+                "d5b5d13671439e9a"
+            ]
+        ]
+    },
+    {
+        "id": "631359044b52c8b1",
+        "type": "inject",
+        "z": "13df9ad25c9618e4",
+        "g": "2f2d6fcd70cbfe4a",
+        "name": "Offline",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"online\":false}",
+        "payloadType": "str",
+        "x": 110,
+        "y": 120,
+        "wires": [
+            [
+                "d5b5d13671439e9a"
+            ]
+        ]
+    },
+    {
+        "id": "a30adc92797161ad",
+        "type": "mqtt in",
+        "z": "13df9ad25c9618e4",
+        "g": "31d7abf2d95de80e",
+        "name": "Sensores",
+        "topic": "infind/GRUPO3/datos",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "8b67b1bd51c43347",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "x": 100,
+        "y": 400,
+        "wires": [
+            [
+                "fd4c253fa4036aa9",
+                "495dd803d5128cd4"
+            ]
+        ]
+    },
+    {
+        "id": "e4e313be7cf72272",
+        "type": "debug",
+        "z": "13df9ad25c9618e4",
+        "g": "31d7abf2d95de80e",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 410,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "204e8951dbb09c53",
+        "type": "inject",
+        "z": "13df9ad25c9618e4",
+        "g": "31d7abf2d95de80e",
+        "name": "Datos",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{  \"Uptime\":12300,  \"Vcc\":4.97,  \"DHT11\":{\"temp\":-2.0,\"hum\":37.0},  \"LED\":100,  \"Wifi\":{\"SSId\":\"infind\",\"IP\":\"192.168.0.100\",\"RSSI\":56}  }",
+        "payloadType": "str",
+        "x": 130,
+        "y": 280,
+        "wires": [
+            [
+                "fd4c253fa4036aa9"
+            ]
+        ]
+    },
+    {
+        "id": "9beb600c63b60280",
+        "type": "mqtt in",
+        "z": "13df9ad25c9618e4",
+        "g": "5cba6c5db0d46559",
+        "name": "Sensores",
+        "topic": "infind/GRUPO3/led/status",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "8b67b1bd51c43347",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "x": 100,
+        "y": 1020,
+        "wires": [
+            [
+                "5ae2c99e08b2c418"
+            ]
+        ]
+    },
+    {
+        "id": "93107118806b4b86",
+        "type": "inject",
+        "z": "13df9ad25c9618e4",
+        "g": "5cba6c5db0d46559",
+        "name": "Status",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{ \"led\":75 }",
+        "payloadType": "str",
+        "x": 110,
+        "y": 900,
+        "wires": [
+            [
+                "5ae2c99e08b2c418"
+            ]
+        ],
+        "info": "# Status\n\n- Topic: infind/GRUPOX/led/status\n- Acción: Publicar\n- Descripción: El dispositivo confirma la configuración de intensidad del LED [0-100] después de aplicarla\n- Ejemplo: { \"led\":75 } "
+    },
+    {
+        "id": "b5d1dddf4e575f4e",
+        "type": "link in",
+        "z": "13df9ad25c9618e4",
+        "g": "2f2d6fcd70cbfe4a",
+        "name": "",
+        "links": [
+            "d5b5d13671439e9a"
+        ],
+        "x": 355,
+        "y": 60,
+        "wires": [
+            [
+                "1eaec8b318944fc3",
+                "06e1a8509d49c5a1"
+            ]
+        ]
+    },
+    {
+        "id": "d5b5d13671439e9a",
+        "type": "link out",
+        "z": "13df9ad25c9618e4",
+        "g": "2f2d6fcd70cbfe4a",
+        "name": "",
+        "links": [
+            "b5d1dddf4e575f4e"
+        ],
+        "x": 295,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "fd4c253fa4036aa9",
+        "type": "json",
+        "z": "13df9ad25c9618e4",
+        "g": "31d7abf2d95de80e",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 290,
+        "y": 380,
+        "wires": [
+            [
+                "e4e313be7cf72272",
+                "ecccce0a5594afdb",
+                "39d6fac3b45b36ea",
+                "2a35eff3801fbdb8",
+                "cdeea9f974f54573",
+                "bee0e551b2c2a3bf",
+                "30fc991dc7523ddb",
+                "34d884309e9afa81"
+            ]
+        ]
+    },
+    {
+        "id": "06e1a8509d49c5a1",
+        "type": "json",
+        "z": "13df9ad25c9618e4",
+        "g": "2f2d6fcd70cbfe4a",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 430,
+        "y": 120,
+        "wires": [
+            [
+                "02738aad3e6d70d4"
+            ]
+        ]
+    },
+    {
+        "id": "89c9e5866eeb4402",
+        "type": "ui_led",
+        "z": "13df9ad25c9618e4",
+        "g": "2f2d6fcd70cbfe4a",
+        "order": 1,
+        "group": "b8b5fb6b4bfeb434",
+        "width": "2",
+        "height": "2",
+        "label": "",
+        "labelPlacement": "left",
+        "labelAlignment": "left",
+        "colorForValue": [
+            {
+                "color": "#ff0000",
+                "value": "false",
+                "valueType": "bool"
+            },
+            {
+                "color": "#008000",
+                "value": "true",
+                "valueType": "bool"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "shape": "circle",
+        "showGlow": true,
+        "name": "",
+        "x": 630,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "02738aad3e6d70d4",
+        "type": "change",
+        "z": "13df9ad25c9618e4",
+        "g": "2f2d6fcd70cbfe4a",
+        "name": "Online",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.online",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 470,
+        "y": 180,
+        "wires": [
+            [
+                "89c9e5866eeb4402"
+            ]
+        ]
+    },
+    {
+        "id": "7873a2401884d320",
+        "type": "ui_text",
+        "z": "13df9ad25c9618e4",
+        "g": "31d7abf2d95de80e",
+        "group": "27e360b8dee7f0ae",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Uptime (s): ",
+        "format": "{{msg.payload.Uptime}}",
+        "layout": "row-left",
+        "className": "",
+        "x": 610,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "ecccce0a5594afdb",
+        "type": "function",
+        "z": "13df9ad25c9618e4",
+        "g": "31d7abf2d95de80e",
+        "name": "ms",
+        "func": "msg.payload.Uptime = msg.payload.Uptime/1000;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 440,
+        "y": 320,
+        "wires": [
+            [
+                "7873a2401884d320"
+            ]
+        ]
+    },
+    {
+        "id": "39d6fac3b45b36ea",
+        "type": "ui_gauge",
+        "z": "13df9ad25c9618e4",
+        "g": "31d7abf2d95de80e",
+        "name": "",
+        "group": "27e360b8dee7f0ae",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Voltios Vcc",
+        "label": "V",
+        "format": "{{msg.payload.Vcc}}",
+        "min": 0,
+        "max": "5",
+        "colors": [
+            "#ff0000",
+            "#e6e600",
+            "#008080"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 610,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "2a35eff3801fbdb8",
+        "type": "ui_gauge",
+        "z": "13df9ad25c9618e4",
+        "g": "31d7abf2d95de80e",
+        "name": "",
+        "group": "27e360b8dee7f0ae",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "ºC",
+        "format": "{{msg.payload.DHT11.temp}}",
+        "min": "-5",
+        "max": "50",
+        "colors": [
+            "#0080ff",
+            "#00ff00",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 610,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "0fc0b1c73d0162a9",
+        "type": "inject",
+        "z": "13df9ad25c9618e4",
+        "g": "c59e69ccdd22540f",
+        "name": "Nivel: 75",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "5",
+        "topic": "",
+        "payload": "{ \"level\":75 }",
+        "payloadType": "str",
+        "x": 120,
+        "y": 660,
+        "wires": [
+            [
+                "02e9f915f64990b0"
+            ]
+        ]
+    },
+    {
+        "id": "02e9f915f64990b0",
+        "type": "mqtt out",
+        "z": "13df9ad25c9618e4",
+        "g": "c59e69ccdd22540f",
+        "name": "Set Level",
+        "topic": "infind/GRUPO3/led/cmd",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "8b67b1bd51c43347",
+        "x": 540,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "e741bb926c073ddc",
+        "type": "inject",
+        "z": "13df9ad25c9618e4",
+        "g": "c59e69ccdd22540f",
+        "name": "Nivel:25",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "7.5",
+        "topic": "",
+        "payload": "{ \"level\":25 }",
+        "payloadType": "str",
+        "x": 120,
+        "y": 700,
+        "wires": [
+            [
+                "02e9f915f64990b0"
+            ]
+        ]
+    },
+    {
+        "id": "cdeea9f974f54573",
+        "type": "ui_gauge",
+        "z": "13df9ad25c9618e4",
+        "g": "31d7abf2d95de80e",
+        "name": "",
+        "group": "27e360b8dee7f0ae",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Humedad",
+        "label": "%",
+        "format": "{{msg.payload.DHT11.hum}}",
+        "min": "0",
+        "max": "100",
+        "colors": [
+            "#0080ff",
+            "#00ff00",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 600,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "495dd803d5128cd4",
+        "type": "debug",
+        "z": "13df9ad25c9618e4",
+        "g": "31d7abf2d95de80e",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 300,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "1031733d058764be",
+        "type": "ui_slider",
+        "z": "13df9ad25c9618e4",
+        "g": "c59e69ccdd22540f",
+        "name": "",
+        "label": "Nivel LED",
+        "tooltip": "",
+        "group": "27e360b8dee7f0ae",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "outs": "end",
+        "topic": "topic",
+        "topicType": "msg",
+        "min": 0,
+        "max": "100",
+        "step": 1,
+        "className": "",
+        "x": 100,
+        "y": 800,
+        "wires": [
+            [
+                "612853001cbb9f90"
+            ]
+        ]
+    },
+    {
+        "id": "612853001cbb9f90",
+        "type": "function",
+        "z": "13df9ad25c9618e4",
+        "g": "c59e69ccdd22540f",
+        "name": "",
+        "func": "msg.payload= \"{ \\\"level\\\":\"+msg.payload+\" }\"\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 800,
+        "wires": [
+            [
+                "02e9f915f64990b0"
+            ]
+        ]
+    },
+    {
+        "id": "bee0e551b2c2a3bf",
+        "type": "ui_text",
+        "z": "13df9ad25c9618e4",
+        "g": "31d7abf2d95de80e",
+        "group": "27e360b8dee7f0ae",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "SSId: ",
+        "format": "{{msg.payload.Wifi.SSId}}",
+        "layout": "row-left",
+        "className": "",
+        "x": 590,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "30fc991dc7523ddb",
+        "type": "ui_text",
+        "z": "13df9ad25c9618e4",
+        "g": "31d7abf2d95de80e",
+        "group": "27e360b8dee7f0ae",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "IP: ",
+        "format": "{{msg.payload.Wifi.IP}}",
+        "layout": "row-left",
+        "className": "",
+        "x": 590,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "34d884309e9afa81",
+        "type": "ui_text",
+        "z": "13df9ad25c9618e4",
+        "g": "31d7abf2d95de80e",
+        "group": "27e360b8dee7f0ae",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "RSSI: ",
+        "format": "{{msg.payload.Wifi.RSSI}}",
+        "layout": "row-left",
+        "className": "",
+        "x": 590,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "29d5550a23b4d981",
+        "type": "ui_gauge",
+        "z": "13df9ad25c9618e4",
+        "g": "5cba6c5db0d46559",
+        "name": "",
+        "group": "27e360b8dee7f0ae",
+        "order": 8,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "gauge",
+        "label": "units",
+        "format": "{{msg.payload.led}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#005680",
+            "#c0c0c0",
+            "#80ffff"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 470,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "5ae2c99e08b2c418",
+        "type": "json",
+        "z": "13df9ad25c9618e4",
+        "g": "5cba6c5db0d46559",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 290,
+        "y": 1000,
+        "wires": [
+            [
+                "29d5550a23b4d981"
+            ]
+        ]
+    }
+]
