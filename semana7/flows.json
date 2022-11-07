@@ -3291,5 +3291,15 @@
                 "29d5550a23b4d981"
             ]
         ]
+    },
+    {
+        "id": "4b7d937061a3dd89",
+        "type": "comment",
+        "z": "9a2c567d.c9bc58",
+        "name": "Dirección Gestionar Firmwares",
+        "info": "http://172.16.142.241:1880/esp8266-ota",
+        "x": 190,
+        "y": 1140,
+        "wires": []
     }
 ]
