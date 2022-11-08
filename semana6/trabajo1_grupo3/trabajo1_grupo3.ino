@@ -6,14 +6,22 @@
 #include <stdlib.h>
 #include <string.h>
 
-
-#define SSID_ "MiFibra-278E"
-#define PASSWORD_ "e7oVWkYw"
-
 #ifdef ESP32
 #pragma message(THIS EXAMPLE IS FOR ESP8266 ONLY!)
 #error Select ESP8266 board.
 #endif
+
+
+/* Function: CONECTA_WIFI */
+#define SSID_ "MiFibra-278E"
+#define PASSWORD_ "e7oVWkYw"
+
+/* Function: CONECTA_MQTT */
+#define MQTT_SERVER_ "iot.ac.uma.es"
+#define MQTT_USER_ "infind"
+#define MQTT_PASS_ "zancudo"
+#define MQTT_PORT_ 1883
+
 
 #define TAMANHO_MENSAJE 128
 #define send_time 30000
@@ -22,13 +30,8 @@ DHTesp dht;
 WiFiClient wClient;
 PubSubClient mqtt_client(wClient);
 
-//const char* ssid = "infind"; 
-//const char* password = "1518wifi"; 
 
 
-const char* mqtt_server = "iot.ac.uma.es";
-const char* mqtt_user = "infind";
-const char* mqtt_pass = "zancudo";
 
 StaticJsonDocument<300> doc;
 StaticJsonDocument<300> doc2;
@@ -87,9 +90,9 @@ void conecta_mqtt() {
     Serial.print("Attempting MQTT connection...");
 
     // Attempt to connect
-    if (mqtt_client.connect(ID_PLACA, mqtt_user, mqtt_pass,"infind/GRUPO3/conexion",1,true,"{\"online\":false}")) {
+    if (mqtt_client.connect(ID_PLACA, MQTT_USER_, MQTT_PASS_,"infind/GRUPO3/conexion",1,true,"{\"online\":false}")) {
 
-      Serial.printf(" conectado a broker: %s\n",mqtt_server);
+      Serial.printf(" conectado a broker: %s\n",MQTT_SERVER_);
       for(i = 0; i < totalTopicSubs; ++i){
         mqtt_client.subscribe(topicSubs[i]);
 
@@ -169,7 +172,7 @@ void setup() {
   sprintf(ID_PLACA, "ESP_%d", ESP.getChipId());
 
   conecta_wifi();
-  mqtt_client.setServer(mqtt_server, 1883);
+  mqtt_client.setServer(MQTT_SERVER_, MQTT_PORT_);
 
   /* para poder enviar mensajes de hasta X bytes */
   mqtt_client.setBufferSize(512);
