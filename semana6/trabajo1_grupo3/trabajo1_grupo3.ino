@@ -29,15 +29,20 @@
 /* TOPICS SUB */
 #define TOPIC_CMD_ "infind/GRUPO3/led/cmd"
 
-/* Last Will and Testament */
+/* LAST WILL AND TESTAMENT */
 #define LWT_MESSAGE_ "{\"online\":false}"
 
-
-/* MQTT CONFIGURATION */
+/* SETUP */
 #define MQTT_BUFFER_SIZE_ 512
+#define INIT_MESSAGE_CONNECTION_ "{\"online\":true}"
+
+/* HARDWARE PIN NAME */
+#define LED1_ 2
+#define LED2_ 16
+
+
 #define TAMANHO_MENSAJE 128
 #define send_time 30000
-
 StaticJsonDocument<300> doc;
 StaticJsonDocument<300> doc2;
 
@@ -48,9 +53,6 @@ unsigned int level_externo = 0;
 unsigned int level_interno = 255;
 char ID_PLACA[16];
 char topic_PUB[256];
-
-int LED1 = 2;
-int LED2 = 16;
 
 #define totalTopicSubs 1
 const char *topicSubs[totalTopicSubs] = { TOPIC_CMD_};
@@ -146,7 +148,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
         level_interno = 255 - level_externo * 255/100;
 
         /* Turn the LED on (Note that LOW is the voltage level */
-        analogWrite(LED2, level_interno);
+        analogWrite(LED2_, level_interno);
 
         doc2.clear();
         doc2["led"] = level_externo;
@@ -165,13 +167,12 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
 /* SETUP                                                                  */
 /**************************************************************************/
 void setup() {
-  int i;
   Serial.begin(115200);
-  pinMode(LED1, OUTPUT);    // inicializa GPIO como salida
-  pinMode(LED2, OUTPUT);
+  pinMode(LED1_, OUTPUT);    // inicializa GPIO como salida
+  pinMode(LED2_, OUTPUT);
 
-  analogWrite(LED1, level_interno);
-  analogWrite(LED2, level_interno);
+  analogWrite(LED1_, level_interno);
+  analogWrite(LED2_, level_interno);
 
   /* crea topics usando id de la placa */
   sprintf(ID_PLACA, "ESP_%d", ESP.getChipId());
@@ -188,7 +189,7 @@ void setup() {
   Serial.printf("Topic publicacion  : %s, %s, %s \n", TOPIC_CONEXION_,TOPIC_DATOS_,TOPIC_STATUS_);
 
   Serial.printf("Topic subscripcion : ");
-  for(i=0;i<totalTopicSubs;i++){
+  for(int i=0;i<totalTopicSubs;i++){
     Serial.printf("%s ",topicSubs[i]);
   }
 
@@ -196,7 +197,7 @@ void setup() {
 
   /* Conectamos el sensor al GPIO2 */
   dht.setup(2, DHTesp::DHT11);
-  mqtt_client.publish(TOPIC_CONEXION_,"{\"online\":true}",true);
+  mqtt_client.publish(TOPIC_CONEXION_,INIT_MESSAGE_CONNECTION_,true);
 }
 
 
@@ -214,29 +215,25 @@ void loop() {
 
   if (ahora - ultimo_mensaje >= send_time) {
 
-    // Sensor de temperatura
-    float temperature = dht.getTemperature();
-
-    // Sensor de humedad
-    float humidity = dht.getHumidity();
-
-    // bateria/alimentacion
-    int bateria = ESP.getVcc();
-
-    // SSID
-    String name_SSID = WiFi.SSID();
-
     doc["Uptime"]= ahora;
-    doc["Vcc"] = bateria/1000;
+
+    /* bateria/alimentacion */
+    doc["Vcc"] = ESP.getVcc()/1000;
 
     JsonObject DHT11_sensor = doc.createNestedObject("DHT11");
-    DHT11_sensor["temp"] = temperature;
-    DHT11_sensor["hum"] = humidity;
+    /* Sensor de temperatura */
+    DHT11_sensor["temp"] = dht.getTemperature();
+    /* Sensor de humedad */
+    DHT11_sensor["hum"] = dht.getHumidity();
+
     doc["LED"] = level_externo;
 
     JsonObject Wifi = doc.createNestedObject("Wifi");
-    Wifi["SSId"] = "infind";
+    /* SSID */
+    Wifi["SSId"] = WiFi.SSID();
+    /* IP */
     Wifi["IP"] = WiFi.localIP().toString();
+    /* RSSI */
     Wifi["RSSI"] = WiFi.RSSI();
 
     serializeJson(doc,output);
