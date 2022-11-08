@@ -2,24 +2,18 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#ifdef ESP32
-#pragma message(THIS EXAMPLE IS FOR ESP8266 ONLY!)
-#error Select ESP8266 board.
-#endif
 
 /* Function: CONECTA_WIFI */
 #define SSID_ "MiFibra-278E"
 #define PASSWORD_ "e7oVWkYw"
+#define WIFI_RETRY_DELAY_ 200
 
 /* Function: CONECTA_MQTT */
 #define MQTT_SERVER_ "iot.ac.uma.es"
 #define MQTT_USER_ "infind"
 #define MQTT_PASS_ "zancudo"
 #define MQTT_PORT_ 1883
+#define MQTT_RETRY_DELAY_ 5000
 
 /* TOPICS PUB */
 #define TOPIC_DATOS_ "infind/GRUPO3/datos"
@@ -28,35 +22,35 @@
 
 /* TOPICS SUB */
 #define TOPIC_CMD_ "infind/GRUPO3/led/cmd"
+#define TOTAL_TOPICS_SUBS_ 1
+
 
 /* LAST WILL AND TESTAMENT */
 #define LWT_MESSAGE_ "{\"online\":false}"
-
-/* SETUP */
-#define MQTT_BUFFER_SIZE_ 512
-#define INIT_MESSAGE_CONNECTION_ "{\"online\":true}"
 
 /* HARDWARE PIN NAME */
 #define LED1_ 2
 #define LED2_ 16
 
-StaticJsonDocument<300> json_enviado;
-StaticJsonDocument<300> json_recibido;
+/* SETUP */
+#define MQTT_BUFFER_SIZE_ 512
+#define INIT_MESSAGE_CONNECTION_ "{\"online\":true}"
+#define DHT_GPIO_ 2
 
-#define TAMANHO_MENSAJE 128
-#define send_time 30000
+/* LOOP */
+#define SEND_TIME_ 30000
 
+/* GLOBAL */
+#define MESSAGE_SIZE_ 300
 
-char mensaje[TAMANHO_MENSAJE];
-unsigned long ultimo_mensaje=0;
+char ID_PLACA[16];
+
+StaticJsonDocument<MESSAGE_SIZE_> json_enviado;
+StaticJsonDocument<MESSAGE_SIZE_> json_recibido;
+
 unsigned int level_externo = 0;
 unsigned int level_interno = 255;
-char ID_PLACA[16];
-char topic_PUB[256];
-
-#define totalTopicSubs 1
-const char *topicSubs[totalTopicSubs] = { TOPIC_CMD_};
-
+const char *topicSubs[TOTAL_TOPICS_SUBS_] = { TOPIC_CMD_};
 
 DHTesp dht;
 WiFiClient wClient;
@@ -64,12 +58,11 @@ PubSubClient mqtt_client(wClient);
 
 /**************************************************************************/
 /* El ESP8266 solo cuenta con un ADC (Analogic Digital Converter),        */
-/* tenemos que seleccionar el modo de operación en este caso se pedía     */
+/* tenemos que seleccionar el modo de operación, en este caso se pedía    */
 /* el voltaje de alimentación.                                            */
 /**************************************************************************/
 /* https://esp8266-arduino-spanish.readthejson_enviados.io/es/latest/reference.html#entrada-analogica */
 ADC_MODE(ADC_VCC);
-
 
 /**************************************************************************/
 /* conecta_wifi()                                                         */
@@ -82,13 +75,12 @@ void conecta_wifi() {
   WiFi.begin(SSID_, PASSWORD_);
 
   while (WiFi.status() != WL_CONNECTED) {
-    delay(200);
+    delay(WIFI_RETRY_DELAY_);
     Serial.print(".");
   }
 
   Serial.printf("\nWiFi connected, IP address: %s\n", WiFi.localIP().toString().c_str());
 }
-
 
 /**************************************************************************/
 /* conecta_mqtt()                                                         */
@@ -107,7 +99,7 @@ void conecta_mqtt() {
     if (mqtt_client.connect(ID_PLACA, MQTT_USER_, MQTT_PASS_,TOPIC_CONEXION_,1,true,LWT_MESSAGE_)) {
 
       Serial.printf("Conectado a broker: %s\n",MQTT_SERVER_);
-      for(i = 0; i < totalTopicSubs; ++i){
+      for(i = 0; i < TOTAL_TOPICS_SUBS_; ++i){
         mqtt_client.subscribe(topicSubs[i]);
       }
     } else {
@@ -115,7 +107,7 @@ void conecta_mqtt() {
       Serial.printf("failed, rc=%d  try again in 5s\n", mqtt_client.state());
 
       // Wait 5 seconds before retrying
-      delay(5000);
+      delay(MQTT_RETRY_DELAY_);
     }
   }
 }
@@ -127,7 +119,7 @@ void conecta_mqtt() {
 /**************************************************************************/
 void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
 
-  static char message_send[300];
+  static char message_send[MESSAGE_SIZE_];
   /* reservo memoria para copiar del mensjae */
   char *mensaje_recibido = (char *)malloc(length+1);
   /* copio el mensaje_recibido en cadena de caracteres */
@@ -139,16 +131,14 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
 
       deserializeJson(json_recibido,mensaje_recibido);
 
-      /* Serial.println(json_recibido[0]); */
       level_externo = json_recibido["level"];
 
-      /* Serial.printf("Level %d \n", level_externo); */
       if (level_externo >= 0 && level_externo <= 100) {
         level_interno = 255 - level_externo * 255/100;
 
-        /* Turn the LED on (Note that LOW is the voltage level */
         analogWrite(LED2_, level_interno);
 
+        /* HAY QUE LIBERAR/LIMPIAR EL BUFFER */
         json_recibido.clear();
         json_recibido["led"] = level_externo;
 
@@ -157,17 +147,18 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
         mqtt_client.publish(TOPIC_STATUS_, message_send);
       }
     }
+  /* HAY QUE LIBERAR/LIMPIAR EL BUFFER */
   json_recibido.clear();
   free(mensaje_recibido);
 }
-
 
 /**************************************************************************/
 /* SETUP                                                                  */
 /**************************************************************************/
 void setup() {
   Serial.begin(115200);
-  pinMode(LED1_, OUTPUT);    // inicializa GPIO como salida
+  /* inicializa GPIO como salida */
+  pinMode(LED1_, OUTPUT);
   pinMode(LED2_, OUTPUT);
 
   analogWrite(LED1_, level_interno);
@@ -187,24 +178,23 @@ void setup() {
   Serial.printf("Topic publicacion  : %s, %s, %s \n", TOPIC_CONEXION_,TOPIC_DATOS_,TOPIC_STATUS_);
 
   Serial.printf("Topic subscripcion : ");
-  for(int i=0;i<totalTopicSubs;i++){
+  for(int i=0;i<TOTAL_TOPICS_SUBS_;i++){
     Serial.printf("%s ",topicSubs[i]);
   }
 
   Serial.printf("\nTermina setup en %lu ms\n\n",millis());
 
   /* Conectamos el sensor al GPIO2 */
-  dht.setup(2, DHTesp::DHT11);
+  dht.setup(DHT_GPIO_, DHTesp::DHT11);
   mqtt_client.publish(TOPIC_CONEXION_,INIT_MESSAGE_CONNECTION_,true);
 }
-
 
 /**************************************************************************/
 /* LOOP                                                                   */
 /**************************************************************************/
 void loop() {
-
-  static char message_send[300];
+  static unsigned long ultimo_mensaje = 0;
+  static char message_send[MESSAGE_SIZE_];
 
   if (!mqtt_client.connected()) conecta_mqtt();
 
@@ -213,11 +203,11 @@ void loop() {
 
   unsigned long ahora = millis();
 
-  if (ahora - ultimo_mensaje >= send_time) {
+  if (ahora - ultimo_mensaje >= SEND_TIME_) {
 
     json_enviado["Uptime"]= ahora;
 
-    /* bateria/alimentacion */
+    /* bateria/alimentacion en voltios*/
     json_enviado["Vcc"] = ESP.getVcc()/1000;
 
     JsonObject DHT11_sensor = json_enviado.createNestedObject("DHT11");
@@ -241,7 +231,7 @@ void loop() {
 
     mqtt_client.publish(TOPIC_DATOS_, message_send);
 
-    //ES NECESARIO Y PRIORITARIO LIMPIAR EL BUFFER
+    /* HAY QUE LIBERAR/LIMPIAR EL BUFFER */
     json_enviado.clear();
   }
 }
