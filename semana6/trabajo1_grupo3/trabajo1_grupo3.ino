@@ -40,15 +40,15 @@
 #define LED1_ 2
 #define LED2_ 16
 
+StaticJsonDocument<300> json_enviado;
+StaticJsonDocument<300> json_recibido;
 
 #define TAMANHO_MENSAJE 128
 #define send_time 30000
-StaticJsonDocument<300> doc;
-StaticJsonDocument<300> doc2;
 
-unsigned long ultimo_mensaje=0;
+
 char mensaje[TAMANHO_MENSAJE];
-char output[300];
+unsigned long ultimo_mensaje=0;
 unsigned int level_externo = 0;
 unsigned int level_interno = 255;
 char ID_PLACA[16];
@@ -67,7 +67,7 @@ PubSubClient mqtt_client(wClient);
 /* tenemos que seleccionar el modo de operación en este caso se pedía     */
 /* el voltaje de alimentación.                                            */
 /**************************************************************************/
-/* https://esp8266-arduino-spanish.readthedocs.io/es/latest/reference.html#entrada-analogica */
+/* https://esp8266-arduino-spanish.readthejson_enviados.io/es/latest/reference.html#entrada-analogica */
 ADC_MODE(ADC_VCC);
 
 
@@ -127,21 +127,20 @@ void conecta_mqtt() {
 /**************************************************************************/
 void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
 
+  static char message_send[300];
   /* reservo memoria para copiar del mensjae */
-  char *mensaje = (char *)malloc(length+1);
+  char *mensaje_recibido = (char *)malloc(length+1);
+  /* copio el mensaje_recibido en cadena de caracteres */
+  strncpy(mensaje_recibido, (char*)payload, length);
 
-  /* copio el mensaje en cadena de caracteres */
-  strncpy(mensaje, (char*)payload, length);
-
-  mensaje[length]='\0'; // caracter cero marca el final de la cadena
-  //  Serial.printf("Mensaje recibido [%s] %s\n", topic, mensaje);
+  mensaje_recibido[length]='\0'; // caracter cero marca el final de la cadena
 
   if(strcmp(topic, TOPIC_CMD_)==0){
 
-      deserializeJson(doc2,mensaje);
+      deserializeJson(json_recibido,mensaje_recibido);
 
-      /* Serial.println(doc2[0]); */
-      level_externo = doc2["level"];
+      /* Serial.println(json_recibido[0]); */
+      level_externo = json_recibido["level"];
 
       /* Serial.printf("Level %d \n", level_externo); */
       if (level_externo >= 0 && level_externo <= 100) {
@@ -150,16 +149,16 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
         /* Turn the LED on (Note that LOW is the voltage level */
         analogWrite(LED2_, level_interno);
 
-        doc2.clear();
-        doc2["led"] = level_externo;
-        serializeJson(doc2,output);
-        snprintf(mensaje, 300, output);
-        sprintf(topic_PUB, TOPIC_STATUS_);
-        mqtt_client.publish(topic_PUB, mensaje);
+        json_recibido.clear();
+        json_recibido["led"] = level_externo;
+
+        serializeJson(json_recibido,message_send);
+
+        mqtt_client.publish(TOPIC_STATUS_, message_send);
       }
     }
-  doc2.clear();
-  free(mensaje);
+  json_recibido.clear();
+  free(mensaje_recibido);
 }
 
 
@@ -174,14 +173,13 @@ void setup() {
   analogWrite(LED1_, level_interno);
   analogWrite(LED2_, level_interno);
 
-  /* crea topics usando id de la placa */
   sprintf(ID_PLACA, "ESP_%d", ESP.getChipId());
 
   conecta_wifi();
   mqtt_client.setServer(MQTT_SERVER_, MQTT_PORT_);
-
   /* para poder enviar mensajes de hasta X bytes */
   mqtt_client.setBufferSize(MQTT_BUFFER_SIZE_);
+  /* Selecciona la función que procesa una llamada del broker */
   mqtt_client.setCallback(procesa_mensaje);
   conecta_mqtt();
 
@@ -206,6 +204,8 @@ void setup() {
 /**************************************************************************/
 void loop() {
 
+  static char message_send[300];
+
   if (!mqtt_client.connected()) conecta_mqtt();
 
   /* LLamada para que la libreria MQTT recupere el control */
@@ -215,20 +215,20 @@ void loop() {
 
   if (ahora - ultimo_mensaje >= send_time) {
 
-    doc["Uptime"]= ahora;
+    json_enviado["Uptime"]= ahora;
 
     /* bateria/alimentacion */
-    doc["Vcc"] = ESP.getVcc()/1000;
+    json_enviado["Vcc"] = ESP.getVcc()/1000;
 
-    JsonObject DHT11_sensor = doc.createNestedObject("DHT11");
+    JsonObject DHT11_sensor = json_enviado.createNestedObject("DHT11");
     /* Sensor de temperatura */
     DHT11_sensor["temp"] = dht.getTemperature();
     /* Sensor de humedad */
     DHT11_sensor["hum"] = dht.getHumidity();
 
-    doc["LED"] = level_externo;
+    json_enviado["LED"] = level_externo;
 
-    JsonObject Wifi = doc.createNestedObject("Wifi");
+    JsonObject Wifi = json_enviado.createNestedObject("Wifi");
     /* SSID */
     Wifi["SSId"] = WiFi.SSID();
     /* IP */
@@ -236,12 +236,12 @@ void loop() {
     /* RSSI */
     Wifi["RSSI"] = WiFi.RSSI();
 
-    serializeJson(doc,output);
+    serializeJson(json_enviado,message_send);
     ultimo_mensaje = ahora;
 
-    mqtt_client.publish(TOPIC_DATOS_, output);
+    mqtt_client.publish(TOPIC_DATOS_, message_send);
 
     //ES NECESARIO Y PRIORITARIO LIMPIAR EL BUFFER
-    doc.clear();
+    json_enviado.clear();
   }
 }
