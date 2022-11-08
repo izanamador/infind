@@ -157,7 +157,6 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
 void setup() {
   int i;
 
-  //strcpy(ID_PLACA,"ESP_00000001");
   Serial.begin(115200);
   pinMode(LED1, OUTPUT);    // inicializa GPIO como salida
   pinMode(LED2, OUTPUT);
@@ -190,6 +189,7 @@ void setup() {
 
   /* Conectamos el sensor al GPIO2 */
   dht.setup(2, DHTesp::DHT11);
+  mqtt_client.publish("infind/GRUPO3/conexion", "{\"online\":true}", true);
 }
 
 
@@ -204,7 +204,6 @@ void loop() {
   mqtt_client.loop();
 
   unsigned long ahora = millis();
-
 
   if (ahora - ultimo_mensaje >= send_time) {
 
@@ -236,10 +235,7 @@ void loop() {
     serializeJson(doc,output);
     ultimo_mensaje = ahora;
 
-    snprintf(mensaje, 300, output);
-
-    sprintf(topic_PUB, "infind/GRUPO3/datos");
-    mqtt_client.publish(topic_PUB, mensaje);
+    mqtt_client.publish("infind/GRUPO3/datos", output);
 
     //ES NECESARIO Y PRIORITARIO LIMPIAR EL BUFFER
     doc.clear();
