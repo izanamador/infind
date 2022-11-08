@@ -7,6 +7,9 @@
 #include <string.h>
 
 
+#define SSID_ "MiFibra-278E"
+#define PASSWORD_ "e7oVWkYw"
+
 #ifdef ESP32
 #pragma message(THIS EXAMPLE IS FOR ESP8266 ONLY!)
 #error Select ESP8266 board.
@@ -14,15 +17,14 @@
 
 #define TAMANHO_MENSAJE 128
 #define send_time 30000
-#define LSIZ 128
-#define RSIZ 10
 
 DHTesp dht;
 WiFiClient wClient;
 PubSubClient mqtt_client(wClient);
 
- const char* ssid = "infind"; 
- const char* password = "1518wifi"; 
+//const char* ssid = "infind"; 
+//const char* password = "1518wifi"; 
+
 
 const char* mqtt_server = "iot.ac.uma.es";
 const char* mqtt_user = "infind";
@@ -57,10 +59,10 @@ const char *topicSubs[totalTopicSubs] = { "infind/GRUPO3/led/cmd"};
 /* ----------------------------------------------------- */
 void conecta_wifi() {
 
-  Serial.printf("\nConnecting to %s:\n", ssid);
+  Serial.printf("\nConnecting to %s:\n", SSID_);
 
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
+  WiFi.begin(SSID_, PASSWORD_);
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(200);
@@ -188,12 +190,7 @@ void setup() {
 
   /* Conectamos el sensor al GPIO2 */
   dht.setup(2, DHTesp::DHT11);
-<<<<<<< ours
-  mqtt_client.publish("infind/GRUPO3/conexion", "{\"online\":true}", true);
-=======
   mqtt_client.publish("infind/GRUPO3/conexion","{\"online\":true}",true);
-
->>>>>>> theirs
 }
 
 
