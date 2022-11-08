@@ -22,6 +22,14 @@
 #define MQTT_PASS_ "zancudo"
 #define MQTT_PORT_ 1883
 
+/* TOPICS PUB */
+#define TOPIC_DATOS_ "infind/GRUPO3/datos"
+#define TOPIC_STATUS_ "infind/GRUPO3/led/status"
+#define TOPIC_CONEXION_ "infind/GRUPO3/conexion"
+
+/* TOPICS SUB */
+#define TOPIC_CMD_ "infind/GRUPO3/led/cmd"
+
 
 #define TAMANHO_MENSAJE 128
 #define send_time 30000
@@ -29,9 +37,6 @@
 DHTesp dht;
 WiFiClient wClient;
 PubSubClient mqtt_client(wClient);
-
-
-
 
 StaticJsonDocument<300> doc;
 StaticJsonDocument<300> doc2;
@@ -57,7 +62,7 @@ ADC_MODE(ADC_VCC);
 
 
 #define totalTopicSubs 1
-const char *topicSubs[totalTopicSubs] = { "infind/GRUPO3/led/cmd"};
+const char *topicSubs[totalTopicSubs] = { TOPIC_CMD_};
 
 /* ----------------------------------------------------- */
 void conecta_wifi() {
@@ -90,12 +95,11 @@ void conecta_mqtt() {
     Serial.print("Attempting MQTT connection...");
 
     // Attempt to connect
-    if (mqtt_client.connect(ID_PLACA, MQTT_USER_, MQTT_PASS_,"infind/GRUPO3/conexion",1,true,"{\"online\":false}")) {
+    if (mqtt_client.connect(ID_PLACA, MQTT_USER_, MQTT_PASS_,TOPIC_CONEXION_,1,true,"{\"online\":false}")) {
 
       Serial.printf(" conectado a broker: %s\n",MQTT_SERVER_);
       for(i = 0; i < totalTopicSubs; ++i){
         mqtt_client.subscribe(topicSubs[i]);
-
       }
     } else {
 
@@ -128,7 +132,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   mensaje[length]='\0'; // caracter cero marca el final de la cadena
   //  Serial.printf("Mensaje recibido [%s] %s\n", topic, mensaje);
 
-  if(strcmp(topic, "infind/GRUPO3/led/cmd")==0){
+  if(strcmp(topic, TOPIC_CMD_)==0){
 
       deserializeJson(doc2,mensaje);
 
@@ -146,7 +150,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
 
         snprintf(mensaje, 300, output);
 
-        sprintf(topic_PUB, "infind/GRUPO3/led/status");
+        sprintf(topic_PUB, TOPIC_STATUS_);
         mqtt_client.publish(topic_PUB, mensaje);
       }
     }
@@ -193,7 +197,7 @@ void setup() {
 
   /* Conectamos el sensor al GPIO2 */
   dht.setup(2, DHTesp::DHT11);
-  mqtt_client.publish("infind/GRUPO3/conexion","{\"online\":true}",true);
+  mqtt_client.publish(TOPIC_CONEXION_,"{\"online\":true}",true);
 }
 
 
@@ -239,7 +243,7 @@ void loop() {
     serializeJson(doc,output);
     ultimo_mensaje = ahora;
 
-    mqtt_client.publish("infind/GRUPO3/datos", output);
+    mqtt_client.publish(TOPIC_DATOS_, output);
 
     //ES NECESARIO Y PRIORITARIO LIMPIAR EL BUFFER
     doc.clear();
