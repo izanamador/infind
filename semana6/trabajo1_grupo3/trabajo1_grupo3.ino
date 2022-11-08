@@ -11,7 +11,6 @@
 #error Select ESP8266 board.
 #endif
 
-
 /* Function: CONECTA_WIFI */
 #define SSID_ "MiFibra-278E"
 #define PASSWORD_ "e7oVWkYw"
@@ -30,13 +29,11 @@
 /* TOPICS SUB */
 #define TOPIC_CMD_ "infind/GRUPO3/led/cmd"
 
+/* Last Will and Testament */
+#define LWT_MESSAGE_ "{\"online\":false}"
 
 #define TAMANHO_MENSAJE 128
 #define send_time 30000
-
-DHTesp dht;
-WiFiClient wClient;
-PubSubClient mqtt_client(wClient);
 
 StaticJsonDocument<300> doc;
 StaticJsonDocument<300> doc2;
@@ -44,13 +41,21 @@ StaticJsonDocument<300> doc2;
 unsigned long ultimo_mensaje=0;
 char mensaje[TAMANHO_MENSAJE];
 char output[300];
-
+unsigned int level_externo = 0;
+unsigned int level_interno = 255;
 char ID_PLACA[16];
 char topic_PUB[256];
-// char topic_SUB[256];
 
 int LED1 = 2;
 int LED2 = 16;
+
+#define totalTopicSubs 1
+const char *topicSubs[totalTopicSubs] = { TOPIC_CMD_};
+
+
+DHTesp dht;
+WiFiClient wClient;
+PubSubClient mqtt_client(wClient);
 
 /**************************************************************************/
 /* El ESP8266 solo cuenta con un ADC (Analogic Digital Converter),        */
@@ -61,12 +66,11 @@ int LED2 = 16;
 ADC_MODE(ADC_VCC);
 
 
-#define totalTopicSubs 1
-const char *topicSubs[totalTopicSubs] = { TOPIC_CMD_};
-
-/* ----------------------------------------------------- */
+/**************************************************************************/
+/* conecta_wifi()                                                         */
+/*    Realiza la conexión del módulo a la WIFI definida en las macros     */
+/**************************************************************************/
 void conecta_wifi() {
-
   Serial.printf("\nConnecting to %s:\n", SSID_);
 
   WiFi.mode(WIFI_STA);
@@ -78,15 +82,15 @@ void conecta_wifi() {
   }
 
   Serial.printf("\nWiFi connected, IP address: %s\n", WiFi.localIP().toString().c_str());
-
 }
 
-/* ----------------------------------------------------- */
-/* conecta_mqtt()
-   Realiza la conexión con el broker MQTT y se suscribe a los topics
-   especificados en la variable topicssubs */
-void conecta_mqtt() {
 
+/**************************************************************************/
+/* conecta_mqtt()                                                         */
+/*    Realiza la conexión con el broker MQTT y se suscribe a los topics   */
+/*    especificados en la variable topicssubs                             */
+/**************************************************************************/
+void conecta_mqtt() {
   int i;
 
   // Loop until we're reconnected
@@ -95,9 +99,9 @@ void conecta_mqtt() {
     Serial.print("Attempting MQTT connection...");
 
     // Attempt to connect
-    if (mqtt_client.connect(ID_PLACA, MQTT_USER_, MQTT_PASS_,TOPIC_CONEXION_,1,true,"{\"online\":false}")) {
+    if (mqtt_client.connect(ID_PLACA, MQTT_USER_, MQTT_PASS_,TOPIC_CONEXION_,1,true,LWT_MESSAGE_)) {
 
-      Serial.printf(" conectado a broker: %s\n",MQTT_SERVER_);
+      Serial.printf("Conectado a broker: %s\n",MQTT_SERVER_);
       for(i = 0; i < totalTopicSubs; ++i){
         mqtt_client.subscribe(topicSubs[i]);
       }
@@ -107,14 +111,9 @@ void conecta_mqtt() {
 
       // Wait 5 seconds before retrying
       delay(5000);
-
     }
   }
-
 }
-
-unsigned int level_externo = 0;
-unsigned int level_interno = 255;
 
 /**************************************************************************/
 /* procesa_mensaje()                                                      */
@@ -142,14 +141,14 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
       /* Serial.printf("Level %d \n", level_externo); */
       if (level_externo >= 0 && level_externo <= 100) {
         level_interno = 255 - level_externo * 255/100;
+
         /* Turn the LED on (Note that LOW is the voltage level */
         analogWrite(LED2, level_interno);
+
         doc2.clear();
         doc2["led"] = level_externo;
         serializeJson(doc2,output);
-
         snprintf(mensaje, 300, output);
-
         sprintf(topic_PUB, TOPIC_STATUS_);
         mqtt_client.publish(topic_PUB, mensaje);
       }
