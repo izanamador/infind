@@ -32,6 +32,9 @@
 /* Last Will and Testament */
 #define LWT_MESSAGE_ "{\"online\":false}"
 
+
+/* MQTT CONFIGURATION */
+#define MQTT_BUFFER_SIZE_ 512
 #define TAMANHO_MENSAJE 128
 #define send_time 30000
 
@@ -163,7 +166,6 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
 /**************************************************************************/
 void setup() {
   int i;
-
   Serial.begin(115200);
   pinMode(LED1, OUTPUT);    // inicializa GPIO como salida
   pinMode(LED2, OUTPUT);
@@ -178,21 +180,19 @@ void setup() {
   mqtt_client.setServer(MQTT_SERVER_, MQTT_PORT_);
 
   /* para poder enviar mensajes de hasta X bytes */
-  mqtt_client.setBufferSize(512);
+  mqtt_client.setBufferSize(MQTT_BUFFER_SIZE_);
   mqtt_client.setCallback(procesa_mensaje);
   conecta_mqtt();
 
   Serial.printf("Identificador placa: %s\n", ID_PLACA );
-  Serial.printf("Topic publicacion  : %s\n", topic_PUB);
+  Serial.printf("Topic publicacion  : %s, %s, %s \n", TOPIC_CONEXION_,TOPIC_DATOS_,TOPIC_STATUS_);
 
-  /* Meter en una funcion void este trozo del código */
   Serial.printf("Topic subscripcion : ");
   for(i=0;i<totalTopicSubs;i++){
     Serial.printf("%s ",topicSubs[i]);
   }
-  Serial.printf("\n");
 
-  Serial.printf("Termina setup en %lu ms\n\n",millis());
+  Serial.printf("\nTermina setup en %lu ms\n\n",millis());
 
   /* Conectamos el sensor al GPIO2 */
   dht.setup(2, DHTesp::DHT11);
