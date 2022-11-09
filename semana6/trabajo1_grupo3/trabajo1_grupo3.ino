@@ -15,6 +15,11 @@
 #define MQTT_PORT_ 1883
 #define MQTT_RETRY_DELAY_ 5000
 
+/* Function: PROCESA_MENSAJE */
+#define MAX_LED_VALUE_ 100
+#define MIN_LED_VALUE_ 0
+#define MAX_SAMPLE_VALUE_ 255 //2^(8)-1
+
 /* TOPICS PUB */
 #define TOPIC_DATOS_ "infind/GRUPO3/datos"
 #define TOPIC_STATUS_ "infind/GRUPO3/led/status"
@@ -23,7 +28,6 @@
 /* TOPICS SUB */
 #define TOPIC_CMD_ "infind/GRUPO3/led/cmd"
 #define TOTAL_TOPICS_SUBS_ 1
-
 
 /* LAST WILL AND TESTAMENT */
 #define LWT_MESSAGE_ "{\"online\":false}"
@@ -48,8 +52,8 @@ char ID_PLACA[16];
 StaticJsonDocument<MESSAGE_SIZE_> json_enviado;
 StaticJsonDocument<MESSAGE_SIZE_> json_recibido;
 
-unsigned int level_externo = 0;
-unsigned int level_interno = 255;
+unsigned int level_externo = MIN_LED_VALUE_;
+unsigned int level_interno = MAX_SAMPLE_VALUE_;
 const char *topicSubs[TOTAL_TOPICS_SUBS_] = { TOPIC_CMD_};
 
 DHTesp dht;
@@ -88,7 +92,6 @@ void conecta_wifi() {
 /*    especificados en la variable topicssubs                             */
 /**************************************************************************/
 void conecta_mqtt() {
-  int i;
 
   // Loop until we're reconnected
   while (!mqtt_client.connected()) {
@@ -99,7 +102,7 @@ void conecta_mqtt() {
     if (mqtt_client.connect(ID_PLACA, MQTT_USER_, MQTT_PASS_,TOPIC_CONEXION_,1,true,LWT_MESSAGE_)) {
 
       Serial.printf("Conectado a broker: %s\n",MQTT_SERVER_);
-      for(i = 0; i < TOTAL_TOPICS_SUBS_; ++i){
+      for(int i = 0; i < TOTAL_TOPICS_SUBS_; ++i){
         mqtt_client.subscribe(topicSubs[i]);
       }
     } else {
@@ -133,8 +136,8 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
 
       level_externo = json_recibido["level"];
 
-      if (level_externo >= 0 && level_externo <= 100) {
-        level_interno = 255 - level_externo * 255/100;
+      if (level_externo >= MIN_LED_VALUE_ && level_externo <= MAX_LED_VALUE_) {
+        level_interno = MAX_SAMPLE_VALUE_ - level_externo * MAX_SAMPLE_VALUE_/MAX_LED_VALUE_;
 
         analogWrite(LED2_, level_interno);
 
