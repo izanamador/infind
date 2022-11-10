@@ -75,7 +75,8 @@
             "9beb600c63b60280",
             "93107118806b4b86",
             "29d5550a23b4d981",
-            "5ae2c99e08b2c418"
+            "5ae2c99e08b2c418",
+            "6f2c3dd3b98b38db"
         ],
         "x": 14,
         "y": 859,
@@ -118,6 +119,7 @@
         "nl": false,
         "rap": true,
         "rh": 0,
+        "inputs": 0,
         "x": 110,
         "y": 180,
         "wires": [
@@ -132,7 +134,7 @@
         "z": "13df9ad25c9618e4",
         "g": "2f2d6fcd70cbfe4a",
         "name": "",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -217,6 +219,7 @@
         "nl": false,
         "rap": true,
         "rh": 0,
+        "inputs": 0,
         "x": 100,
         "y": 400,
         "wires": [
@@ -287,11 +290,13 @@
         "nl": false,
         "rap": true,
         "rh": 0,
+        "inputs": 0,
         "x": 100,
         "y": 1020,
         "wires": [
             [
-                "5ae2c99e08b2c418"
+                "5ae2c99e08b2c418",
+                "6f2c3dd3b98b38db"
             ]
         ]
     },
@@ -537,7 +542,7 @@
         "gtype": "gage",
         "title": "Temperatura",
         "label": "ºC",
-        "format": "{{msg.payload.DHT11.temp}}",
+        "format": "{{msg.payload.DHT11.temp | number:1}}",
         "min": "-5",
         "max": "50",
         "colors": [
@@ -569,7 +574,7 @@
         ],
         "repeat": "",
         "crontab": "",
-        "once": true,
+        "once": false,
         "onceDelay": "5",
         "topic": "",
         "payload": "{ \"level\":75 }",
@@ -606,7 +611,7 @@
         "type": "inject",
         "z": "13df9ad25c9618e4",
         "g": "c59e69ccdd22540f",
-        "name": "Nivel:25",
+        "name": "Nivel:0",
         "props": [
             {
                 "p": "payload"
@@ -618,12 +623,12 @@
         ],
         "repeat": "",
         "crontab": "",
-        "once": true,
+        "once": false,
         "onceDelay": "7.5",
         "topic": "",
-        "payload": "{ \"level\":25 }",
+        "payload": "{ \"level\":0}",
         "payloadType": "str",
-        "x": 120,
+        "x": 110,
         "y": 700,
         "wires": [
             [
@@ -665,7 +670,7 @@
         "z": "13df9ad25c9618e4",
         "g": "31d7abf2d95de80e",
         "name": "",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -824,12 +829,30 @@
         ]
     },
     {
+        "id": "6f2c3dd3b98b38db",
+        "type": "debug",
+        "z": "13df9ad25c9618e4",
+        "g": "5cba6c5db0d46559",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 440,
+        "y": 900,
+        "wires": []
+    },
+    {
         "id": "8b67b1bd51c43347",
         "type": "mqtt-broker",
         "name": "",
         "broker": "iot.ac.uma.es",
         "port": "1883",
         "clientid": "",
+        "autoConnect": true,
         "usetls": false,
         "protocolVersion": "4",
         "keepalive": "60",
@@ -846,6 +869,7 @@
         "willQos": "0",
         "willPayload": "",
         "willMsg": {},
+        "userProps": "",
         "sessionExpiry": ""
     },
     {
