@@ -223,8 +223,6 @@ void loop() {
     JsonObject DHT11_sensor = json_enviado.createNestedObject("DHT11");
     DHT11_sensor["temp"] = dht.getTemperature();
     DHT11_sensor["hum"] = dht.getHumidity();
-    Serial.printf("Temperatura %f",dht.getTemperature());
-    Serial.printf("Humedad %f",dht.getHumidity()) ;
     json_enviado["LED"] = level_externo; // de 0 oscuro a 100 iluminado
     JsonObject Wifi = json_enviado.createNestedObject("Wifi");
     Wifi["SSId"] = WiFi.SSID();
