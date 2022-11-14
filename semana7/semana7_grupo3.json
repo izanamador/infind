@@ -1,0 +1,6042 @@
+[
+    {
+        "id": "ec32f48f9404062e",
+        "type": "tab",
+        "label": "FOTA",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "6919a768eab2e12c",
+        "type": "tab",
+        "label": "Tarea ESP826",
+        "disabled": false,
+        "info": "# Tarea de grupo ESP826\n\n## Grupo 3\n- Izan Amador Bustos\n- Irene Guijarro Molina\n- Jorge Luis Benavides Macías\n- Ricardo Panero Lamothe\n\n## Descripción de la práctica\n\nHay que programar usando el IDE Arduino la placa de desarrollo ESP8266 NodeMCU Dev Kit para que realice las siguientes funciones.\n\n1. Conexión \n2. Envío periódico de datos\n3. Escritura en LED\n4. Lectura del LED\n\nHay dos opciones para usar como servidor MQTT, el de vuestra máquina virtual. Hay que usar como IP del servidor la del PC que estáis usando. También podéis usar el servidor iot.ac.uma.es usando como usuario y clave: infind / zancudo . Siempre que se use este servidor los topics tienen que empezar obligatoriamente por infind/\n\nEn los topics hay que usar el nombre del grupo, por ejemplo GRUPO5 si se trata del prototipo del grupo 5. Si dentro del mismo grupo hay varios prototipos en marcha añadir otro nivel intermedio al topic con el nombre propio del programador si se quiere evitar interferencias.\n\nImplementar flujos Node-RED para que sean funcionales con este nuevo prototipo. Se deben recibir los datos de sensores y estado para visualizarlos en el Dashboard y permitir configurar el nivel de brillo del LED.\n\nEntregar en grupo el programa Arduino y flujo NodeRED desarrollados.\nLibrerías de interés\n\nPara configurar la conexión MQTT, LWT, publicar y suscribirse a topics, ... usamos la librería PubSubClient. Consultar referencia en: https://pubsubclient.knolleary.net/ \n\nPara manejar las cadenas formateadas con JSON se recomienda utilizar la librería ArduinoJson (https://arduinojson.org/) instalable desde el gestor de librerías de la herramienta. O imprimir las cadenas con el formato adecuado usando funciones de C como sprintf().\n\n\n## 1. Conexión \n\nConectar usando el punto de acceso WiFi con SSID: infind  y password: 1518wifi si estamos en el laboratorio y vuestra WiFi si estáis en casa.\n\n\n\n## 2. Envío periódico de datos\n\nEl dispositivo debe leer un sensor de humedad y tempertaura DHT11, también la entrada analógica para controlar el nivel de la batería/alimentación (ver https://arduino-esp8266.readthedocs.io/en/latest/reference.html#analog-input) y enviar periodicamente (cada 30 segundos) los valores mediante MQTT.  \n\nEn este envío periódico se incluirá también información de la conexión WiFi (SSid), IP asignada y potencia de señal (RSSI). \n\nHabrá que realizar el conexionado del sensor DHT11 como vimos en tareas anteriores. Para la lectura del nivel de voltaje (Vcc) hay que usar las indicaciones del enlace en el párrafo anterior, la función para leer ESP.getVcc() devolverá los milivoltios observados en la entrada de alimentación (https://arduino-esp8266.readthedocs.io/en/latest/libraries.html#esp-specific-apis).\n\nPara el campo \"Uptime\", enviaremos el número de milisegundos desde que inició la placa.\n\nLa información sobre la conexión WiFi del dispositivo se podrá consultar mediante la clases disponibles en la librería WiFi (https://www.arduino.cc/en/Reference/WiFi). Algunas particularidades para ESP8266 estarán mejor descritas en la librería ESP8266WiFi (https://arduino-esp8266.readthedocs.io/en/latest/esp8266wifi/station-class.html)  y en el API de la librería  ( https://links2004.github.io/Arduino/df/d1c/class_e_s_p8266_wi_fi_scan_class.html).\n\n\n\n\n## 3. Escritura en LED\n\nTambién mediante el mismo protocolo debe recibir ordenes para actuar sobre la salida GPIO2 (conectada a un LED azul sobre la placa), informando de los cambios realizados.\n\nEl control del LED (GPIO2) esta vez lo haremos usando PWM (https://arduino-esp8266.readthedocs.io/en/latest/reference.html#analog-output) de forma que se configurará su funcionamiento con un número entero entre 0 y 100, que representará el nivel de brillo del LED en tanto por ciento. \n\nLos valores 0 y 100 deben funcionar como hasta ahora apagando y encendiendo totalmente el LED y los valores intermedios deben encenderlo con la atenuación indicada usando PWM.\n\nPosiblemente el rango de actuación de analogWrite() sea de [0-1023] o [0-255], dependerá de la versión que estemos usando del soporte para ESP8266 en Arduino.\n\n## 4. Lectura del LED\n\n\n\n## 1 Envío periódico de datos\n\nEl dispositivo debe leer un sensor de humedad y tempertaura DHT11, también la entrada analógica para controlar el nivel de la batería/alimentación ( ver https://arduino-esp8266.readthedocs.io/en/latest/reference.html#analog-input) y enviar periodicamente (cada 30 segundos) los valores mediante MQTT.  \n\nEn este envío periódico se incluirá también información de la conexión WiFi (SSid), IP asignada y potencia de señal (RSSI). También mediante el mismo protocolo debe recibir ordenes para actuar sobre la salida GPIO2 (conectada a un LED azul sobre la placa), informando de los cambios realizados."
+    },
+    {
+        "id": "d4b0b9af2d22c4c5",
+        "type": "subflow",
+        "name": "Json-Parametros",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 240,
+                "y": 180,
+                "wires": [
+                    {
+                        "id": "739acb2e5d96d6d1"
+                    },
+                    {
+                        "id": "6364518df0819b73"
+                    },
+                    {
+                        "id": "7c67230e160d5cf8"
+                    },
+                    {
+                        "id": "4a8d138b098a367d"
+                    },
+                    {
+                        "id": "ad39c85bb5dfab20"
+                    },
+                    {
+                        "id": "dfb68f38731cc66e"
+                    },
+                    {
+                        "id": "7e6790d40d8392e4"
+                    },
+                    {
+                        "id": "5fa0d539e1b0e3f1"
+                    },
+                    {
+                        "id": "6afa443428d6ade8"
+                    },
+                    {
+                        "id": "b9f9414098d2fe92"
+                    },
+                    {
+                        "id": "dc34374c0e9c2d3c"
+                    },
+                    {
+                        "id": "e6650b4005bf68d8"
+                    },
+                    {
+                        "id": "c5c2f7d0f93d7779"
+                    },
+                    {
+                        "id": "aa4bc1a699ebdf02"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 700,
+                "y": 60,
+                "wires": [
+                    {
+                        "id": "739acb2e5d96d6d1",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 100,
+                "wires": [
+                    {
+                        "id": "6364518df0819b73",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 140,
+                "wires": [
+                    {
+                        "id": "7c67230e160d5cf8",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 180,
+                "wires": [
+                    {
+                        "id": "4a8d138b098a367d",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 220,
+                "wires": [
+                    {
+                        "id": "ad39c85bb5dfab20",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 260,
+                "wires": [
+                    {
+                        "id": "dfb68f38731cc66e",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 300,
+                "wires": [
+                    {
+                        "id": "7e6790d40d8392e4",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 340,
+                "wires": [
+                    {
+                        "id": "5fa0d539e1b0e3f1",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 380,
+                "wires": [
+                    {
+                        "id": "6afa443428d6ade8",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 420,
+                "wires": [
+                    {
+                        "id": "b9f9414098d2fe92",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 460,
+                "wires": [
+                    {
+                        "id": "dc34374c0e9c2d3c",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 500,
+                "wires": [
+                    {
+                        "id": "e6650b4005bf68d8",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 540,
+                "wires": [
+                    {
+                        "id": "c5c2f7d0f93d7779",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 700,
+                "y": 580,
+                "wires": [
+                    {
+                        "id": "aa4bc1a699ebdf02",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [
+            {
+                "name": "entrada",
+                "type": "str",
+                "value": "salida"
+            }
+        ],
+        "meta": {},
+        "color": "#3FADB5",
+        "inputLabels": [
+            "json"
+        ],
+        "outputLabels": [
+            "SSID",
+            "RSSI",
+            "localIP",
+            "macAddress",
+            "uptime_ms",
+            "interval_s",
+            "ChipID",
+            "Des",
+            "Rojo",
+            "Verde",
+            "Temperatura",
+            "Humedad",
+            "Presion",
+            "Illuminacion"
+        ],
+        "icon": "node-red/parser-json.svg"
+    },
+    {
+        "id": "37ec6b68afa30644",
+        "type": "group",
+        "z": "6919a768eab2e12c",
+        "name": "Estado y LWT",
+        "style": {
+            "fill": "#e3f3d3",
+            "label": true
+        },
+        "nodes": [
+            "d2432eb670be7609",
+            "fa3145a4ee72dd9c",
+            "0e8d901ee55bd63d",
+            "9108de6cb7fefb46",
+            "10296ba37ac23290",
+            "855f7188f5809494",
+            "71abc5600192bdda",
+            "2cd5c9b802fcde99",
+            "4b843cc50ce60c55"
+        ],
+        "x": 14,
+        "y": 19,
+        "w": 692,
+        "h": 202,
+        "info": "# Estado y LWT\n\n- Topic: infind/GRUPOX/conexion\n- Acción: Publicar\n- Descripción: Estado de conexión del dispositivo (mensaje retenido). Usar últimas voluntades (LWT) para enviar la notificación desconexión\n- Ejemplos: {\"online\":true}  {\"online\":false}"
+    },
+    {
+        "id": "88b807191bcf7a6b",
+        "type": "group",
+        "z": "6919a768eab2e12c",
+        "name": "Sensores",
+        "style": {
+            "fill": "#e3f3d3",
+            "label": true
+        },
+        "nodes": [
+            "8cfbcf61b0b50f0e",
+            "307527e94677b96a",
+            "5ff8049e20ad1998",
+            "501ee66435eef6e1",
+            "0cd5e26cddc1a096",
+            "102449d7a75b8653",
+            "e5582ad98a8a5251",
+            "bad8432a6187859f",
+            "7e18852f4ec991d0",
+            "da5b18967025b6e4",
+            "9805f1a5c7bf5cfe",
+            "998937069f896d25",
+            "84d0adf38af9fb90"
+        ],
+        "x": 14,
+        "y": 239,
+        "w": 692,
+        "h": 362,
+        "info": "# Sensores\n\n- Topic: infind/GRUPOX/datos\n- Acción: Publicar\n- Descripción: Actualización periódica (30s) de información de sensores y más\n- Ejemplo:\n\n\n{\n\n\"Uptime\":12300,\n\n\"Vcc\":2.97,\n\n\"DHT11\":{\"temp\":26.0,\"hum\":37.0},\n\n\"LED\":100,\n\n\"Wifi\":{\"SSId\":\"infind\",\"IP\":\"192.168.0.100\",\"RSSI\":56}\n\n}\n"
+    },
+    {
+        "id": "29836963a0a8e4a1",
+        "type": "group",
+        "z": "6919a768eab2e12c",
+        "name": "Estado Led",
+        "style": {
+            "fill": "#e3f3d3",
+            "label": true
+        },
+        "nodes": [
+            "9fc3a16dab2ae7ca",
+            "8e27a1f8424ea532",
+            "79a60caa9e51678f",
+            "752ab266b5801832"
+        ],
+        "x": 14,
+        "y": 859,
+        "w": 532,
+        "h": 202,
+        "info": "# Sensores\n\n- Topic: infind/GRUPOX/datos\n- Acción: Publicar\n- Descripción: Actualización periódica (30s) de información de sensores y más\n- Ejemplo:\n\n\n{\n\n\"Uptime\":12300,\n\n\"Vcc\":2.97,\n\n\"DHT11\":{\"temp\":26.0,\"hum\":37.0},\n\n\"LED\":100,\n\n\"Wifi\":{\"SSId\":\"infind\",\"IP\":\"192.168.0.100\",\"RSSI\":56}\n\n}\n"
+    },
+    {
+        "id": "5ea0a382098871a2",
+        "type": "group",
+        "z": "6919a768eab2e12c",
+        "name": "Cambio LED",
+        "style": {
+            "fill": "#ffbfbf",
+            "label": true
+        },
+        "nodes": [
+            "50ba0c9125982b94",
+            "a1a05cfad7be05fa",
+            "a86d1fa8398c5e3a",
+            "a6a771f46bd87470",
+            "07f939462386a85b"
+        ],
+        "x": 14,
+        "y": 619,
+        "w": 612,
+        "h": 222,
+        "info": "# Intensidad\n\n- Topic: infind/GRUPOX/led/cmd\n- Acción: Suscribir\n- Descripción: El dispositivo recibe la configuración de intensidad del LED [0-100]\n- Ejemplo: { \"level\":75 }"
+    },
+    {
+        "id": "dfefd42be31cab40",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "8b67b1bd51c43347",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "b8b5fb6b4bfeb434",
+        "type": "ui_group",
+        "name": "Estado y LWT",
+        "tab": "4a06ba0a96f6d1fb",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "d0920580d888ed45",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "0ed26ac15587586a",
+        "type": "ui_group",
+        "name": "Leds",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "09a719eba0028171",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-light",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#0094CE",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#097479",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": false
+            },
+            "customTheme": {
+                "name": "Untitled Theme 1",
+                "default": "#4B7930",
+                "baseColor": "#4B7930",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#0094CE",
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#fafafa",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#1bbfff",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "widget-textColor": {
+                    "value": "#111111",
+                    "edited": false
+                },
+                "widget-backgroundColor": {
+                    "value": "#0094ce",
+                    "edited": false
+                },
+                "widget-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "base-font": {
+                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+                }
+            },
+            "angularTheme": {
+                "primary": "indigo",
+                "accents": "blue",
+                "warn": "red",
+                "background": "grey",
+                "palette": "light"
+            }
+        },
+        "site": {
+            "name": "Node-RED Dashboard",
+            "hideToolbar": "false",
+            "allowSwipe": "false",
+            "lockMenu": "false",
+            "allowTempTheme": "true",
+            "dateFormat": "DD/MM/YYYY",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
+    },
+    {
+        "id": "96d7b634fbe25751",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "0c552cf21f8c54ec",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "798feb5e6b5ffd42",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9ff8455e4877d275",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "aef662cc245f250d",
+        "type": "ui_group",
+        "name": "LEDs",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ae078cb8c1e8a8e2",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "87d174228646d8f5",
+        "type": "ui_group",
+        "name": "Sensores",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "e4919f1e55cab2a3",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "5be1367554b98032",
+        "type": "ui_group",
+        "name": "LEDS",
+        "tab": "",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "fdaf377779b5e450",
+        "type": "ui_group",
+        "name": "Otro rupo",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "adbc4c596863f3e4",
+        "type": "ui_group",
+        "name": "Datos disposiivo",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "064635dd5ac075b9",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "678d9008232f934d",
+        "type": "ui_group",
+        "name": "Comandos LEds",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "43f1fc821e3bb6bc",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "835985acf70380f0",
+        "type": "ui_group",
+        "name": "Sensores",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "f05c7ca658796db9",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "4ab1c7c0019bf72b",
+        "type": "ui_group",
+        "name": "Botones",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "d7824af7a61834a0",
+        "type": "ui_group",
+        "name": "LEDS",
+        "tab": "",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "135504dede3d3499",
+        "type": "ui_group",
+        "name": "Media",
+        "tab": "",
+        "order": 5,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "e0ba194b54fca1c5",
+        "type": "ui_group",
+        "name": "Graficas",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "a3392ed0481c1d32",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "91d9951c34bf726e",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "5f053b4d2c56c90c",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "d130dd8635423bdb",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "3ef0d00c80b04ead",
+        "type": "ui_group",
+        "name": "LEDs",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9006a85c89dffe2f",
+        "type": "ui_group",
+        "name": "Group 4",
+        "tab": "",
+        "order": 4,
+        "disp": true,
+        "width": 6
+    },
+    {
+        "id": "b253d70f257d5aae",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "920d2cdb8892e7ed",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "2441ff6e83d9acd9",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b530dc01d63b5b79",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "72851d82e5d5c034",
+        "type": "ui_group",
+        "name": "Leds",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "3f1dcffc8d3ed7ff",
+        "type": "ui_group",
+        "name": "Dispositivos",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "1e70bae0bc94cdd2",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "7334dbec06dd3f53",
+        "type": "ui_group",
+        "name": "LEDS",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "fac7a69f213f946c",
+        "type": "ui_group",
+        "name": "Json",
+        "tab": "",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "3bc0b2a34e0b8549",
+        "type": "ui_group",
+        "name": "Conexión",
+        "tab": "",
+        "order": 5,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "c4d44e15ff85f5d5",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "92965cbba1a477e2",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "8bdeef539d6f506f",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "5d04f9272f76ebc8",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "65fb5bae6748de78",
+        "type": "ui_group",
+        "name": "LEDs",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "a0ed475002443fa0",
+        "type": "ui_group",
+        "name": "Group 4",
+        "tab": "",
+        "order": 4,
+        "disp": true,
+        "width": 6
+    },
+    {
+        "id": "948cc6994cdf03fb",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "fcef60a89e5e926b",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "86cbe0c96c68bfd9",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "017608d8d5426db1",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b5f13be5ac58fa39",
+        "type": "ui_group",
+        "name": "Leds",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "2c0a517ac6d44f8a",
+        "type": "ui_group",
+        "name": "Dispositivos",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "4439eee33da27bb1",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "57e2388c3e304176",
+        "type": "ui_group",
+        "name": "LEDS",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "39af50d411515ef4",
+        "type": "ui_group",
+        "name": "Json",
+        "tab": "",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "f6751a2de53b365e",
+        "type": "ui_group",
+        "name": "Conexión",
+        "tab": "",
+        "order": 5,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "473dc87db0bc51f6",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "0eb40eb72f173282",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "4099a85038057ce4",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "e13a9bbecae607df",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "9242943a4eff375d",
+        "type": "ui_group",
+        "name": "LEDs",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "944a9c22d9430a85",
+        "type": "ui_group",
+        "name": "Group 4",
+        "tab": "",
+        "order": 4,
+        "disp": true,
+        "width": 6
+    },
+    {
+        "id": "7feb925a670414ec",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "87ac5c849fd45517",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "34dbdddd8526dc08",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9edc8da9071b5192",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "bee7a7a256b81a5e",
+        "type": "ui_group",
+        "name": "Leds",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "4ecd049c90f2ecdc",
+        "type": "ui_group",
+        "name": "Dispositivos",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "7788b64bd9daf9bd",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "313d2b1e3f6e0506",
+        "type": "ui_group",
+        "name": "LEDS",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "57f93f45e1ac5393",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "9ca9fd01c48894c4",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b12fdf722046301e",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "963469eaa805a823",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "220bc56e4aeb6e66",
+        "type": "ui_group",
+        "name": "LEDs",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "0e67f131b3cf26fa",
+        "type": "ui_group",
+        "name": "Group 4",
+        "tab": "",
+        "order": 4,
+        "disp": true,
+        "width": 6
+    },
+    {
+        "id": "ec4788244022d37c",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "a89ddd1f0444f702",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "3fd56f418f66944f",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b121e76685818030",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "43e04c49d5a43056",
+        "type": "ui_group",
+        "name": "Leds",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "5a758ba4865dd539",
+        "type": "ui_group",
+        "name": "Dispositivos",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "616b65c3ca3f1cd6",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "14ed4a011fca9d91",
+        "type": "ui_group",
+        "name": "LEDS",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "60d9f072db008dc6",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "19a80c23f15d65e0",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "d3b7e625cab64d02",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ae2f4d9a321a73fa",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "d9f5558297105589",
+        "type": "ui_group",
+        "name": "LEDs",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ceaf53bebc39f451",
+        "type": "ui_group",
+        "name": "Group 4",
+        "tab": "",
+        "order": 4,
+        "disp": true,
+        "width": 6
+    },
+    {
+        "id": "e23674498f4a118e",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "d0b08ca6aa2b09c2",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "b118ada43633feb0",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "96fb27cc6cec48d9",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "739779cef735d8d0",
+        "type": "ui_group",
+        "name": "Leds",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "07ac6ae7143d2439",
+        "type": "ui_group",
+        "name": "Dispositivos",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "c81ec9a772258e44",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "1f7484988691416f",
+        "type": "ui_group",
+        "name": "LEDS",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "a61baf4842748c6b",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "6287538aeea3d7e3",
+        "type": "ui_group",
+        "name": "Sensores",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "6db44abaead357b1",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "5fa5d23c1340d6eb",
+        "type": "ui_group",
+        "name": "LEDS",
+        "tab": "",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "966ad01e70fb8ce7",
+        "type": "ui_group",
+        "name": "Otro rupo",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "48b85b1998cfa507",
+        "type": "ui_group",
+        "name": "Datos disposiivo",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ce078b66624f4c0f",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "acaef60c1a0792a6",
+        "type": "ui_group",
+        "name": "Comandos LEds",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9d9e946a5422a9b8",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "ac22be0bbbab310d",
+        "type": "ui_group",
+        "name": "Sensores",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "16e792ee60f6f28c",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "98586016d3aa2e21",
+        "type": "ui_group",
+        "name": "Botones",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "d298c02efdbc0970",
+        "type": "ui_group",
+        "name": "LEDS",
+        "tab": "",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "46902b7a352fc363",
+        "type": "ui_group",
+        "name": "Media",
+        "tab": "",
+        "order": 5,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "dfb6b4444b182193",
+        "type": "ui_group",
+        "name": "Graficas",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "43a74ef0fe359891",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "fab7f67fc588f0f4",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "03e311dd8436b90e",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b932e4c8a44a0b95",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "e3218e1f12df8ad6",
+        "type": "ui_group",
+        "name": "LEDs",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "cae1900394be5fe2",
+        "type": "ui_group",
+        "name": "Group 4",
+        "tab": "",
+        "order": 4,
+        "disp": true,
+        "width": 6
+    },
+    {
+        "id": "6e0892a2acfe7c93",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "d74c0b5fe36c8d63",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "543e4af6bf1405c2",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "186d5f35168f10ae",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b0f7ca8cdb2cdc3a",
+        "type": "ui_group",
+        "name": "Leds",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "56ae423b5f28c83b",
+        "type": "ui_group",
+        "name": "Dispositivos",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "f64cc383631af4dc",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "628378a0ccf7c71a",
+        "type": "ui_group",
+        "name": "LEDS",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "322c04f6493e6256",
+        "type": "ui_group",
+        "name": "Json",
+        "tab": "",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "e20293600e77bc68",
+        "type": "ui_group",
+        "name": "Conexión",
+        "tab": "",
+        "order": 5,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "6c394f0bfb6bbe35",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "67d53997c0d498ec",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "42c0a7f896915977",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ee685a8162b69491",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "ef5ad9c3b6604955",
+        "type": "ui_group",
+        "name": "LEDs",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b96554de44ee67a3",
+        "type": "ui_group",
+        "name": "Group 4",
+        "tab": "",
+        "order": 4,
+        "disp": true,
+        "width": 6
+    },
+    {
+        "id": "8df834e309a3b3fd",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "1f6c7dd606b6d8bd",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "8cac0f6a44747ce9",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "f52748d0eb3704a3",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "171d4d113765f626",
+        "type": "ui_group",
+        "name": "Leds",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "6b6c5b51057ba5d5",
+        "type": "ui_group",
+        "name": "Dispositivos",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "51158e4e516714a8",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "8f421022cdb03bdd",
+        "type": "ui_group",
+        "name": "LEDS",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ad1365e8f4a46f68",
+        "type": "ui_group",
+        "name": "Json",
+        "tab": "",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "58c0c333e02a5081",
+        "type": "ui_group",
+        "name": "Conexión",
+        "tab": "",
+        "order": 5,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "0dda133dd2468732",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "634efc4cc64c4faa",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "7a492044ebabe6cd",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "54b0fc22eeaacf2c",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "7725fcb3873e9763",
+        "type": "ui_group",
+        "name": "LEDs",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "54cdb5fe51ca87d2",
+        "type": "ui_group",
+        "name": "Group 4",
+        "tab": "",
+        "order": 4,
+        "disp": true,
+        "width": 6
+    },
+    {
+        "id": "0e315f89ecb718fe",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "13b2f9c25851573b",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "3e15c4525e50c79b",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "03e26cf62e598de2",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "43712668052a9ea8",
+        "type": "ui_group",
+        "name": "Leds",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "bd73a72226c5d523",
+        "type": "ui_group",
+        "name": "Dispositivos",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "026d407e9ba233e4",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b4c347d360d40fdc",
+        "type": "ui_group",
+        "name": "LEDS",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "c2bbf69aa69c5e84",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "2d091bfe68932941",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "8dea6a9bc6dd0543",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "d1028f14d6de87be",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "a2e225e599b1c443",
+        "type": "ui_group",
+        "name": "LEDs",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "80c061900a71ddbf",
+        "type": "ui_group",
+        "name": "Group 4",
+        "tab": "",
+        "order": 4,
+        "disp": true,
+        "width": 6
+    },
+    {
+        "id": "35ea43ebeb5cad04",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "4ce8e0207403a36b",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "d6caefbc30b00657",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "d2bc882eb2e06f45",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ecdddee54d0010a4",
+        "type": "ui_group",
+        "name": "Leds",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "a84a691bc763e752",
+        "type": "ui_group",
+        "name": "Dispositivos",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "bd5ffda41393f197",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "08c5f7d3f1e1fe34",
+        "type": "ui_group",
+        "name": "LEDS",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "8e48ccdf1c8c822a",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "8c9a9b4c49e7a632",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "e2b95494fdd12ec8",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "14b2b5eb2017ee29",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "329c8f527253a84a",
+        "type": "ui_group",
+        "name": "LEDs",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "8462caabbf592ce6",
+        "type": "ui_group",
+        "name": "Group 4",
+        "tab": "",
+        "order": 4,
+        "disp": true,
+        "width": 6
+    },
+    {
+        "id": "564f69a6a4f507f5",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "99c301fed5edc89e",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "ca0b5f0170df0b84",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "6d42cf1024190a4e",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "47f714bff9ac1a67",
+        "type": "ui_group",
+        "name": "Leds",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "97f35ebbdecf6603",
+        "type": "ui_group",
+        "name": "Dispositivos",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "84926d7ab6193ee7",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "",
+        "order": 2,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9b7d0f7cb1f5420a",
+        "type": "ui_group",
+        "name": "LEDS",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9d6eb7a5c1f2626e",
+        "type": "ui_group",
+        "name": "Default",
+        "tab": "4a06ba0a96f6d1fb",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "76b38672b640defe",
+        "type": "ui_group",
+        "name": "Default",
+        "tab": "",
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "4a06ba0a96f6d1fb",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "2cf94e8b0b111c09",
+        "type": "ui_group",
+        "name": "Group 3",
+        "tab": "4a06ba0a96f6d1fb",
+        "order": 3,
+        "disp": true,
+        "width": 6
+    },
+    {
+        "id": "ce953a64df5979a6",
+        "type": "ui_group",
+        "name": "Group 4",
+        "tab": "4a06ba0a96f6d1fb",
+        "order": 4,
+        "disp": true,
+        "width": 6
+    },
+    {
+        "id": "27e360b8dee7f0ae",
+        "type": "ui_group",
+        "name": "G3 Datos",
+        "tab": "4a06ba0a96f6d1fb",
+        "order": 5,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "c04b651d166f0880",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "86a172b6dd1aa146",
+        "type": "ui_group",
+        "name": "datos",
+        "tab": "7b6156df88ab779f",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "7c8f4f321ece9fbb",
+        "type": "ui_group",
+        "name": "Default",
+        "tab": "b1b81913872cac1e",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "7b6156df88ab779f",
+        "type": "ui_tab",
+        "name": "elquequerais",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "b1b81913872cac1e",
+        "type": "ui_tab",
+        "name": "LEDs",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "8f4722037a14cdcf",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-light",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#56bbe6",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#ffffff",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "customTheme": {
+                "name": "Untitled Theme 1",
+                "default": "#4B7930",
+                "baseColor": "#4cd65c",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "reset": false
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#0094CE",
+                    "value": "#56bbe6",
+                    "edited": true
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#56bbe6",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#fafafa",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#99d6f0",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "widget-textColor": {
+                    "value": "#111111",
+                    "edited": true
+                },
+                "widget-backgroundColor": {
+                    "value": "#56bbe6",
+                    "edited": false
+                },
+                "widget-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "base-font": {
+                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+                }
+            },
+            "angularTheme": {
+                "primary": "indigo",
+                "accents": "blue",
+                "warn": "red",
+                "background": "grey",
+                "palette": "light"
+            }
+        },
+        "site": {
+            "name": "Node-RED Dashboard",
+            "hideToolbar": "false",
+            "allowSwipe": "false",
+            "lockMenu": "false",
+            "allowTempTheme": "true",
+            "dateFormat": "DD/MM/YYYY",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
+    },
+    {
+        "id": "d8516ee7d6592581",
+        "type": "ui_tab",
+        "name": "Dashboard Principal",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "7fd3d408df5a667d",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "7d88a03d3a1baec0",
+        "type": "ui_group",
+        "name": "Datos dispositivo",
+        "tab": "bb4d07ae52421eb2",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "7a83a0bf50ad08c8",
+        "type": "ui_group",
+        "name": "Histórico",
+        "tab": "bb4d07ae52421eb2",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "6a946b8adfb954f4",
+        "type": "ui_group",
+        "name": "LEDs",
+        "tab": "bb4d07ae52421eb2",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "bb4d07ae52421eb2",
+        "type": "ui_tab",
+        "name": "Grupo1",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "c50e3f35b06fa778",
+        "type": "ui_tab",
+        "name": "Información Completa",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "0a041ca30c5b51bb",
+        "type": "ui_group",
+        "name": "Conexiones",
+        "tab": "c50e3f35b06fa778",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "c91b8f1ca5984f8e",
+        "type": "ui_group",
+        "name": "Gráficas",
+        "tab": "c50e3f35b06fa778",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "4ff6f1d8eabc28e8",
+        "type": "ui_group",
+        "name": "Datos del Dispositivo",
+        "tab": "c50e3f35b06fa778",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "21d0e1f0c1cc4de4",
+        "type": "ui_group",
+        "name": "LEDs",
+        "tab": "c50e3f35b06fa778",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9429730b136ace7e",
+        "type": "ui_group",
+        "name": "Control LEDs",
+        "tab": "d8516ee7d6592581",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "726517984169ee94",
+        "type": "ui_group",
+        "name": "Conexiones",
+        "tab": "d8516ee7d6592581",
+        "order": 5,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "e01f1a470feda45a",
+        "type": "ui_group",
+        "name": "ESP82",
+        "tab": "de790893f2f7d475",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "59d3b115ecd96202",
+        "type": "ui_group",
+        "name": "Control LEDs JSON",
+        "tab": "d8516ee7d6592581",
+        "order": 6,
+        "disp": true,
+        "width": "4",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9b32b4232d504d48",
+        "type": "ui_group",
+        "name": "Estado LEDs (sin bugs JSON)",
+        "tab": "d8516ee7d6592581",
+        "order": 7,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b135aaa9bc001441",
+        "type": "ui_group",
+        "name": "Datos Dispositivo 2.0",
+        "tab": "d8516ee7d6592581",
+        "order": 8,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "36caf35c3acacf5e",
+        "type": "mongodb",
+        "hostname": "127.0.0.1",
+        "topology": "direct",
+        "connectOptions": "",
+        "port": "27017",
+        "db": "pruebas",
+        "name": ""
+    },
+    {
+        "id": "e362792374ae8fea",
+        "type": "ui_tab",
+        "name": "MongoDB",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "4c20e1b7ce76ff45",
+        "type": "ui_group",
+        "name": "Default",
+        "tab": "e362792374ae8fea",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "f33350fe2528b4d1",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "fad341cea1f7f7ae",
+        "type": "mongodb",
+        "hostname": "127.0.0.1",
+        "connectOptions": "",
+        "port": "27017",
+        "db": "ejercicio",
+        "name": ""
+    },
+    {
+        "id": "46e0e1204481ca58",
+        "type": "ui_group",
+        "name": "Consulta",
+        "tab": "2a520105beeba779",
+        "order": 1,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "2a520105beeba779",
+        "type": "ui_tab",
+        "name": "Ejemplo Mongo",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "de790893f2f7d475",
+        "type": "ui_tab",
+        "name": "ESP82",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "b65ceddc7e37cffe",
+        "type": "ui_tab",
+        "name": "Demo",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "8251f44551216a54",
+        "type": "ui_group",
+        "name": "Controles Consulta",
+        "tab": "2a520105beeba779",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "a22ea6666af960a0",
+        "type": "ui_group",
+        "name": "Datos Sensor",
+        "tab": "de790893f2f7d475",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "cfc13b1ddb0a0114",
+        "type": "ui_group",
+        "name": "Consulta Tiempo",
+        "tab": "2a520105beeba779",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "e62375e15e7d4787",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "2f424428ce05b1aa",
+        "type": "ui_group",
+        "name": "Humedad",
+        "tab": "cb35332b658c2e23",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "25e1b112c2d972dc",
+        "type": "ui_group",
+        "name": "Temperatura",
+        "tab": "cb35332b658c2e23",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "1b7a5d4d1e769d53",
+        "type": "ui_group",
+        "name": "Sensación térmica",
+        "tab": "cb35332b658c2e23",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "cb35332b658c2e23",
+        "type": "ui_tab",
+        "name": "Tarea 4",
+        "icon": "dashboard",
+        "order": 3,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "db415aafe7eec99c",
+        "type": "ui_group",
+        "name": "Gráfica",
+        "tab": "2a520105beeba779",
+        "order": 5,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "d6d28569a34546e9",
+        "type": "ui_group",
+        "name": "Mensaje",
+        "tab": "de790893f2f7d475",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "aa4bc1a699ebdf02",
+        "type": "change",
+        "z": "d4b0b9af2d22c4c5",
+        "name": "Iluminacion",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.ADC.Iluminacion",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 510,
+        "y": 680,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dc34374c0e9c2d3c",
+        "type": "change",
+        "z": "d4b0b9af2d22c4c5",
+        "name": "Temperatura",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.BME280.Temperatura",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 510,
+        "y": 520,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e6650b4005bf68d8",
+        "type": "change",
+        "z": "d4b0b9af2d22c4c5",
+        "name": "Humedad",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.BME280.Humedad",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 500,
+        "y": 560,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c5c2f7d0f93d7779",
+        "type": "change",
+        "z": "d4b0b9af2d22c4c5",
+        "name": "Presion",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.BME280.Presion",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 500,
+        "y": 600,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6afa443428d6ade8",
+        "type": "change",
+        "z": "d4b0b9af2d22c4c5",
+        "name": "Rojo",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.LEDs.Rojo",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b9f9414098d2fe92",
+        "type": "change",
+        "z": "d4b0b9af2d22c4c5",
+        "name": "Verde",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.LEDs.Verde",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7e6790d40d8392e4",
+        "type": "change",
+        "z": "d4b0b9af2d22c4c5",
+        "name": "ChipID",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.nodeID.ChipID",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5fa0d539e1b0e3f1",
+        "type": "change",
+        "z": "d4b0b9af2d22c4c5",
+        "name": "Des",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.Des",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "739acb2e5d96d6d1",
+        "type": "change",
+        "z": "d4b0b9af2d22c4c5",
+        "name": "SSID",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.conexion.SSID",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 40,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6364518df0819b73",
+        "type": "change",
+        "z": "d4b0b9af2d22c4c5",
+        "name": "RSSI",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.conexion.RSSI",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7c67230e160d5cf8",
+        "type": "change",
+        "z": "d4b0b9af2d22c4c5",
+        "name": "localIP",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.conexion.localIP",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4a8d138b098a367d",
+        "type": "change",
+        "z": "d4b0b9af2d22c4c5",
+        "name": "macAddress",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.conexion.macAddress",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 510,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ad39c85bb5dfab20",
+        "type": "change",
+        "z": "d4b0b9af2d22c4c5",
+        "name": "uptime_ms",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.conexion.uptime_ms",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 510,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dfb68f38731cc66e",
+        "type": "change",
+        "z": "d4b0b9af2d22c4c5",
+        "name": "interval_s",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.conexion.interval_s",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 500,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b0af3cb4256797dd",
+        "type": "http response",
+        "z": "ec32f48f9404062e",
+        "name": "OTA Response",
+        "statusCode": "",
+        "headers": {},
+        "x": 2772.559814453125,
+        "y": 663.1071910858154,
+        "wires": []
+    },
+    {
+        "id": "56d90a36a0b1a22f",
+        "type": "http in",
+        "z": "ec32f48f9404062e",
+        "name": "OTA Manager",
+        "url": "/esp8266-ota",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 88.05558013916016,
+        "y": 648.2856712341309,
+        "wires": [
+            [
+                "57b25fe657706080"
+            ]
+        ]
+    },
+    {
+        "id": "fc978a9d4e74348f",
+        "type": "file",
+        "z": "ec32f48f9404062e",
+        "name": "Save md5 Checksum",
+        "filename": "",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "true",
+        "x": 1539.9998168945312,
+        "y": 845.8333740234375,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "87fd3967b706289d",
+        "type": "file in",
+        "z": "ec32f48f9404062e",
+        "name": "Read firmware",
+        "filename": "",
+        "format": "",
+        "x": 842.0833740234375,
+        "y": 846.6666870117188,
+        "wires": [
+            [
+                "c1cc623ab54c6d6c"
+            ]
+        ]
+    },
+    {
+        "id": "73c3903eeaf3ff6e",
+        "type": "change",
+        "z": "ec32f48f9404062e",
+        "name": "Extract filename",
+        "rules": [
+            {
+                "t": "set",
+                "p": "filename",
+                "pt": "msg",
+                "to": "firmware.directory",
+                "tot": "flow"
+            },
+            {
+                "t": "change",
+                "p": "filename",
+                "pt": "msg",
+                "from": "$",
+                "fromt": "re",
+                "to": "req.files.firmware[0].originalname",
+                "tot": "msg"
+            },
+            {
+                "t": "delete",
+                "p": "req",
+                "pt": "msg"
+            },
+            {
+                "t": "delete",
+                "p": "res",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 619.375,
+        "y": 847.9166870117188,
+        "wires": [
+            [
+                "87fd3967b706289d"
+            ]
+        ]
+    },
+    {
+        "id": "2e677d5b2f88f9c0",
+        "type": "change",
+        "z": "ec32f48f9404062e",
+        "name": "",
+        "rules": [
+            {
+                "t": "change",
+                "p": "filename",
+                "pt": "msg",
+                "from": "bin$",
+                "fromt": "re",
+                "to": "md5",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1225.625,
+        "y": 846.25,
+        "wires": [
+            [
+                "fc978a9d4e74348f"
+            ]
+        ]
+    },
+    {
+        "id": "ad08ae76434521d1",
+        "type": "comment",
+        "z": "ec32f48f9404062e",
+        "name": "Firmware Upgrade",
+        "info": "The system determines which firmware to send based\non the MAC address, version, and MD5 headers in the\nrequest from the ESP8266.\n\nFirstly, it checks if a firmware hash file with \nthe MAC address as the name exists, or else if a \nfirmware file with the version as the name exists.\nIf neither exist then no update is available.\n\nIt then reads the corresponding MD5 hash from the\nhash file and compares to the MD5 hash in the\nrequest.  If they match then the firmware is up\nto date and no update is required.\n\nOtherwise, it sends the contents of the firmware\nbin file and the MD5 hash value.",
+        "x": 103.5,
+        "y": 46,
+        "wires": []
+    },
+    {
+        "id": "dc18c9ed37a7e650",
+        "type": "comment",
+        "z": "ec32f48f9404062e",
+        "name": "Firmware Management",
+        "info": "",
+        "x": 110.5,
+        "y": 542,
+        "wires": []
+    },
+    {
+        "id": "226d9dedc98399b7",
+        "type": "template",
+        "z": "ec32f48f9404062e",
+        "name": "Firmware Manager",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "html",
+        "syntax": "mustache",
+        "template": "<html>\n    <head>\n        <title>ESP8266 OTA Firmware Manager</title>\n        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n        <link rel=\"stylesheet\" href=\"http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css\">\n        <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js\"></script>\n        <script src=\"http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js\"></script>\n        <style>\n            .file-btn-grp {\n                display: none;\n            }\n            body {\n                background-color: #f6f6f6;\n            }\n            .text_holder {\n                display: block;\n                max-width: 100%;\n                word-wrap: break-word;\n                line-height: 30px;\n            }\n            #main {\n                margin-top: 50px;\n                background-color: #ffffff;\n                border-radius: 5px;\n                width: 70%;\n                min-width: 500px;\n                border: 1px solid #545454;\n            }\n            .alert {\n                margin-top: 10px;\n                margin-bottom: 5px;\n            }\n            .link {\n                font-style: italic;\n            }\n            .listentry {\n                display: none;\n                list-style-type: none;\n            }\n        </style>\n\n    </head>\n    <body>\n        <div class=\"container\" id=\"main\">\n            <h1><small>ESP8266 OTA Firmware Manager</small></h1>\n            <h2><small>Upload New Firmware</small></h2>\n\n            <form role =\"form\" id=\"main_input_box\" action=\"esp8266-ota\" method=\"POST\" enctype=\"multipart/form-data\" class=\"form-inline\">\n                <input type=\"file\" accept=\".bin\" class=\"hidden\" id=\"fileUpload\" name=\"firmware\" placeholder=\"firmware.bin\">\n                <div class=\"form-group\">\n                <div class=\"input-group\">\n                    <span class=\"input-group-btn\">\n                        <button id=\"browse\" type=\"button\" class=\"btn btn-primary\">Browse...</button>\n                    </span>\n                    <input id=\"filename\" size=100 readonly=\"\" class=\"form-control\" placeholder=\"Firmware.bin\">\n                    <span class=\"input-group-btn\">\n                        <input type=\"submit\" value=\"Upload\" class=\"btn btn-primary add_button\">\n                    </span>\n                </div>\n                </div>\n            </form>\n\n            <h2><small>Current Firmware</small></h2>\n            <ul class=\"list-group\" id=\"list_of_items\">\n            </ul>\n        </div>\n\n        <div id=\"linkModal\" class=\"modal fade\" role=\"dialog\">\n            <div class=\"modal-dialog\">\n        \n                <!-- Modal content-->\n                <div class=\"modal-content\">\n                    <div class=\"modal-header\">\n                        <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\n                        <h4 class=\"modal-title\">Create Symbolic Link</h4>\n                    </div>\n                    <div class=\"modal-body\">\n                        <form class=\"form-horizontal\" id=\"linkForm\" role=\"form\" action=\"#\" method=\"POST\">\n                            <div class=\"form-group\">\n                                <label class=\"control-label  col-sm-2\" for=\"linkName\">Link:</label> \n                                <div class=\"col-sm-10\">\n                                    <input id=\"linkName\" name=\"linkName\" class=\"form-control\"/>\n                                </div>\n                            </div>\n                            <div class=\"form-group\">\n                                <label class=\"control-label  col-sm-2\" for=\"linkFile\">To:</label> \n                                <div class=\"col-sm-10\">\n                                    <input class=\"form-control\" id=\"linkFile\" name=\"linkFile\"/>\n                                </div>\n                            </div>\n                        </form>\n                    </div>\n                    <div class=\"modal-footer\">\n                        <button type=\"submit\" class=\"btn btn-success link-create\">Create</button>\n                        <button type=\"button\" class=\"btn btn-warning\" data-dismiss=\"modal\">Cancel</button>\n                    </div>\n                </div>\n            </div>\n        </div>\n        \n        <script>\n\n            var deleteButton = \"<button id='delete' class='btn btn-warning'>Delete</button>\";\n            var linkButton = \"<button id='link' class='btn btn-success'>Link</button>\";\n            var oneButton = \"<div class='file-btn-grp btn-group pull-right'>\" + deleteButton + \"</div>\";\n            var twoButtons = \"<div class='file-btn-grp btn-group pull-right'>\" + deleteButton + linkButton + \"</div>\";\n            \n            function addListEntry(list, filename, linkname) {\n            \n                var entry;\n                \n                if (linkname === undefined) {\n                    entry = $(\"<li class='listentry list-group-item'><div class='text_holder'><span>\" \n                    + filename + \"</span>\" + twoButtons + \"</div></li>\");\n                } else {\n                    entry = $(\"<li class='listentry list-group-item'><div class='text_holder'><span class='link'>\" \n                    + filename + \"</span> <span class='glyphicon glyphicon-arrow-right'></span> \" \n                    + linkname + oneButton + \"</div></li>\");\n                }\n                \n                entry.mouseover(function(){\n                    $(this).find(\".btn-group\").fadeIn(\"fast\");\n                });\n                entry.mouseleave(function(){\n                    $(this).find(\".btn-group\").fadeOut(\"slow\");\n                });\n                \n                entry.on(\"click\", \"button#delete\", function(){\n                    var listItem = this.parentElement.parentElement.parentElement;\n                    var file = this.parentElement.parentElement.childNodes[0].childNodes[0].data;\n                    $.ajax({\n                        type: 'DELETE',\n                        data: {\"filename\": file},\n                        success: function(result) {\n                            $(listItem).fadeOut(\"slow\", function(){\n                                listItem.remove();\n                            });\n                        },\n                        error: function(result) {\n                            $(listItem).append(\"<div class='alert alert-danger'>\"\n                                + \"<a href='#' class='close' data-dismiss='alert'\"\n                                + \"aria-label='close'>&times;</a>\"\n                                + result.responseText + \"</div>\");\n                        }\n                    });\n                });\n           \n                entry.on(\"click\", \"button#link\", function(){\n                    var file = this.parentElement.parentElement.childNodes[0].childNodes[0].data;\n                    $(\"#linkName\").val(\"\");\n                    $(\"#linkFile\").prop(\"disabled\", true).val(file);\n                    $(\"#linkName\").parent().removeClass(\"has-error\");\n                    $(\"#linkModal\").modal();\n                    $('#linkModal').on('shown.bs.modal', function () {\n                        $('#linkName').focus();\n                    });\n                });\n                \n                if (list.children().length == 0) {\n                    list.append(entry);\n                    entry.fadeIn(\"slow\");\n                    return;\n                }\n\n                if (filename < $(\"li:first span:first\", list).text()) {\n                    $(\"li:first\", list).before(entry);\n                    entry.fadeIn(\"slow\");\n                    return;\n                }\n                if (filename > $(\"li:last span:first\", list).text()) {\n                    $(\"li:last\", list).after(entry);\n                    entry.fadeIn(\"slow\");\n                    return;\n                }\n                \n                var count = 0;\n                var $li = $(\"li\", list);\n                do {\n                    var index = parseInt($li.length / 2);\n                    var $compare = $li.eq(index);\n                    var compare = $(\"span:first\",$compare).text();\n                    if (filename === compare) {\n                        break;\n                    }\n                    else if (filename > compare) {\n                        $li = $li.slice(index, $li.length);\n                    } else {\n                        $li = $li.slice(0, index);\n                    }\n                } while ($li.length > 1);\n\n                if (filename === compare) {\n                    $compare.slideUp(\"fast\").slideDown(\"slow\");\n                    return;\n                } else if (filename < compare) { \n                    entry.insertBefore($compare); \n                } else { \n                    entry.insertAfter($compare); \n                }\n                entry.slideDown(\"slow\");\n            }\n            \n            \n            var files = String(\"{{payload.files}}\").split(',');\n            var links = String(\"{{payload.links}}\").split(',');\n            \n            var list_of_items = $(\"#list_of_items\");\n            \n            files.forEach(function(file,index) {\n                if (links[index] == \"\") {\n                    addListEntry(this, file.slice(0,-4));\n                } else {\n                    addListEntry(this, file.slice(0,-4), links[index].slice(0,-4));\n                }\n            },list_of_items);\n           \n           \n            $(\"#linkModal\").on(\"click\", \"button.link-create\", function(event){\n               event.preventDefault();\n               if ($(\"#linkName\").val() == \"\") {\n                    $('#linkName').focus();\n                    $('#linkName').parent().addClass(\"has-error\");\n                    return false;\n               }\n               $(\"#linkFile\").prop(\"disabled\",false);               \n               $.ajax({\n                    type: 'PUT',\n                    data: $(\"#linkForm\").serialize(),\n                    success: function(result) {\n                        $(\"#linkModal\").modal('hide');\n                        addListEntry(list_of_items, $('#linkName').val(), $('#linkFile').val());\n                    },\n                    error: function(result) {\n                        $(\"#linkFile\").prop(\"disabled\", true);\n                        $('#linkName').focus();\n                        $('#linkName').parent().addClass(\"has-error\");\n                        $(linkForm).append(\"<div id='linkError' class='alert alert-danger'>\"\n                             + \"<a href='#' class='close' data-dismiss='alert'\"\n                             + \"aria-label='close'>&times;</a>\"\n                             + result.responseText + \"</div>\");\n                    }\n                });\n            });\n            \n            $(\"#browse\").on('click', function () {\n                fileUpload.click();\n            });\n            \n            $(\"#fileUpload\").on('change', function () {\n                $(\"#filename\").val($(\"#fileUpload\").val().split('/').pop().split('\\\\').pop());\n            });\n            \n            var frm = $(\"#main_input_box\");\n            \n            frm.submit( function( e ) {\n                e.preventDefault();\n                if ($('#fileUpload').val() == \"\") return null;\n                $.ajax( {\n                    url: frm.attr('action'),\n                    type: frm.attr('method'),\n                    data: new FormData( this ),\n                    processData: false,\n                    contentType: false,\n                    success: function(result) {\n                        addListEntry(list_of_items, $('#fileUpload').val().slice(0,-4).split('\\\\').pop());\n                        $('#fileUpload').val('');\n                        $(':text').val('');\n                    },\n                    error: function(result) {\n                        $(\"#main_input_box\").append(\"<div class='alert alert-danger'>\"\n                             + \"<a href='#' class='close' data-dismiss='alert'\"\n                             + \"aria-label='close'>&times;</a>\"\n                             + result.responseText + \"</div>\");\n                    }\n\n                });\n            });\n        </script>\n    </body>\n</html>",
+        "output": "str",
+        "x": 1381.3333740234375,
+        "y": 645.8135375976562,
+        "wires": [
+            [
+                "b0af3cb4256797dd"
+            ]
+        ]
+    },
+    {
+        "id": "d6a890178167ba51",
+        "type": "http in",
+        "z": "ec32f48f9404062e",
+        "name": "OTA Delete",
+        "url": "/esp8266-ota",
+        "method": "delete",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 83.125,
+        "y": 933.75,
+        "wires": [
+            [
+                "db7efe8857a62bf7"
+            ]
+        ]
+    },
+    {
+        "id": "89851a34ec0497a9",
+        "type": "catch",
+        "z": "ec32f48f9404062e",
+        "name": "File Error",
+        "scope": [
+            "31746358067ceedd",
+            "46d85228476e46df",
+            "45cba05a5d7e50d7",
+            "3ba3eff633018984",
+            "4550ea8469deb527"
+        ],
+        "x": 1870.6665573120117,
+        "y": 805.3333158493042,
+        "wires": [
+            [
+                "51bd2e52d427dbbf"
+            ]
+        ]
+    },
+    {
+        "id": "51bd2e52d427dbbf",
+        "type": "change",
+        "z": "ec32f48f9404062e",
+        "name": "Error",
+        "rules": [
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "500",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "error.message",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2159,
+        "y": 791,
+        "wires": [
+            [
+                "b0af3cb4256797dd"
+            ]
+        ]
+    },
+    {
+        "id": "d9b8438ff45fac64",
+        "type": "change",
+        "z": "ec32f48f9404062e",
+        "name": "Change to MD5 filename",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload.filename",
+                "pt": "msg",
+                "from": "bin",
+                "fromt": "str",
+                "to": "md5",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1879.1666564941406,
+        "y": 936.6666269302368,
+        "wires": [
+            [
+                "46d85228476e46df"
+            ]
+        ]
+    },
+    {
+        "id": "9f1d42f54df5142f",
+        "type": "http in",
+        "z": "ec32f48f9404062e",
+        "name": "OTA Link",
+        "url": "/esp8266-ota",
+        "method": "put",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 84,
+        "y": 1041.5,
+        "wires": [
+            [
+                "602af262e54907ad"
+            ]
+        ]
+    },
+    {
+        "id": "602af262e54907ad",
+        "type": "change",
+        "z": "ec32f48f9404062e",
+        "name": "Extract filename",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload.linkName",
+                "pt": "msg",
+                "from": "$",
+                "fromt": "re",
+                "to": ".bin",
+                "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "payload.linkFile",
+                "pt": "msg",
+                "from": "$",
+                "fromt": "re",
+                "to": ".bin",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1385,
+        "y": 1044,
+        "wires": [
+            [
+                "45cba05a5d7e50d7"
+            ]
+        ]
+    },
+    {
+        "id": "ac5c5e3c04043d20",
+        "type": "change",
+        "z": "ec32f48f9404062e",
+        "name": "Change to MD5 Filename",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload.linkName",
+                "pt": "msg",
+                "from": "bin$",
+                "fromt": "re",
+                "to": "md5",
+                "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "payload.linkFile",
+                "pt": "msg",
+                "from": "bin$",
+                "fromt": "re",
+                "to": "md5",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1908,
+        "y": 1045,
+        "wires": [
+            [
+                "3ba3eff633018984"
+            ]
+        ]
+    },
+    {
+        "id": "db7efe8857a62bf7",
+        "type": "change",
+        "z": "ec32f48f9404062e",
+        "name": "Extract filename",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload.filename",
+                "pt": "msg",
+                "from": "$",
+                "fromt": "re",
+                "to": ".bin",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1382.5,
+        "y": 937.5,
+        "wires": [
+            [
+                "31746358067ceedd"
+            ]
+        ]
+    },
+    {
+        "id": "1d3c0f1f8efe41cb",
+        "type": "http response",
+        "z": "ec32f48f9404062e",
+        "name": "OTA Response",
+        "x": 3210.059814453125,
+        "y": 366.06256103515625,
+        "wires": []
+    },
+    {
+        "id": "669ef608d3c4ab79",
+        "type": "file in",
+        "z": "ec32f48f9404062e",
+        "name": "Load Firmware",
+        "filename": "",
+        "format": "",
+        "sendError": false,
+        "x": 2586.999786376953,
+        "y": 399.88400077819824,
+        "wires": [
+            [
+                "1d3c0f1f8efe41cb",
+                "7d72227bda9293a9"
+            ]
+        ]
+    },
+    {
+        "id": "8c07b12b4470d93e",
+        "type": "change",
+        "z": "ec32f48f9404062e",
+        "name": "No Update",
+        "rules": [
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "304",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2956.107421875,
+        "y": 258.52682304382324,
+        "wires": [
+            [
+                "1d3c0f1f8efe41cb"
+            ]
+        ]
+    },
+    {
+        "id": "01f52b2d8be0183b",
+        "type": "change",
+        "z": "ec32f48f9404062e",
+        "name": "Forbidden",
+        "rules": [
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "403",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "Forbidden",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2933.999755859375,
+        "y": 135.84826469421387,
+        "wires": [
+            [
+                "1d3c0f1f8efe41cb"
+            ]
+        ]
+    },
+    {
+        "id": "7d72227bda9293a9",
+        "type": "debug",
+        "z": "ec32f48f9404062e",
+        "name": "Update sent",
+        "active": true,
+        "console": "false",
+        "complete": "req.headers.x-esp8266-sta-mac",
+        "x": 2932.0000610351562,
+        "y": 405.955472946167,
+        "wires": []
+    },
+    {
+        "id": "8a81656d6ac7e631",
+        "type": "change",
+        "z": "ec32f48f9404062e",
+        "name": "Save MD5 Hash",
+        "rules": [
+            {
+                "t": "set",
+                "p": "headers.x-MD5",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "change",
+                "p": "filename",
+                "pt": "msg",
+                "from": "md5",
+                "fromt": "str",
+                "to": "bin",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2375.785789489746,
+        "y": 387.0268669128418,
+        "wires": [
+            [
+                "669ef608d3c4ab79"
+            ]
+        ]
+    },
+    {
+        "id": "37272914b72eb7f6",
+        "type": "switch",
+        "z": "ec32f48f9404062e",
+        "name": "Update type",
+        "property": "req.headers.x-esp8266-mode",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "spiffs",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "sketch",
+                "vt": "str"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 474.5179748535156,
+        "y": 228.52685356140137,
+        "wires": [
+            [
+                "8c07b12b4470d93e"
+            ],
+            [
+                "c13aab414c8aeb56"
+            ]
+        ]
+    },
+    {
+        "id": "e72c1a4484bf643a",
+        "type": "switch",
+        "z": "ec32f48f9404062e",
+        "name": "Compare MD5 hash",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "req.headers.x-esp8266-sketch-md5",
+                "vt": "msg"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "outputs": 2,
+        "x": 1945.41064453125,
+        "y": 342.13403129577637,
+        "wires": [
+            [
+                "8c07b12b4470d93e",
+                "81f08a7902adb29c"
+            ],
+            [
+                "8a81656d6ac7e631",
+                "98e81b4b2d5eb455"
+            ]
+        ]
+    },
+    {
+        "id": "fa922967b29fb14c",
+        "type": "catch",
+        "z": "ec32f48f9404062e",
+        "name": "File error",
+        "scope": [
+            "669ef608d3c4ab79",
+            "2dab511673f25f61"
+        ],
+        "x": 2628.3572387695312,
+        "y": 348.52682304382324,
+        "wires": [
+            [
+                "8c07b12b4470d93e",
+                "e3803c68564a1463"
+            ]
+        ]
+    },
+    {
+        "id": "afef5cf671ae793e",
+        "type": "switch",
+        "z": "ec32f48f9404062e",
+        "name": "Check user agent",
+        "property": "req.headers.user-agent",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "ESP8266-http-Update",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 311.21436309814453,
+        "y": 134.95541191101074,
+        "wires": [
+            [
+                "01f52b2d8be0183b"
+            ],
+            [
+                "37272914b72eb7f6"
+            ]
+        ]
+    },
+    {
+        "id": "c13aab414c8aeb56",
+        "type": "change",
+        "z": "ec32f48f9404062e",
+        "name": "Get MAC hash filename",
+        "rules": [
+            {
+                "t": "set",
+                "p": "filename",
+                "pt": "msg",
+                "to": "firmware.directory",
+                "tot": "flow"
+            },
+            {
+                "t": "change",
+                "p": "filename",
+                "pt": "msg",
+                "from": "$",
+                "fromt": "re",
+                "to": "req.headers.x-esp8266-sta-mac",
+                "tot": "msg"
+            },
+            {
+                "t": "change",
+                "p": "filename",
+                "pt": "msg",
+                "from": "$",
+                "fromt": "re",
+                "to": ".md5",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 703.6428451538086,
+        "y": 354.9554100036621,
+        "wires": [
+            [
+                "f2ab525c604c37a2"
+            ]
+        ]
+    },
+    {
+        "id": "2dab511673f25f61",
+        "type": "file in",
+        "z": "ec32f48f9404062e",
+        "name": "Load Hash",
+        "filename": "",
+        "format": "utf8",
+        "sendError": false,
+        "x": 1734.410629272461,
+        "y": 341.7768840789795,
+        "wires": [
+            [
+                "e72c1a4484bf643a"
+            ]
+        ]
+    },
+    {
+        "id": "5272d32613d306fc",
+        "type": "change",
+        "z": "ec32f48f9404062e",
+        "name": "Get Version hash filename",
+        "rules": [
+            {
+                "t": "set",
+                "p": "filename",
+                "pt": "msg",
+                "to": "firmware.directory",
+                "tot": "flow"
+            },
+            {
+                "t": "change",
+                "p": "filename",
+                "pt": "msg",
+                "from": "$",
+                "fromt": "re",
+                "to": "req.headers.x-esp8266-version",
+                "tot": "msg"
+            },
+            {
+                "t": "change",
+                "p": "filename",
+                "pt": "msg",
+                "from": "$",
+                "fromt": "re",
+                "to": ".md5",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1183.7857666015625,
+        "y": 459.5982036590576,
+        "wires": [
+            [
+                "422745d6db7e859a",
+                "529e39744abdb0f5"
+            ]
+        ]
+    },
+    {
+        "id": "e3803c68564a1463",
+        "type": "debug",
+        "z": "ec32f48f9404062e",
+        "name": "Firmware file error",
+        "active": false,
+        "console": "false",
+        "complete": "error",
+        "x": 2891.2142944335938,
+        "y": 347.09826469421387,
+        "wires": []
+    },
+    {
+        "id": "c659742aa9078a1c",
+        "type": "http in",
+        "z": "ec32f48f9404062e",
+        "name": "OTA Request",
+        "url": "/esp8266-ota/update",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 75,
+        "y": 134.95541191101074,
+        "wires": [
+            [
+                "afef5cf671ae793e",
+                "ad014a56196f312e"
+            ]
+        ]
+    },
+    {
+        "id": "ae726226a075a934",
+        "type": "switch",
+        "z": "ec32f48f9404062e",
+        "name": "",
+        "property": "req.headers.x-esp8266-version",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nnull"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 2,
+        "x": 687.4642333984375,
+        "y": 466.74108695983887,
+        "wires": [
+            [
+                "5272d32613d306fc"
+            ],
+            [
+                "1f1e74431d0cd582"
+            ]
+        ]
+    },
+    {
+        "id": "1f1e74431d0cd582",
+        "type": "change",
+        "z": "ec32f48f9404062e",
+        "name": "Version in Request",
+        "rules": [
+            {
+                "t": "set",
+                "p": "req.headers.x-esp8266-version",
+                "pt": "msg",
+                "to": "req.params.version",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 896.9285278320312,
+        "y": 532.8125286102295,
+        "wires": [
+            [
+                "5272d32613d306fc"
+            ]
+        ]
+    },
+    {
+        "id": "ad014a56196f312e",
+        "type": "debug",
+        "z": "ec32f48f9404062e",
+        "name": "Update req",
+        "active": true,
+        "console": "false",
+        "complete": "true",
+        "x": 246.2144012451172,
+        "y": 235.66967582702637,
+        "wires": []
+    },
+    {
+        "id": "31a76420791e821f",
+        "type": "debug",
+        "z": "ec32f48f9404062e",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "false",
+        "x": 1291.773494720459,
+        "y": 382.1797161102295,
+        "wires": []
+    },
+    {
+        "id": "1993e90ec1849a36",
+        "type": "debug",
+        "z": "ec32f48f9404062e",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "false",
+        "x": 1315.0234375,
+        "y": 294.0390625,
+        "wires": []
+    },
+    {
+        "id": "529e39744abdb0f5",
+        "type": "debug",
+        "z": "ec32f48f9404062e",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "filename",
+        "x": 1393.0234375,
+        "y": 555.0390625,
+        "wires": []
+    },
+    {
+        "id": "aa74deabf0ed8585",
+        "type": "debug",
+        "z": "ec32f48f9404062e",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "filename",
+        "x": 1770.0234375,
+        "y": 524.0390625,
+        "wires": []
+    },
+    {
+        "id": "9efe792cbe327a54",
+        "type": "debug",
+        "z": "ec32f48f9404062e",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "filename",
+        "x": 1789.0234375,
+        "y": 407.0390625,
+        "wires": []
+    },
+    {
+        "id": "81f08a7902adb29c",
+        "type": "debug",
+        "z": "ec32f48f9404062e",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "filename",
+        "x": 2148.0234375,
+        "y": 279.0390625,
+        "wires": []
+    },
+    {
+        "id": "98e81b4b2d5eb455",
+        "type": "debug",
+        "z": "ec32f48f9404062e",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "filename",
+        "x": 2170.0234375,
+        "y": 506.0390625,
+        "wires": []
+    },
+    {
+        "id": "4550ea8469deb527",
+        "type": "fs-ops-move",
+        "z": "ec32f48f9404062e",
+        "name": "Store firmware",
+        "sourcePath": "req.files.firmware[0].destination",
+        "sourcePathType": "msg",
+        "sourceFilename": "req.files.firmware[0].filename",
+        "sourceFilenameType": "msg",
+        "destPath": "firmware.directory",
+        "destPathType": "flow",
+        "destFilename": "req.files.firmware[0].originalname",
+        "destFilenameType": "msg",
+        "link": false,
+        "x": 365.89284896850586,
+        "y": 818.3332557678223,
+        "wires": [
+            [
+                "73c3903eeaf3ff6e",
+                "b0af3cb4256797dd"
+            ]
+        ]
+    },
+    {
+        "id": "45cba05a5d7e50d7",
+        "type": "fs-ops-move",
+        "z": "ec32f48f9404062e",
+        "name": "Link firmware",
+        "sourcePath": "",
+        "sourcePathType": "str",
+        "sourceFilename": "payload.linkFile",
+        "sourceFilenameType": "msg",
+        "destPath": "firmware.directory",
+        "destPathType": "flow",
+        "destFilename": "payload.linkName",
+        "destFilenameType": "msg",
+        "link": true,
+        "x": 1644.5,
+        "y": 1044,
+        "wires": [
+            [
+                "ac5c5e3c04043d20"
+            ]
+        ]
+    },
+    {
+        "id": "3ba3eff633018984",
+        "type": "fs-ops-move",
+        "z": "ec32f48f9404062e",
+        "name": "Link MD5",
+        "sourcePath": "",
+        "sourcePathType": "str",
+        "sourceFilename": "payload.linkFile",
+        "sourceFilenameType": "msg",
+        "destPath": "firmware.directory",
+        "destPathType": "flow",
+        "destFilename": "payload.linkName",
+        "destFilenameType": "msg",
+        "link": true,
+        "x": 2152.5,
+        "y": 1044,
+        "wires": [
+            [
+                "b0af3cb4256797dd"
+            ]
+        ]
+    },
+    {
+        "id": "31746358067ceedd",
+        "type": "fs-ops-delete",
+        "z": "ec32f48f9404062e",
+        "name": "Delete firmware",
+        "path": "firmware.directory",
+        "pathType": "flow",
+        "filename": "payload.filename",
+        "filenameType": "msg",
+        "x": 1628.6250457763672,
+        "y": 936.5832777023315,
+        "wires": [
+            [
+                "d9b8438ff45fac64"
+            ]
+        ]
+    },
+    {
+        "id": "46d85228476e46df",
+        "type": "fs-ops-delete",
+        "z": "ec32f48f9404062e",
+        "name": "Delete MD5 Hash",
+        "path": "firmware.directory",
+        "pathType": "flow",
+        "filename": "payload.filename",
+        "filenameType": "msg",
+        "x": 2170.833206176758,
+        "y": 936.6665878295898,
+        "wires": [
+            [
+                "b0af3cb4256797dd"
+            ]
+        ]
+    },
+    {
+        "id": "422745d6db7e859a",
+        "type": "fs-ops-access",
+        "z": "ec32f48f9404062e",
+        "name": "Check for MD5 file exists",
+        "path": "",
+        "pathType": "str",
+        "filename": "filename",
+        "filenameType": "msg",
+        "read": true,
+        "write": false,
+        "throwerror": false,
+        "x": 1497.2857055664062,
+        "y": 459.6696147918701,
+        "wires": [
+            [
+                "2dab511673f25f61",
+                "9efe792cbe327a54"
+            ],
+            [
+                "8c07b12b4470d93e",
+                "aa74deabf0ed8585"
+            ]
+        ]
+    },
+    {
+        "id": "f2ab525c604c37a2",
+        "type": "fs-ops-access",
+        "z": "ec32f48f9404062e",
+        "name": "Check for MD5 file exists",
+        "path": "",
+        "pathType": "str",
+        "filename": "filename",
+        "filenameType": "msg",
+        "read": true,
+        "write": false,
+        "throwerror": false,
+        "x": 1009.357177734375,
+        "y": 349.09826469421387,
+        "wires": [
+            [
+                "2dab511673f25f61",
+                "1993e90ec1849a36"
+            ],
+            [
+                "ae726226a075a934",
+                "31a76420791e821f"
+            ]
+        ]
+    },
+    {
+        "id": "baf5423587c64655",
+        "type": "fs-ops-link",
+        "z": "ec32f48f9404062e",
+        "name": "Get Links",
+        "path": "firmware.directory",
+        "pathType": "flow",
+        "filename": "payload.files",
+        "filenameType": "msg",
+        "link": "payload.links",
+        "linkType": "msg",
+        "x": 776.4999923706055,
+        "y": 648.3333110809326,
+        "wires": [
+            [
+                "226d9dedc98399b7"
+            ]
+        ]
+    },
+    {
+        "id": "57b25fe657706080",
+        "type": "fs-ops-dir",
+        "z": "ec32f48f9404062e",
+        "name": "Firmware listing",
+        "path": "firmware.directory",
+        "pathType": "flow",
+        "filter": "*.bin",
+        "filterType": "str",
+        "dir": "payload.files",
+        "dirType": "msg",
+        "x": 493.0355987548828,
+        "y": 647.8015928268433,
+        "wires": [
+            [
+                "baf5423587c64655"
+            ]
+        ]
+    },
+    {
+        "id": "c1cc623ab54c6d6c",
+        "type": "md5",
+        "z": "ec32f48f9404062e",
+        "name": "",
+        "fieldToHash": "payload",
+        "hashField": "payload",
+        "hashFieldType": "msg",
+        "x": 1031.6668090820312,
+        "y": 846.6666259765625,
+        "wires": [
+            [
+                "2e677d5b2f88f9c0"
+            ]
+        ]
+    },
+    {
+        "id": "1c64d4ab83114430",
+        "type": "config",
+        "z": "ec32f48f9404062e",
+        "name": "Firmware Config",
+        "properties": [
+            {
+                "p": "firmware.directory",
+                "pt": "flow",
+                "to": "/home/ubuntu/OTA/",
+                "tot": "str"
+            }
+        ],
+        "active": true,
+        "x": 123.0714111328125,
+        "y": 360.1428527832031,
+        "wires": []
+    },
+    {
+        "id": "d2432eb670be7609",
+        "type": "mqtt in",
+        "z": "6919a768eab2e12c",
+        "g": "37ec6b68afa30644",
+        "name": "Estado y LWT",
+        "topic": "infind/GRUPO3/conexion",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "8b67b1bd51c43347",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "x": 110,
+        "y": 180,
+        "wires": [
+            [
+                "855f7188f5809494"
+            ]
+        ]
+    },
+    {
+        "id": "fa3145a4ee72dd9c",
+        "type": "debug",
+        "z": "6919a768eab2e12c",
+        "g": "37ec6b68afa30644",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 590,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "0e8d901ee55bd63d",
+        "type": "inject",
+        "z": "6919a768eab2e12c",
+        "g": "37ec6b68afa30644",
+        "name": "Online",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"online\":true}",
+        "payloadType": "str",
+        "x": 110,
+        "y": 60,
+        "wires": [
+            [
+                "855f7188f5809494"
+            ]
+        ]
+    },
+    {
+        "id": "9108de6cb7fefb46",
+        "type": "inject",
+        "z": "6919a768eab2e12c",
+        "g": "37ec6b68afa30644",
+        "name": "Offline",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"online\":false}",
+        "payloadType": "str",
+        "x": 110,
+        "y": 120,
+        "wires": [
+            [
+                "855f7188f5809494"
+            ]
+        ]
+    },
+    {
+        "id": "8cfbcf61b0b50f0e",
+        "type": "mqtt in",
+        "z": "6919a768eab2e12c",
+        "g": "88b807191bcf7a6b",
+        "name": "Sensores",
+        "topic": "infind/GRUPO3/datos",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "8b67b1bd51c43347",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "x": 100,
+        "y": 400,
+        "wires": [
+            [
+                "501ee66435eef6e1",
+                "da5b18967025b6e4"
+            ]
+        ]
+    },
+    {
+        "id": "307527e94677b96a",
+        "type": "debug",
+        "z": "6919a768eab2e12c",
+        "g": "88b807191bcf7a6b",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 410,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "5ff8049e20ad1998",
+        "type": "inject",
+        "z": "6919a768eab2e12c",
+        "g": "88b807191bcf7a6b",
+        "name": "Datos",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{  \"Uptime\":12300,  \"Vcc\":4.97,  \"DHT11\":{\"temp\":-2.0,\"hum\":37.0},  \"LED\":100,  \"Wifi\":{\"SSId\":\"infind\",\"IP\":\"192.168.0.100\",\"RSSI\":56}  }",
+        "payloadType": "str",
+        "x": 130,
+        "y": 280,
+        "wires": [
+            [
+                "501ee66435eef6e1"
+            ]
+        ]
+    },
+    {
+        "id": "9fc3a16dab2ae7ca",
+        "type": "mqtt in",
+        "z": "6919a768eab2e12c",
+        "g": "29836963a0a8e4a1",
+        "name": "Sensores",
+        "topic": "infind/GRUPO3/led/status",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "8b67b1bd51c43347",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "x": 100,
+        "y": 1020,
+        "wires": [
+            [
+                "752ab266b5801832"
+            ]
+        ]
+    },
+    {
+        "id": "8e27a1f8424ea532",
+        "type": "inject",
+        "z": "6919a768eab2e12c",
+        "g": "29836963a0a8e4a1",
+        "name": "Status",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{ \"led\":75 }",
+        "payloadType": "str",
+        "x": 110,
+        "y": 900,
+        "wires": [
+            [
+                "752ab266b5801832"
+            ]
+        ],
+        "info": "# Status\n\n- Topic: infind/GRUPOX/led/status\n- Acción: Publicar\n- Descripción: El dispositivo confirma la configuración de intensidad del LED [0-100] después de aplicarla\n- Ejemplo: { \"led\":75 } "
+    },
+    {
+        "id": "10296ba37ac23290",
+        "type": "link in",
+        "z": "6919a768eab2e12c",
+        "g": "37ec6b68afa30644",
+        "name": "",
+        "links": [
+            "855f7188f5809494"
+        ],
+        "x": 355,
+        "y": 60,
+        "wires": [
+            [
+                "fa3145a4ee72dd9c",
+                "71abc5600192bdda"
+            ]
+        ]
+    },
+    {
+        "id": "855f7188f5809494",
+        "type": "link out",
+        "z": "6919a768eab2e12c",
+        "g": "37ec6b68afa30644",
+        "name": "",
+        "links": [
+            "10296ba37ac23290"
+        ],
+        "x": 295,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "501ee66435eef6e1",
+        "type": "json",
+        "z": "6919a768eab2e12c",
+        "g": "88b807191bcf7a6b",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 290,
+        "y": 380,
+        "wires": [
+            [
+                "307527e94677b96a",
+                "102449d7a75b8653",
+                "e5582ad98a8a5251",
+                "bad8432a6187859f",
+                "7e18852f4ec991d0",
+                "9805f1a5c7bf5cfe",
+                "998937069f896d25",
+                "84d0adf38af9fb90"
+            ]
+        ]
+    },
+    {
+        "id": "71abc5600192bdda",
+        "type": "json",
+        "z": "6919a768eab2e12c",
+        "g": "37ec6b68afa30644",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 430,
+        "y": 120,
+        "wires": [
+            [
+                "4b843cc50ce60c55"
+            ]
+        ]
+    },
+    {
+        "id": "2cd5c9b802fcde99",
+        "type": "ui_led",
+        "z": "6919a768eab2e12c",
+        "g": "37ec6b68afa30644",
+        "order": 1,
+        "group": "b8b5fb6b4bfeb434",
+        "width": "2",
+        "height": "2",
+        "label": "",
+        "labelPlacement": "left",
+        "labelAlignment": "left",
+        "colorForValue": [
+            {
+                "color": "#ff0000",
+                "value": "false",
+                "valueType": "bool"
+            },
+            {
+                "color": "#008000",
+                "value": "true",
+                "valueType": "bool"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "shape": "circle",
+        "showGlow": true,
+        "name": "",
+        "x": 630,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "4b843cc50ce60c55",
+        "type": "change",
+        "z": "6919a768eab2e12c",
+        "g": "37ec6b68afa30644",
+        "name": "Online",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.online",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 470,
+        "y": 180,
+        "wires": [
+            [
+                "2cd5c9b802fcde99"
+            ]
+        ]
+    },
+    {
+        "id": "0cd5e26cddc1a096",
+        "type": "ui_text",
+        "z": "6919a768eab2e12c",
+        "g": "88b807191bcf7a6b",
+        "group": "27e360b8dee7f0ae",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Uptime (s): ",
+        "format": "{{msg.payload.Uptime}}",
+        "layout": "row-left",
+        "className": "",
+        "x": 610,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "102449d7a75b8653",
+        "type": "function",
+        "z": "6919a768eab2e12c",
+        "g": "88b807191bcf7a6b",
+        "name": "ms",
+        "func": "msg.payload.Uptime = msg.payload.Uptime/1000;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 440,
+        "y": 320,
+        "wires": [
+            [
+                "0cd5e26cddc1a096"
+            ]
+        ]
+    },
+    {
+        "id": "e5582ad98a8a5251",
+        "type": "ui_gauge",
+        "z": "6919a768eab2e12c",
+        "g": "88b807191bcf7a6b",
+        "name": "",
+        "group": "27e360b8dee7f0ae",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Voltios Vcc",
+        "label": "V",
+        "format": "{{msg.payload.Vcc}}",
+        "min": 0,
+        "max": "5",
+        "colors": [
+            "#ff0000",
+            "#e6e600",
+            "#008080"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 610,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "bad8432a6187859f",
+        "type": "ui_gauge",
+        "z": "6919a768eab2e12c",
+        "g": "88b807191bcf7a6b",
+        "name": "",
+        "group": "27e360b8dee7f0ae",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "ºC",
+        "format": "{{msg.payload.DHT11.temp}}",
+        "min": "-5",
+        "max": "50",
+        "colors": [
+            "#0080ff",
+            "#00ff00",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 610,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "50ba0c9125982b94",
+        "type": "inject",
+        "z": "6919a768eab2e12c",
+        "g": "5ea0a382098871a2",
+        "name": "Nivel: 75",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "5",
+        "topic": "",
+        "payload": "{ \"level\":75 }",
+        "payloadType": "str",
+        "x": 120,
+        "y": 660,
+        "wires": [
+            [
+                "a1a05cfad7be05fa"
+            ]
+        ]
+    },
+    {
+        "id": "a1a05cfad7be05fa",
+        "type": "mqtt out",
+        "z": "6919a768eab2e12c",
+        "g": "5ea0a382098871a2",
+        "name": "Set Level",
+        "topic": "infind/GRUPO3/led/cmd",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "8b67b1bd51c43347",
+        "x": 540,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "a86d1fa8398c5e3a",
+        "type": "inject",
+        "z": "6919a768eab2e12c",
+        "g": "5ea0a382098871a2",
+        "name": "Nivel:25",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "7.5",
+        "topic": "",
+        "payload": "{ \"level\":25 }",
+        "payloadType": "str",
+        "x": 120,
+        "y": 700,
+        "wires": [
+            [
+                "a1a05cfad7be05fa"
+            ]
+        ]
+    },
+    {
+        "id": "7e18852f4ec991d0",
+        "type": "ui_gauge",
+        "z": "6919a768eab2e12c",
+        "g": "88b807191bcf7a6b",
+        "name": "",
+        "group": "27e360b8dee7f0ae",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Humedad",
+        "label": "%",
+        "format": "{{msg.payload.DHT11.hum}}",
+        "min": "0",
+        "max": "100",
+        "colors": [
+            "#0080ff",
+            "#00ff00",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 600,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "da5b18967025b6e4",
+        "type": "debug",
+        "z": "6919a768eab2e12c",
+        "g": "88b807191bcf7a6b",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 300,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "a6a771f46bd87470",
+        "type": "ui_slider",
+        "z": "6919a768eab2e12c",
+        "g": "5ea0a382098871a2",
+        "name": "",
+        "label": "Nivel LED",
+        "tooltip": "",
+        "group": "27e360b8dee7f0ae",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "outs": "end",
+        "topic": "topic",
+        "topicType": "msg",
+        "min": 0,
+        "max": "100",
+        "step": 1,
+        "className": "",
+        "x": 100,
+        "y": 800,
+        "wires": [
+            [
+                "07f939462386a85b"
+            ]
+        ]
+    },
+    {
+        "id": "07f939462386a85b",
+        "type": "function",
+        "z": "6919a768eab2e12c",
+        "g": "5ea0a382098871a2",
+        "name": "",
+        "func": "msg.payload= \"{ \\\"level\\\":\"+msg.payload+\" }\"\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 800,
+        "wires": [
+            [
+                "a1a05cfad7be05fa"
+            ]
+        ]
+    },
+    {
+        "id": "9805f1a5c7bf5cfe",
+        "type": "ui_text",
+        "z": "6919a768eab2e12c",
+        "g": "88b807191bcf7a6b",
+        "group": "27e360b8dee7f0ae",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "SSId: ",
+        "format": "{{msg.payload.Wifi.SSId}}",
+        "layout": "row-left",
+        "className": "",
+        "x": 590,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "998937069f896d25",
+        "type": "ui_text",
+        "z": "6919a768eab2e12c",
+        "g": "88b807191bcf7a6b",
+        "group": "27e360b8dee7f0ae",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "IP: ",
+        "format": "{{msg.payload.Wifi.IP}}",
+        "layout": "row-left",
+        "className": "",
+        "x": 590,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "84d0adf38af9fb90",
+        "type": "ui_text",
+        "z": "6919a768eab2e12c",
+        "g": "88b807191bcf7a6b",
+        "group": "27e360b8dee7f0ae",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "RSSI: ",
+        "format": "{{msg.payload.Wifi.RSSI}}",
+        "layout": "row-left",
+        "className": "",
+        "x": 590,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "79a60caa9e51678f",
+        "type": "ui_gauge",
+        "z": "6919a768eab2e12c",
+        "g": "29836963a0a8e4a1",
+        "name": "",
+        "group": "27e360b8dee7f0ae",
+        "order": 8,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "gauge",
+        "label": "units",
+        "format": "{{msg.payload.led}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#005680",
+            "#c0c0c0",
+            "#80ffff"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 470,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "752ab266b5801832",
+        "type": "json",
+        "z": "6919a768eab2e12c",
+        "g": "29836963a0a8e4a1",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 290,
+        "y": 1000,
+        "wires": [
+            [
+                "79a60caa9e51678f"
+            ]
+        ]
+    },
+    {
+        "id": "6a49fbcfa19cbd3e",
+        "type": "comment",
+        "z": "ec32f48f9404062e",
+        "name": "Dirección Gestionar Firmwares",
+        "info": "http://172.16.53.133:1880/esp8266-ota",
+        "x": 190,
+        "y": 1140,
+        "wires": []
+    },
+    {
+        "id": "4aa5d4dafb0e22be",
+        "type": "httpInMultipart",
+        "z": "ec32f48f9404062e",
+        "name": "OTA Upload",
+        "url": "/esp8266-ota",
+        "method": "post",
+        "fields": "[{ \"name\": \"firmware\"}]",
+        "swaggerDoc": "",
+        "x": 79.7857437133789,
+        "y": 812.4286108016968,
+        "wires": [
+            [
+                "4550ea8469deb527"
+            ]
+        ]
+    }
+]

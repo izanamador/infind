@@ -4,15 +4,15 @@
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 
-// datos para actualización   >>>> SUSTITUIR IP <<<<<
-#define HTTP_OTA_ADDRESS      F("172.16.53.###")         // Address of OTA update server
+// datos para actualización   >>>> SUSTITUIR IP <<<<< 
+#define HTTP_OTA_ADDRESS      F("172.16.53.133")         // Address of OTA update server
 #define HTTP_OTA_PATH         F("/esp8266-ota/update") // Path to update firmware
 #define HTTP_OTA_PORT         1880                     // Port of update server
                                                        // Name of firmware
 #define HTTP_OTA_VERSION      String(__FILE__).substring(String(__FILE__).lastIndexOf('\\')+1) + ".nodemcu" 
 
 /* Function: CONECTA_WIFI */
-#define SSID_ "infind"
+#define SSID_ "infind2"
 #define PASSWORD_ "1518wifi"
 #define WIFI_RETRY_DELAY_ 200
 
@@ -94,7 +94,7 @@ void intenta_OTA()
   WiFiClient wClient;
   switch(ESPhttpUpdate.update(wClient, HTTP_OTA_ADDRESS, HTTP_OTA_PORT, HTTP_OTA_PATH, HTTP_OTA_VERSION)) {
     case HTTP_UPDATE_FAILED:
-      Serial.printf(" HTTP update failed: Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+      Serial.printf(" HTTP update  failed: Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
       break;
     case HTTP_UPDATE_NO_UPDATES:
       Serial.println(F(" El dispositivo ya está actualizado"));
@@ -294,8 +294,6 @@ void loop()
     JsonObject DHT11_sensor = json_enviado.createNestedObject("DHT11");
     DHT11_sensor["temp"] = dht.getTemperature();
     DHT11_sensor["hum"] = dht.getHumidity();
-    Serial.printf("Temperatura %f",dht.getTemperature());
-    Serial.printf("Humedad %f",dht.getHumidity()) ;
     json_enviado["LED"] = level_externo; // de 0 oscuro a 100 iluminado
     JsonObject Wifi = json_enviado.createNestedObject("Wifi");
     Wifi["SSId"] = WiFi.SSID();
