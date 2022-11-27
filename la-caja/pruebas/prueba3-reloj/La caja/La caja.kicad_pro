@@ -225,7 +225,7 @@
       "no_connect_dangling": "warning",
       "pin_not_connected": "error",
       "pin_not_driven": "error",
-      "pin_to_pin": "warning",
+      "pin_to_pin": "error",
       "power_pin_not_driven": "error",
       "similar_labels": "warning",
       "unannotated": "error",
@@ -283,7 +283,23 @@
     "drawing": {
       "default_line_thickness": 6.0,
       "default_text_size": 50.0,
-      "field_names": [],
+      "field_names": [
+        {
+          "name": "Precio",
+          "url": true,
+          "visible": true
+        },
+        {
+          "name": "Deuda",
+          "url": false,
+          "visible": false
+        },
+        {
+          "name": "Publico",
+          "url": false,
+          "visible": false
+        }
+      ],
       "intersheets_ref_own_page": false,
       "intersheets_ref_prefix": "",
       "intersheets_ref_short": false,
@@ -309,8 +325,8 @@
       "model_mode": 0,
       "workbook_filename": ""
     },
-    "page_layout_descr_file": "",
-    "plot_directory": "",
+    "page_layout_descr_file": "/home/rhyloo/.local/share/kicad/6.0/template/mytemplate.kicad_wks",
+    "plot_directory": "PDFS/",
     "spice_adjust_passive_values": false,
     "spice_external_command": "spice \"%I\"",
     "subpart_first_id": 65,
@@ -320,6 +336,26 @@
     [
       "9538e4ed-27e6-4c37-b989-9859dc0d49e8",
       ""
+    ],
+    [
+      "b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae",
+      "Prueba_1"
+    ],
+    [
+      "5c7cb303-2d94-4fc0-8dd4-57f1cabca490",
+      "Prueba_2"
+    ],
+    [
+      "a7a27db3-26d1-4801-b378-7ca6de1dbeb1",
+      "Prueba_3"
+    ],
+    [
+      "2498f4fd-bdcd-476c-904a-8afce4fd8507",
+      "Prueba_4"
+    ],
+    [
+      "fa6a7ee8-bd0b-4726-91a3-4faa7c7b558b",
+      "Prueba_5"
     ]
   ],
   "text_variables": {}
