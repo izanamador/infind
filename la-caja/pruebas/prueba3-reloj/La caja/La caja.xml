@@ -1,0 +1,664 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="E">
+  <design>
+    <source>/home/rhyloo/Documents/Universidad/Informática industrial/Trabajo en grupo/la-caja/pruebas/prueba3-reloj/La caja/La caja.kicad_sch</source>
+    <date>dom 27 nov 2022 01:03:29</date>
+    <tool>Eeschema 6.0.2+dfsg-1</tool>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title>Testing de esquematicos</title>
+        <company>Proyecto la Caja</company>
+        <rev>0.0.1</rev>
+        <date>2022-11-26</date>
+        <source>La caja.kicad_sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+    <sheet number="2" name="/Prueba_1/" tstamps="/b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae/">
+      <title_block>
+        <title>Testing de esquematicos</title>
+        <company>Proyecto la Caja</company>
+        <rev>0.0.1</rev>
+        <date>2022-11-26</date>
+        <source>Prueba_1.kicad_sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+    <sheet number="3" name="/Prueba_2/" tstamps="/5c7cb303-2d94-4fc0-8dd4-57f1cabca490/">
+      <title_block>
+        <title>Testing de esquematicos</title>
+        <company>Proyecto la Caja</company>
+        <rev>0.0.1</rev>
+        <date>2022-11-26</date>
+        <source>Prueba_2.kicad_sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+    <sheet number="4" name="/Prueba_3/" tstamps="/a7a27db3-26d1-4801-b378-7ca6de1dbeb1/">
+      <title_block>
+        <title>Testing de esquematicos</title>
+        <company>Proyecto la Caja</company>
+        <rev>0.0.1</rev>
+        <date>2022-11-26</date>
+        <source>Prueba_3.kicad_sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+    <sheet number="5" name="/Prueba_4/" tstamps="/2498f4fd-bdcd-476c-904a-8afce4fd8507/">
+      <title_block>
+        <title>Testing de esquematicos</title>
+        <company>Proyecto la Caja</company>
+        <rev>0.0.1</rev>
+        <date>2022-11-26</date>
+        <source>Prueba_4.kicad_sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+    <sheet number="6" name="/Prueba_5/" tstamps="/fa6a7ee8-bd0b-4726-91a3-4faa7c7b558b/">
+      <title_block>
+        <title>Testing de esquematicos</title>
+        <company>Proyecto la Caja</company>
+        <rev>0.0.1</rev>
+        <date>2022-11-26</date>
+        <source>Prueba_5.kicad_sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="PRUEBA1">
+      <value>NodeMCU1.0(ESP-12E)</value>
+      <datasheet>https://www.esploradores.com/wp-content/uploads/2019/11/PINOUT-NodeMCU_1.0-V2-2_2.jpg</datasheet>
+      <fields>
+        <field name="Precio">10€</field>
+      </fields>
+      <libsource lib="ESP8266" part="NodeMCU1.0(ESP-12E)" description=""/>
+      <property name="Precio" value="10€"/>
+      <property name="Sheetname" value="Prueba_1"/>
+      <property name="Sheetfile" value="Prueba_1.kicad_sch"/>
+      <sheetpath names="/Prueba_1/" tstamps="/b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae/"/>
+      <tstamps>7cceb1ec-ef66-4300-b14a-a6d5885566c6</tstamps>
+    </comp>
+    <comp ref="PRUEBA2">
+      <value>NodeMCU1.0(ESP-12E)</value>
+      <datasheet>https://www.esploradores.com/wp-content/uploads/2019/11/PINOUT-NodeMCU_1.0-V2-2_2.jpg</datasheet>
+      <fields>
+        <field name="Precio">10€</field>
+      </fields>
+      <libsource lib="ESP8266" part="NodeMCU1.0(ESP-12E)" description=""/>
+      <property name="Precio" value="10€"/>
+      <property name="Sheetname" value="Prueba_2"/>
+      <property name="Sheetfile" value="Prueba_2.kicad_sch"/>
+      <sheetpath names="/Prueba_2/" tstamps="/5c7cb303-2d94-4fc0-8dd4-57f1cabca490/"/>
+      <tstamps>4e456102-642a-4219-b8cd-cf6c61abfd4a</tstamps>
+    </comp>
+    <comp ref="PRUEBA3">
+      <value>NodeMCU1.0(ESP-12E)</value>
+      <datasheet>https://www.esploradores.com/wp-content/uploads/2019/11/PINOUT-NodeMCU_1.0-V2-2_2.jpg</datasheet>
+      <fields>
+        <field name="Precio">10€</field>
+      </fields>
+      <libsource lib="ESP8266" part="NodeMCU1.0(ESP-12E)" description=""/>
+      <property name="Precio" value="10€"/>
+      <property name="Sheetname" value="Prueba_3"/>
+      <property name="Sheetfile" value="Prueba_3.kicad_sch"/>
+      <sheetpath names="/Prueba_3/" tstamps="/a7a27db3-26d1-4801-b378-7ca6de1dbeb1/"/>
+      <tstamps>d3d5ac86-c364-42d3-b107-2f6fb5119784</tstamps>
+    </comp>
+    <comp ref="PRUEBA4">
+      <value>NodeMCU1.0(ESP-12E)</value>
+      <datasheet>https://www.esploradores.com/wp-content/uploads/2019/11/PINOUT-NodeMCU_1.0-V2-2_2.jpg</datasheet>
+      <fields>
+        <field name="Precio">10€</field>
+      </fields>
+      <libsource lib="ESP8266" part="NodeMCU1.0(ESP-12E)" description=""/>
+      <property name="Precio" value="10€"/>
+      <property name="Sheetname" value="Prueba_4"/>
+      <property name="Sheetfile" value="Prueba_4.kicad_sch"/>
+      <sheetpath names="/Prueba_4/" tstamps="/2498f4fd-bdcd-476c-904a-8afce4fd8507/"/>
+      <tstamps>bb48e294-efe1-4399-936f-010795803cf2</tstamps>
+    </comp>
+    <comp ref="PRUEBA5">
+      <value>NodeMCU1.0(ESP-12E)</value>
+      <datasheet>https://www.esploradores.com/wp-content/uploads/2019/11/PINOUT-NodeMCU_1.0-V2-2_2.jpg</datasheet>
+      <fields>
+        <field name="Precio">10€</field>
+      </fields>
+      <libsource lib="ESP8266" part="NodeMCU1.0(ESP-12E)" description=""/>
+      <property name="Precio" value="10€"/>
+      <property name="Sheetname" value="Prueba_5"/>
+      <property name="Sheetfile" value="Prueba_5.kicad_sch"/>
+      <sheetpath names="/Prueba_5/" tstamps="/fa6a7ee8-bd0b-4726-91a3-4faa7c7b558b/"/>
+      <tstamps>7cceb1ec-ef66-4300-b14a-a6d5885566c6</tstamps>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="ESP8266" part="NodeMCU1.0(ESP-12E)">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">NodeMCU1.0(ESP-12E)</field>
+      </fields>
+      <pins>
+        <pin num="1" name="A0(ADC0)" type="input"/>
+        <pin num="2" name="RSV" type="input"/>
+        <pin num="3" name="RSV" type="input"/>
+        <pin num="4" name="SD3(GPIO10)" type="input"/>
+        <pin num="5" name="SD2(GPIO9)" type="input"/>
+        <pin num="6" name="SD1(MOSI)" type="input"/>
+        <pin num="7" name="CMD(CS)" type="input"/>
+        <pin num="8" name="SDO(MISO)" type="input"/>
+        <pin num="9" name="CLK(SCLK)" type="input"/>
+        <pin num="10" name="GND" type="input"/>
+        <pin num="11" name="3.3V" type="input"/>
+        <pin num="12" name="EN" type="input"/>
+        <pin num="13" name="RST" type="input"/>
+        <pin num="14" name="GND" type="input"/>
+        <pin num="15" name="VIN" type="input"/>
+        <pin num="16" name="3.3V" type="input"/>
+        <pin num="17" name="GND" type="input"/>
+        <pin num="18" name="TX(GPIO1)" type="input"/>
+        <pin num="19" name="RX(DPIO3)" type="input"/>
+        <pin num="20" name="D8(GPIO15)" type="input"/>
+        <pin num="21" name="D7(GPIO13)" type="input"/>
+        <pin num="22" name="D6(GPIO12)" type="input"/>
+        <pin num="23" name="D5(GPIO14)" type="input"/>
+        <pin num="24" name="GND" type="input"/>
+        <pin num="25" name="3.3V" type="input"/>
+        <pin num="26" name="D4(GPIO2)" type="input"/>
+        <pin num="27" name="D3(GPIO0)" type="input"/>
+        <pin num="28" name="D2(GPIO4)" type="input"/>
+        <pin num="29" name="D1(GPIO5)" type="input"/>
+        <pin num="30" name="D0(GPIO16)" type="input"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="ESP8266">
+      <uri>/home/rhyloo/Documents/Universidad/Informática industrial/Trabajo en grupo/la-caja/pruebas/prueba3-reloj/kicad-ESP8266-master/ESP8266.lib</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="5vvvv">
+      <node ref="PRUEBA1" pin="15" pinfunction="VIN" pintype="input"/>
+      <node ref="PRUEBA2" pin="15" pinfunction="VIN" pintype="input"/>
+      <node ref="PRUEBA3" pin="15" pinfunction="VIN" pintype="input"/>
+      <node ref="PRUEBA4" pin="15" pinfunction="VIN" pintype="input"/>
+      <node ref="PRUEBA5" pin="15" pinfunction="VIN" pintype="input"/>
+    </net>
+    <net code="2" name="GND">
+      <node ref="PRUEBA1" pin="14" pinfunction="GND" pintype="input"/>
+      <node ref="PRUEBA2" pin="14" pinfunction="GND" pintype="input"/>
+      <node ref="PRUEBA3" pin="14" pinfunction="GND" pintype="input"/>
+      <node ref="PRUEBA4" pin="14" pinfunction="GND" pintype="input"/>
+      <node ref="PRUEBA5" pin="14" pinfunction="GND" pintype="input"/>
+    </net>
+    <net code="3" name="unconnected-(PRUEBA1-Pad1)">
+      <node ref="PRUEBA1" pin="1" pinfunction="A0(ADC0)" pintype="input"/>
+    </net>
+    <net code="4" name="unconnected-(PRUEBA1-Pad2)">
+      <node ref="PRUEBA1" pin="2" pinfunction="RSV" pintype="input"/>
+    </net>
+    <net code="5" name="unconnected-(PRUEBA1-Pad3)">
+      <node ref="PRUEBA1" pin="3" pinfunction="RSV" pintype="input"/>
+    </net>
+    <net code="6" name="unconnected-(PRUEBA1-Pad4)">
+      <node ref="PRUEBA1" pin="4" pinfunction="SD3(GPIO10)" pintype="input"/>
+    </net>
+    <net code="7" name="unconnected-(PRUEBA1-Pad5)">
+      <node ref="PRUEBA1" pin="5" pinfunction="SD2(GPIO9)" pintype="input"/>
+    </net>
+    <net code="8" name="unconnected-(PRUEBA1-Pad6)">
+      <node ref="PRUEBA1" pin="6" pinfunction="SD1(MOSI)" pintype="input"/>
+    </net>
+    <net code="9" name="unconnected-(PRUEBA1-Pad7)">
+      <node ref="PRUEBA1" pin="7" pinfunction="CMD(CS)" pintype="input"/>
+    </net>
+    <net code="10" name="unconnected-(PRUEBA1-Pad8)">
+      <node ref="PRUEBA1" pin="8" pinfunction="SDO(MISO)" pintype="input"/>
+    </net>
+    <net code="11" name="unconnected-(PRUEBA1-Pad9)">
+      <node ref="PRUEBA1" pin="9" pinfunction="CLK(SCLK)" pintype="input"/>
+    </net>
+    <net code="12" name="unconnected-(PRUEBA1-Pad10)">
+      <node ref="PRUEBA1" pin="10" pinfunction="GND" pintype="input"/>
+    </net>
+    <net code="13" name="unconnected-(PRUEBA1-Pad11)">
+      <node ref="PRUEBA1" pin="11" pinfunction="3.3V" pintype="input"/>
+    </net>
+    <net code="14" name="unconnected-(PRUEBA1-Pad12)">
+      <node ref="PRUEBA1" pin="12" pinfunction="EN" pintype="input"/>
+    </net>
+    <net code="15" name="unconnected-(PRUEBA1-Pad13)">
+      <node ref="PRUEBA1" pin="13" pinfunction="RST" pintype="input"/>
+    </net>
+    <net code="16" name="unconnected-(PRUEBA1-Pad16)">
+      <node ref="PRUEBA1" pin="16" pinfunction="3.3V" pintype="input"/>
+    </net>
+    <net code="17" name="unconnected-(PRUEBA1-Pad17)">
+      <node ref="PRUEBA1" pin="17" pinfunction="GND" pintype="input"/>
+    </net>
+    <net code="18" name="unconnected-(PRUEBA1-Pad18)">
+      <node ref="PRUEBA1" pin="18" pinfunction="TX(GPIO1)" pintype="input"/>
+    </net>
+    <net code="19" name="unconnected-(PRUEBA1-Pad19)">
+      <node ref="PRUEBA1" pin="19" pinfunction="RX(DPIO3)" pintype="input"/>
+    </net>
+    <net code="20" name="unconnected-(PRUEBA1-Pad20)">
+      <node ref="PRUEBA1" pin="20" pinfunction="D8(GPIO15)" pintype="input"/>
+    </net>
+    <net code="21" name="unconnected-(PRUEBA1-Pad21)">
+      <node ref="PRUEBA1" pin="21" pinfunction="D7(GPIO13)" pintype="input"/>
+    </net>
+    <net code="22" name="unconnected-(PRUEBA1-Pad22)">
+      <node ref="PRUEBA1" pin="22" pinfunction="D6(GPIO12)" pintype="input"/>
+    </net>
+    <net code="23" name="unconnected-(PRUEBA1-Pad23)">
+      <node ref="PRUEBA1" pin="23" pinfunction="D5(GPIO14)" pintype="input"/>
+    </net>
+    <net code="24" name="unconnected-(PRUEBA1-Pad24)">
+      <node ref="PRUEBA1" pin="24" pinfunction="GND" pintype="input"/>
+    </net>
+    <net code="25" name="unconnected-(PRUEBA1-Pad25)">
+      <node ref="PRUEBA1" pin="25" pinfunction="3.3V" pintype="input"/>
+    </net>
+    <net code="26" name="unconnected-(PRUEBA1-Pad26)">
+      <node ref="PRUEBA1" pin="26" pinfunction="D4(GPIO2)" pintype="input"/>
+    </net>
+    <net code="27" name="unconnected-(PRUEBA1-Pad27)">
+      <node ref="PRUEBA1" pin="27" pinfunction="D3(GPIO0)" pintype="input"/>
+    </net>
+    <net code="28" name="unconnected-(PRUEBA1-Pad28)">
+      <node ref="PRUEBA1" pin="28" pinfunction="D2(GPIO4)" pintype="input"/>
+    </net>
+    <net code="29" name="unconnected-(PRUEBA1-Pad29)">
+      <node ref="PRUEBA1" pin="29" pinfunction="D1(GPIO5)" pintype="input"/>
+    </net>
+    <net code="30" name="unconnected-(PRUEBA1-Pad30)">
+      <node ref="PRUEBA1" pin="30" pinfunction="D0(GPIO16)" pintype="input"/>
+    </net>
+    <net code="31" name="unconnected-(PRUEBA2-Pad1)">
+      <node ref="PRUEBA2" pin="1" pinfunction="A0(ADC0)" pintype="input"/>
+    </net>
+    <net code="32" name="unconnected-(PRUEBA2-Pad2)">
+      <node ref="PRUEBA2" pin="2" pinfunction="RSV" pintype="input"/>
+    </net>
+    <net code="33" name="unconnected-(PRUEBA2-Pad3)">
+      <node ref="PRUEBA2" pin="3" pinfunction="RSV" pintype="input"/>
+    </net>
+    <net code="34" name="unconnected-(PRUEBA2-Pad4)">
+      <node ref="PRUEBA2" pin="4" pinfunction="SD3(GPIO10)" pintype="input"/>
+    </net>
+    <net code="35" name="unconnected-(PRUEBA2-Pad5)">
+      <node ref="PRUEBA2" pin="5" pinfunction="SD2(GPIO9)" pintype="input"/>
+    </net>
+    <net code="36" name="unconnected-(PRUEBA2-Pad6)">
+      <node ref="PRUEBA2" pin="6" pinfunction="SD1(MOSI)" pintype="input"/>
+    </net>
+    <net code="37" name="unconnected-(PRUEBA2-Pad7)">
+      <node ref="PRUEBA2" pin="7" pinfunction="CMD(CS)" pintype="input"/>
+    </net>
+    <net code="38" name="unconnected-(PRUEBA2-Pad8)">
+      <node ref="PRUEBA2" pin="8" pinfunction="SDO(MISO)" pintype="input"/>
+    </net>
+    <net code="39" name="unconnected-(PRUEBA2-Pad9)">
+      <node ref="PRUEBA2" pin="9" pinfunction="CLK(SCLK)" pintype="input"/>
+    </net>
+    <net code="40" name="unconnected-(PRUEBA2-Pad10)">
+      <node ref="PRUEBA2" pin="10" pinfunction="GND" pintype="input"/>
+    </net>
+    <net code="41" name="unconnected-(PRUEBA2-Pad11)">
+      <node ref="PRUEBA2" pin="11" pinfunction="3.3V" pintype="input"/>
+    </net>
+    <net code="42" name="unconnected-(PRUEBA2-Pad12)">
+      <node ref="PRUEBA2" pin="12" pinfunction="EN" pintype="input"/>
+    </net>
+    <net code="43" name="unconnected-(PRUEBA2-Pad13)">
+      <node ref="PRUEBA2" pin="13" pinfunction="RST" pintype="input"/>
+    </net>
+    <net code="44" name="unconnected-(PRUEBA2-Pad16)">
+      <node ref="PRUEBA2" pin="16" pinfunction="3.3V" pintype="input"/>
+    </net>
+    <net code="45" name="unconnected-(PRUEBA2-Pad17)">
+      <node ref="PRUEBA2" pin="17" pinfunction="GND" pintype="input"/>
+    </net>
+    <net code="46" name="unconnected-(PRUEBA2-Pad18)">
+      <node ref="PRUEBA2" pin="18" pinfunction="TX(GPIO1)" pintype="input"/>
+    </net>
+    <net code="47" name="unconnected-(PRUEBA2-Pad19)">
+      <node ref="PRUEBA2" pin="19" pinfunction="RX(DPIO3)" pintype="input"/>
+    </net>
+    <net code="48" name="unconnected-(PRUEBA2-Pad20)">
+      <node ref="PRUEBA2" pin="20" pinfunction="D8(GPIO15)" pintype="input"/>
+    </net>
+    <net code="49" name="unconnected-(PRUEBA2-Pad21)">
+      <node ref="PRUEBA2" pin="21" pinfunction="D7(GPIO13)" pintype="input"/>
+    </net>
+    <net code="50" name="unconnected-(PRUEBA2-Pad22)">
+      <node ref="PRUEBA2" pin="22" pinfunction="D6(GPIO12)" pintype="input"/>
+    </net>
+    <net code="51" name="unconnected-(PRUEBA2-Pad23)">
+      <node ref="PRUEBA2" pin="23" pinfunction="D5(GPIO14)" pintype="input"/>
+    </net>
+    <net code="52" name="unconnected-(PRUEBA2-Pad24)">
+      <node ref="PRUEBA2" pin="24" pinfunction="GND" pintype="input"/>
+    </net>
+    <net code="53" name="unconnected-(PRUEBA2-Pad25)">
+      <node ref="PRUEBA2" pin="25" pinfunction="3.3V" pintype="input"/>
+    </net>
+    <net code="54" name="unconnected-(PRUEBA2-Pad26)">
+      <node ref="PRUEBA2" pin="26" pinfunction="D4(GPIO2)" pintype="input"/>
+    </net>
+    <net code="55" name="unconnected-(PRUEBA2-Pad27)">
+      <node ref="PRUEBA2" pin="27" pinfunction="D3(GPIO0)" pintype="input"/>
+    </net>
+    <net code="56" name="unconnected-(PRUEBA2-Pad28)">
+      <node ref="PRUEBA2" pin="28" pinfunction="D2(GPIO4)" pintype="input"/>
+    </net>
+    <net code="57" name="unconnected-(PRUEBA2-Pad29)">
+      <node ref="PRUEBA2" pin="29" pinfunction="D1(GPIO5)" pintype="input"/>
+    </net>
+    <net code="58" name="unconnected-(PRUEBA2-Pad30)">
+      <node ref="PRUEBA2" pin="30" pinfunction="D0(GPIO16)" pintype="input"/>
+    </net>
+    <net code="59" name="unconnected-(PRUEBA3-Pad1)">
+      <node ref="PRUEBA3" pin="1" pinfunction="A0(ADC0)" pintype="input"/>
+    </net>
+    <net code="60" name="unconnected-(PRUEBA3-Pad2)">
+      <node ref="PRUEBA3" pin="2" pinfunction="RSV" pintype="input"/>
+    </net>
+    <net code="61" name="unconnected-(PRUEBA3-Pad3)">
+      <node ref="PRUEBA3" pin="3" pinfunction="RSV" pintype="input"/>
+    </net>
+    <net code="62" name="unconnected-(PRUEBA3-Pad4)">
+      <node ref="PRUEBA3" pin="4" pinfunction="SD3(GPIO10)" pintype="input"/>
+    </net>
+    <net code="63" name="unconnected-(PRUEBA3-Pad5)">
+      <node ref="PRUEBA3" pin="5" pinfunction="SD2(GPIO9)" pintype="input"/>
+    </net>
+    <net code="64" name="unconnected-(PRUEBA3-Pad6)">
+      <node ref="PRUEBA3" pin="6" pinfunction="SD1(MOSI)" pintype="input"/>
+    </net>
+    <net code="65" name="unconnected-(PRUEBA3-Pad7)">
+      <node ref="PRUEBA3" pin="7" pinfunction="CMD(CS)" pintype="input"/>
+    </net>
+    <net code="66" name="unconnected-(PRUEBA3-Pad8)">
+      <node ref="PRUEBA3" pin="8" pinfunction="SDO(MISO)" pintype="input"/>
+    </net>
+    <net code="67" name="unconnected-(PRUEBA3-Pad9)">
+      <node ref="PRUEBA3" pin="9" pinfunction="CLK(SCLK)" pintype="input"/>
+    </net>
+    <net code="68" name="unconnected-(PRUEBA3-Pad10)">
+      <node ref="PRUEBA3" pin="10" pinfunction="GND" pintype="input"/>
+    </net>
+    <net code="69" name="unconnected-(PRUEBA3-Pad11)">
+      <node ref="PRUEBA3" pin="11" pinfunction="3.3V" pintype="input"/>
+    </net>
+    <net code="70" name="unconnected-(PRUEBA3-Pad12)">
+      <node ref="PRUEBA3" pin="12" pinfunction="EN" pintype="input"/>
+    </net>
+    <net code="71" name="unconnected-(PRUEBA3-Pad13)">
+      <node ref="PRUEBA3" pin="13" pinfunction="RST" pintype="input"/>
+    </net>
+    <net code="72" name="unconnected-(PRUEBA3-Pad16)">
+      <node ref="PRUEBA3" pin="16" pinfunction="3.3V" pintype="input"/>
+    </net>
+    <net code="73" name="unconnected-(PRUEBA3-Pad17)">
+      <node ref="PRUEBA3" pin="17" pinfunction="GND" pintype="input"/>
+    </net>
+    <net code="74" name="unconnected-(PRUEBA3-Pad18)">
+      <node ref="PRUEBA3" pin="18" pinfunction="TX(GPIO1)" pintype="input"/>
+    </net>
+    <net code="75" name="unconnected-(PRUEBA3-Pad19)">
+      <node ref="PRUEBA3" pin="19" pinfunction="RX(DPIO3)" pintype="input"/>
+    </net>
+    <net code="76" name="unconnected-(PRUEBA3-Pad20)">
+      <node ref="PRUEBA3" pin="20" pinfunction="D8(GPIO15)" pintype="input"/>
+    </net>
+    <net code="77" name="unconnected-(PRUEBA3-Pad21)">
+      <node ref="PRUEBA3" pin="21" pinfunction="D7(GPIO13)" pintype="input"/>
+    </net>
+    <net code="78" name="unconnected-(PRUEBA3-Pad22)">
+      <node ref="PRUEBA3" pin="22" pinfunction="D6(GPIO12)" pintype="input"/>
+    </net>
+    <net code="79" name="unconnected-(PRUEBA3-Pad23)">
+      <node ref="PRUEBA3" pin="23" pinfunction="D5(GPIO14)" pintype="input"/>
+    </net>
+    <net code="80" name="unconnected-(PRUEBA3-Pad24)">
+      <node ref="PRUEBA3" pin="24" pinfunction="GND" pintype="input"/>
+    </net>
+    <net code="81" name="unconnected-(PRUEBA3-Pad25)">
+      <node ref="PRUEBA3" pin="25" pinfunction="3.3V" pintype="input"/>
+    </net>
+    <net code="82" name="unconnected-(PRUEBA3-Pad26)">
+      <node ref="PRUEBA3" pin="26" pinfunction="D4(GPIO2)" pintype="input"/>
+    </net>
+    <net code="83" name="unconnected-(PRUEBA3-Pad27)">
+      <node ref="PRUEBA3" pin="27" pinfunction="D3(GPIO0)" pintype="input"/>
+    </net>
+    <net code="84" name="unconnected-(PRUEBA3-Pad28)">
+      <node ref="PRUEBA3" pin="28" pinfunction="D2(GPIO4)" pintype="input"/>
+    </net>
+    <net code="85" name="unconnected-(PRUEBA3-Pad29)">
+      <node ref="PRUEBA3" pin="29" pinfunction="D1(GPIO5)" pintype="input"/>
+    </net>
+    <net code="86" name="unconnected-(PRUEBA3-Pad30)">
+      <node ref="PRUEBA3" pin="30" pinfunction="D0(GPIO16)" pintype="input"/>
+    </net>
+    <net code="87" name="unconnected-(PRUEBA4-Pad1)">
+      <node ref="PRUEBA4" pin="1" pinfunction="A0(ADC0)" pintype="input"/>
+    </net>
+    <net code="88" name="unconnected-(PRUEBA4-Pad2)">
+      <node ref="PRUEBA4" pin="2" pinfunction="RSV" pintype="input"/>
+    </net>
+    <net code="89" name="unconnected-(PRUEBA4-Pad3)">
+      <node ref="PRUEBA4" pin="3" pinfunction="RSV" pintype="input"/>
+    </net>
+    <net code="90" name="unconnected-(PRUEBA4-Pad4)">
+      <node ref="PRUEBA4" pin="4" pinfunction="SD3(GPIO10)" pintype="input"/>
+    </net>
+    <net code="91" name="unconnected-(PRUEBA4-Pad5)">
+      <node ref="PRUEBA4" pin="5" pinfunction="SD2(GPIO9)" pintype="input"/>
+    </net>
+    <net code="92" name="unconnected-(PRUEBA4-Pad6)">
+      <node ref="PRUEBA4" pin="6" pinfunction="SD1(MOSI)" pintype="input"/>
+    </net>
+    <net code="93" name="unconnected-(PRUEBA4-Pad7)">
+      <node ref="PRUEBA4" pin="7" pinfunction="CMD(CS)" pintype="input"/>
+    </net>
+    <net code="94" name="unconnected-(PRUEBA4-Pad8)">
+      <node ref="PRUEBA4" pin="8" pinfunction="SDO(MISO)" pintype="input"/>
+    </net>
+    <net code="95" name="unconnected-(PRUEBA4-Pad9)">
+      <node ref="PRUEBA4" pin="9" pinfunction="CLK(SCLK)" pintype="input"/>
+    </net>
+    <net code="96" name="unconnected-(PRUEBA4-Pad10)">
+      <node ref="PRUEBA4" pin="10" pinfunction="GND" pintype="input"/>
+    </net>
+    <net code="97" name="unconnected-(PRUEBA4-Pad11)">
+      <node ref="PRUEBA4" pin="11" pinfunction="3.3V" pintype="input"/>
+    </net>
+    <net code="98" name="unconnected-(PRUEBA4-Pad12)">
+      <node ref="PRUEBA4" pin="12" pinfunction="EN" pintype="input"/>
+    </net>
+    <net code="99" name="unconnected-(PRUEBA4-Pad13)">
+      <node ref="PRUEBA4" pin="13" pinfunction="RST" pintype="input"/>
+    </net>
+    <net code="100" name="unconnected-(PRUEBA4-Pad16)">
+      <node ref="PRUEBA4" pin="16" pinfunction="3.3V" pintype="input"/>
+    </net>
+    <net code="101" name="unconnected-(PRUEBA4-Pad17)">
+      <node ref="PRUEBA4" pin="17" pinfunction="GND" pintype="input"/>
+    </net>
+    <net code="102" name="unconnected-(PRUEBA4-Pad18)">
+      <node ref="PRUEBA4" pin="18" pinfunction="TX(GPIO1)" pintype="input"/>
+    </net>
+    <net code="103" name="unconnected-(PRUEBA4-Pad19)">
+      <node ref="PRUEBA4" pin="19" pinfunction="RX(DPIO3)" pintype="input"/>
+    </net>
+    <net code="104" name="unconnected-(PRUEBA4-Pad20)">
+      <node ref="PRUEBA4" pin="20" pinfunction="D8(GPIO15)" pintype="input"/>
+    </net>
+    <net code="105" name="unconnected-(PRUEBA4-Pad21)">
+      <node ref="PRUEBA4" pin="21" pinfunction="D7(GPIO13)" pintype="input"/>
+    </net>
+    <net code="106" name="unconnected-(PRUEBA4-Pad22)">
+      <node ref="PRUEBA4" pin="22" pinfunction="D6(GPIO12)" pintype="input"/>
+    </net>
+    <net code="107" name="unconnected-(PRUEBA4-Pad23)">
+      <node ref="PRUEBA4" pin="23" pinfunction="D5(GPIO14)" pintype="input"/>
+    </net>
+    <net code="108" name="unconnected-(PRUEBA4-Pad24)">
+      <node ref="PRUEBA4" pin="24" pinfunction="GND" pintype="input"/>
+    </net>
+    <net code="109" name="unconnected-(PRUEBA4-Pad25)">
+      <node ref="PRUEBA4" pin="25" pinfunction="3.3V" pintype="input"/>
+    </net>
+    <net code="110" name="unconnected-(PRUEBA4-Pad26)">
+      <node ref="PRUEBA4" pin="26" pinfunction="D4(GPIO2)" pintype="input"/>
+    </net>
+    <net code="111" name="unconnected-(PRUEBA4-Pad27)">
+      <node ref="PRUEBA4" pin="27" pinfunction="D3(GPIO0)" pintype="input"/>
+    </net>
+    <net code="112" name="unconnected-(PRUEBA4-Pad28)">
+      <node ref="PRUEBA4" pin="28" pinfunction="D2(GPIO4)" pintype="input"/>
+    </net>
+    <net code="113" name="unconnected-(PRUEBA4-Pad29)">
+      <node ref="PRUEBA4" pin="29" pinfunction="D1(GPIO5)" pintype="input"/>
+    </net>
+    <net code="114" name="unconnected-(PRUEBA4-Pad30)">
+      <node ref="PRUEBA4" pin="30" pinfunction="D0(GPIO16)" pintype="input"/>
+    </net>
+    <net code="115" name="unconnected-(PRUEBA5-Pad1)">
+      <node ref="PRUEBA5" pin="1" pinfunction="A0(ADC0)" pintype="input"/>
+    </net>
+    <net code="116" name="unconnected-(PRUEBA5-Pad2)">
+      <node ref="PRUEBA5" pin="2" pinfunction="RSV" pintype="input"/>
+    </net>
+    <net code="117" name="unconnected-(PRUEBA5-Pad3)">
+      <node ref="PRUEBA5" pin="3" pinfunction="RSV" pintype="input"/>
+    </net>
+    <net code="118" name="unconnected-(PRUEBA5-Pad4)">
+      <node ref="PRUEBA5" pin="4" pinfunction="SD3(GPIO10)" pintype="input"/>
+    </net>
+    <net code="119" name="unconnected-(PRUEBA5-Pad5)">
+      <node ref="PRUEBA5" pin="5" pinfunction="SD2(GPIO9)" pintype="input"/>
+    </net>
+    <net code="120" name="unconnected-(PRUEBA5-Pad6)">
+      <node ref="PRUEBA5" pin="6" pinfunction="SD1(MOSI)" pintype="input"/>
+    </net>
+    <net code="121" name="unconnected-(PRUEBA5-Pad7)">
+      <node ref="PRUEBA5" pin="7" pinfunction="CMD(CS)" pintype="input"/>
+    </net>
+    <net code="122" name="unconnected-(PRUEBA5-Pad8)">
+      <node ref="PRUEBA5" pin="8" pinfunction="SDO(MISO)" pintype="input"/>
+    </net>
+    <net code="123" name="unconnected-(PRUEBA5-Pad9)">
+      <node ref="PRUEBA5" pin="9" pinfunction="CLK(SCLK)" pintype="input"/>
+    </net>
+    <net code="124" name="unconnected-(PRUEBA5-Pad10)">
+      <node ref="PRUEBA5" pin="10" pinfunction="GND" pintype="input"/>
+    </net>
+    <net code="125" name="unconnected-(PRUEBA5-Pad11)">
+      <node ref="PRUEBA5" pin="11" pinfunction="3.3V" pintype="input"/>
+    </net>
+    <net code="126" name="unconnected-(PRUEBA5-Pad12)">
+      <node ref="PRUEBA5" pin="12" pinfunction="EN" pintype="input"/>
+    </net>
+    <net code="127" name="unconnected-(PRUEBA5-Pad13)">
+      <node ref="PRUEBA5" pin="13" pinfunction="RST" pintype="input"/>
+    </net>
+    <net code="128" name="unconnected-(PRUEBA5-Pad16)">
+      <node ref="PRUEBA5" pin="16" pinfunction="3.3V" pintype="input"/>
+    </net>
+    <net code="129" name="unconnected-(PRUEBA5-Pad17)">
+      <node ref="PRUEBA5" pin="17" pinfunction="GND" pintype="input"/>
+    </net>
+    <net code="130" name="unconnected-(PRUEBA5-Pad18)">
+      <node ref="PRUEBA5" pin="18" pinfunction="TX(GPIO1)" pintype="input"/>
+    </net>
+    <net code="131" name="unconnected-(PRUEBA5-Pad19)">
+      <node ref="PRUEBA5" pin="19" pinfunction="RX(DPIO3)" pintype="input"/>
+    </net>
+    <net code="132" name="unconnected-(PRUEBA5-Pad20)">
+      <node ref="PRUEBA5" pin="20" pinfunction="D8(GPIO15)" pintype="input"/>
+    </net>
+    <net code="133" name="unconnected-(PRUEBA5-Pad21)">
+      <node ref="PRUEBA5" pin="21" pinfunction="D7(GPIO13)" pintype="input"/>
+    </net>
+    <net code="134" name="unconnected-(PRUEBA5-Pad22)">
+      <node ref="PRUEBA5" pin="22" pinfunction="D6(GPIO12)" pintype="input"/>
+    </net>
+    <net code="135" name="unconnected-(PRUEBA5-Pad23)">
+      <node ref="PRUEBA5" pin="23" pinfunction="D5(GPIO14)" pintype="input"/>
+    </net>
+    <net code="136" name="unconnected-(PRUEBA5-Pad24)">
+      <node ref="PRUEBA5" pin="24" pinfunction="GND" pintype="input"/>
+    </net>
+    <net code="137" name="unconnected-(PRUEBA5-Pad25)">
+      <node ref="PRUEBA5" pin="25" pinfunction="3.3V" pintype="input"/>
+    </net>
+    <net code="138" name="unconnected-(PRUEBA5-Pad26)">
+      <node ref="PRUEBA5" pin="26" pinfunction="D4(GPIO2)" pintype="input"/>
+    </net>
+    <net code="139" name="unconnected-(PRUEBA5-Pad27)">
+      <node ref="PRUEBA5" pin="27" pinfunction="D3(GPIO0)" pintype="input"/>
+    </net>
+    <net code="140" name="unconnected-(PRUEBA5-Pad28)">
+      <node ref="PRUEBA5" pin="28" pinfunction="D2(GPIO4)" pintype="input"/>
+    </net>
+    <net code="141" name="unconnected-(PRUEBA5-Pad29)">
+      <node ref="PRUEBA5" pin="29" pinfunction="D1(GPIO5)" pintype="input"/>
+    </net>
+    <net code="142" name="unconnected-(PRUEBA5-Pad30)">
+      <node ref="PRUEBA5" pin="30" pinfunction="D0(GPIO16)" pintype="input"/>
+    </net>
+  </nets>
+</export>
