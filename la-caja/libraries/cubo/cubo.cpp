@@ -16,6 +16,9 @@ If the library doesn't seem to build, make sure that the files really end in .cp
 #include "Arduino.h"
 #include "Cubo.h"
 
+#define APAGADO HIGH
+#define ENCENDIDO LOW
+
 Cubo::Cubo(int pin)
 {
   pinMode(pin, OUTPUT);
@@ -25,17 +28,23 @@ Cubo::Cubo(int pin)
 
 void Cubo::dot()
 {
-  digitalWrite(_pin, HIGH);
+  digitalWrite(_pin, ENCENDIDO);
   delay(250);
-  digitalWrite(_pin, LOW);
+  digitalWrite(_pin, APAGADO);
   delay(250);  
 }
 
 
 void Cubo::dash()
 {
-  digitalWrite(_pin, HIGH);
+  digitalWrite(_pin, ENCENDIDO);
   delay(1000);
-  digitalWrite(_pin, LOW);
+  digitalWrite(_pin, APAGADO);
   delay(250);
+}
+
+void Cubo::wait()
+{
+  digitalWrite(_pin, APAGADO);
+  delay(5000);
 }

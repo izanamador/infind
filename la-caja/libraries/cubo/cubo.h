@@ -19,6 +19,7 @@ class Cubo
     Cubo(int pin);
     void dot();
     void dash();
+    void wait();
 
   private:
     int _pin;
