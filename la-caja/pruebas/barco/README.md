@@ -1,41 +1,17 @@
-<!--
-Hey, thanks for using the awesome-readme-template template.  
-If you have any enhancements, then fork this project and create a pull request 
-or just open an issue with the label "enhancement".
 
-Don't forget to give this project a star for additional support ;)
-Maybe you can mention me or this repo in the acknowledgements too
--->
 <div align="center">
 
-
-  <h1>Awesome Readme Template</h1>
+  <img src="https://www.3dbenchy.com/wp-content/uploads/2016/01/cropped-3DBenchy_website_logo_512x512px.png" alt="logo" width="200" height="auto" />
+  <h1>Prueba 5: El barco</h1>
   
   <p>
-    An awesome README template for your projects! Prueba de ediciion 
+    Enviar SOS en código Morse mediante linterna a LDR 
   </p>
   
   
 <!-- Badges -->
 <p>
-  <a href="https://github.com/Louis3797/awesome-readme-template/graphs/contributors">
-    <img src="https://img.shields.io/github/contributors/Louis3797/awesome-readme-template" alt="contributors" />
-  </a>
-  <a href="">
-    <img src="https://img.shields.io/github/last-commit/Louis3797/awesome-readme-template" alt="last update" />
-  </a>
-  <a href="https://github.com/Louis3797/awesome-readme-template/network/members">
-    <img src="https://img.shields.io/github/forks/Louis3797/awesome-readme-template" alt="forks" />
-  </a>
-  <a href="https://github.com/Louis3797/awesome-readme-template/stargazers">
-    <img src="https://img.shields.io/github/stars/Louis3797/awesome-readme-template" alt="stars" />
-  </a>
-  <a href="https://github.com/Louis3797/awesome-readme-template/issues/">
-    <img src="https://img.shields.io/github/issues/Louis3797/awesome-readme-template" alt="open issues" />
-  </a>
-  <a href="https://github.com/Louis3797/awesome-readme-template/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/Louis3797/awesome-readme-template.svg" alt="license" />
-  </a>
+  
 </p>
    
 <h4>
@@ -52,28 +28,22 @@ Maybe you can mention me or this repo in the acknowledgements too
 <br />
 
 <!-- Table of Contents -->
-# :notebook_with_decorative_cover: Table of Contents
+# Tabla de Contenidos
 
-- [About the Project](#star2-about-the-project)
-  * [Screenshots](#camera-screenshots)
-  * [Tech Stack](#space_invader-tech-stack)
-  * [Features](#dart-features)
-  * [Color Reference](#art-color-reference)
-  * [Environment Variables](#key-environment-variables)
-- [Getting Started](#toolbox-getting-started)
-  * [Prerequisites](#bangbang-prerequisites)
-  * [Installation](#gear-installation)
-  * [Running Tests](#test_tube-running-tests)
-  * [Run Locally](#running-run-locally)
-  * [Deployment](#triangular_flag_on_post-deployment)
-- [Usage](#eyes-usage)
-- [Roadmap](#compass-roadmap)
-- [Contributing](#wave-contributing)
-  * [Code of Conduct](#scroll-code-of-conduct)
-- [FAQ](#grey_question-faq)
-- [License](#warning-license)
-- [Contact](#handshake-contact)
-- [Acknowledgements](#gem-acknowledgements)
+- [Descripción de la prueba](#descripcion)
+  * [Información Dashboard](#dart-features)
+  * [Información Bot de Telegram](#art-color-reference)
+- [Hardware necesario](#ampliaciones)
+  * [Esquemático técnico](#opcion1)
+  * [Esquemático usuario](#opcion1)
+- [Pseudocódigo](#ampliaciones)
+  * [C++](#opcion1)
+  * [NodeRED](#opcion1)
+- [Ampliaciones](#ampliaciones)
+  * [Opción 1](#opcion1)
+  * [Opción 2](#opcion1)
+
+
 
   
 
