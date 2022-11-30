@@ -8,20 +8,15 @@
     Enviar SOS en código Morse mediante linterna a LDR 
   </p>
   
-  
-<!-- Badges -->
-<p>
-  
-</p>
    
 <h4>
-    <a href="https://github.com/Louis3797/awesome-readme-template/">View Demo</a>
+    <a href="https://www.youtube.com/watch?v=k8m8R4x0Mgk">View Solution Demo</a>
   <span> · </span>
-    <a href="https://github.com/Louis3797/awesome-readme-template">Documentation</a>
+    <a href="https://github.com/izanamador/infind">Documentation</a>
   <span> · </span>
-    <a href="https://github.com/Louis3797/awesome-readme-template/issues/">Report Bug</a>
+    <a href="https://github.com/izanamador/infind/issues/">Report Bug</a>
   <span> · </span>
-    <a href="https://github.com/Louis3797/awesome-readme-template/issues/">Request Feature</a>
+    <a href="https://github.com/izanamador/infind/issues/">Request Feature</a>
   </h4>
 </div>
 
@@ -33,246 +28,112 @@
 - [Descripción de la prueba](#descripcion)
   * [Información Dashboard](#dart-features)
   * [Información Bot de Telegram](#art-color-reference)
+    #### [Pistas](#art-color-reference)
 - [Hardware necesario](#ampliaciones)
   * [Esquemático técnico](#opcion1)
   * [Esquemático usuario](#opcion1)
 - [Pseudocódigo](#ampliaciones)
   * [C++](#opcion1)
   * [NodeRED](#opcion1)
+  #### [Base de datos](#art-color-reference)
 - [Ampliaciones](#ampliaciones)
   * [Opción 1](#opcion1)
   * [Opción 2](#opcion1)
 
 
-
-  
-
 <!-- About the Project -->
-## :star2: About the Project
+# Descripción de la prueba 5
+
+Se dispone en una de las caras del cubo de un LDR escondido en un barco impreso en 3D o en una imagen. Al usuario se le proporciona una descripción sobre la necesidad de ser rescatado de una isla desierta. Para solucionar la prueba, se debe de introducir la secuencia la traducción del mensaje S.O.S en código MORSE generando la señal de luz mediante la linterna del móvil. 
 
 
-<!-- Screenshots -->
-### :camera: Screenshots
+## Información Dashboard
 
-<div align="center"> 
-  <img src="https://placehold.co/600x400?text=Your+Screenshot+here" alt="screenshot" />
-</div>
+- Opción 1: Se mostrará una imagen de una isla desierta con algún tipo de foco.
 
+- Opción 2: Se mostrará una imagen del puerto de Málaga o de similares con un las luces correspondientes. 
 
-<!-- TechStack -->
-### :space_invader: Tech Stack
+La idea es generar dos imágenes distintas. Una con las luces encendidas y otra con las luces apagadas. De esta manera, cuando el usuario llegue al umbral definido alumbrando con la linterna al LDR en el dashboard se actualizará en tiempo real la imagen para que sea consciente de que está mandando una señal positiva. 
 
-<details>
-  <summary>Client</summary>
-  <ul>
-    <li><a href="https://www.typescriptlang.org/">Typescript</a></li>
-    <li><a href="https://nextjs.org/">Next.js</a></li>
-    <li><a href="https://reactjs.org/">React.js</a></li>
-    <li><a href="https://tailwindcss.com/">TailwindCSS</a></li>
-  </ul>
-</details>
+## Información Bot de Telegram
 
-<details>
-  <summary>Server</summary>
-  <ul>
-    <li><a href="https://www.typescriptlang.org/">Typescript</a></li>
-    <li><a href="https://expressjs.com/">Express.js</a></li>
-    <li><a href="https://go.dev/">Golang</a></li>
-    <li><a href="https://nestjs.com/">Nest.js</a></li>
-    <li><a href="https://socket.io/">SocketIO</a></li>
-    <li><a href="https://www.prisma.io/">Prisma</a></li>    
-    <li><a href="https://www.apollographql.com/">Apollo</a></li>
-    <li><a href="https://graphql.org/">GraphQL</a></li>
-  </ul>
-</details>
+"Llevaís en una isla desierta varios días sin comida ni agua, y divisáis un barco a lo lejos... Es el momento de aprovechar vuestra oportunidad para salvaros."
 
-<details>
-<summary>Database</summary>
-  <ul>
-    <li><a href="https://www.mysql.com/">MySQL</a></li>
-    <li><a href="https://www.postgresql.org/">PostgreSQL</a></li>
-    <li><a href="https://redis.io/">Redis</a></li>
-    <li><a href="https://neo4j.com/">Neo4j</a></li>
-    <li><a href="https://www.mongodb.com/">MongoDB</a></li>
-  </ul>
-</details>
-
-<details>
-<summary>DevOps</summary>
-  <ul>
-    <li><a href="https://www.docker.com/">Docker</a></li>
-    <li><a href="https://www.jenkins.io/">Jenkins</a></li>
-    <li><a href="https://circleci.com/">CircleCLI</a></li>
-  </ul>
-</details>
-
-<!-- Features -->
-### :dart: Features
-
-- Feature 1
-- Feature 2
-- Feature 3
-
-<!-- Color Reference -->
-### :art: Color Reference
-
-| Color             | Hex                                                                |
-| ----------------- | ------------------------------------------------------------------ |
-| Primary Color | ![#222831](https://via.placeholder.com/10/222831?text=+) #222831 |
-| Secondary Color | ![#393E46](https://via.placeholder.com/10/393E46?text=+) #393E46 |
-| Accent Color | ![#00ADB5](https://via.placeholder.com/10/00ADB5?text=+) #00ADB5 |
-| Text Color | ![#EEEEEE](https://via.placeholder.com/10/EEEEEE?text=+) #EEEEEE |
+- Opción 1: Enunciado corto pero estándart.
 
 
-<!-- Env Variables -->
-### :key: Environment Variables
+- Opción 2: Enunciado Malaguita.
 
-To run this project, you will need to add the following environment variables to your .env file
+- Opción 3: Enunciado extenso con detalles innecesarios. 
 
-`API_KEY`
+ ### Pistas
+ 1.  Idea de usar la linterna
+ 2.  Idea de usar código morse o link de herramienta de conversor a morse
+ 3.  Idea de mandar S.O.S 
+ 
 
-`ANOTHER_API_KEY`
+# Hardware Necesario
 
-<!-- Getting Started -->
-## 	:toolbox: Getting Started
+El hardware de la prueba consistirá únicamente en un sensor LDR conectado a la ESP8266. 
 
-<!-- Prerequisites -->
-### :bangbang: Prerequisites
+https://datasheetspdf.com/pdf-file/1402029/Joy-IT/KY-018/1
+https://www.nteinc.com/resistor_web/pdf/LDR-Series.pdf
 
-This project uses Yarn as package manager
+Pines:
 
-```bash
- npm install --global yarn
+- Data (Analog)
+- Vcc (5 V)
+- Gnd
+
+Se trata de un sensor analógico por lo que habrá que conectarlo a la ADC0 de la ESP8266. 
+
+El integrado presenta un divisor de tensión por lo que habrá que acondicionar la señal adecuadamente en el .ino si se pretenden leer valores intermedios. 
+
+
+## [Esquemático Técnico](https://shields.io/)
+## [Esquemático Usuario](https://shields.io/)
+
+# Pseudocógido
+
+https://create.arduino.cc/projecthub/shjin/adaptive-led-morse-code-decoder-and-timer-interrupt-8d18a7
+
+## C++
+
+``` C++
+umbral_luz = valor max; / Saturar sensor
+
+umbral_punto = umbral_t1;
+umbral_guion = umbral_t2;
+
+lectura ldr ()
+  if valor_lectura == umbral_luz during umbral_punto then
+  msg = "."
+  else if valor_lectura == umbral_luz during umbral_guion then
+  msg = "-"
+  else
+  msg = " "
+
 ```
+## NodeRED
 
-<!-- Installation -->
-### :gear: Installation
+```NodeRED
+begin:
+mqtt
+  json node
+    change svg or image
+    mongo db 
+    correct answer checker
 
-Install my-project with npm
-
-```bash
-  yarn install my-project
-  cd my-project
-```
-   
-<!-- Running Tests -->
-### :test_tube: Running Tests
-
-To run tests, run the following command
-
-```bash
-  yarn test test
-```
-
-<!-- Run Locally -->
-### :running: Run Locally
-
-Clone the project
-
-```bash
-  git clone https://github.com/Louis3797/awesome-readme-template.git
-```
-
-Go to the project directory
-
-```bash
-  cd my-project
-```
-
-Install dependencies
-
-```bash
-  yarn install
-```
-
-Start the server
-
-```bash
-  yarn start
 ```
 
 
-<!-- Deployment -->
-### :triangular_flag_on_post: Deployment
 
-To deploy this project run
+# Ampliaciones
 
-```bash
-  yarn deploy
-```
+## Opción 1
 
+Módulo adherido a la caja emisor de luz mediante led, cable y accionado mediante botón para ser autocontenido. 
 
-<!-- Usage -->
-## :eyes: Usage
+## Opción 2
 
-Use this space to tell a little more about your project and how it can be used. Show additional screenshots, code samples, demos or link to other resources.
-
-
-```javascript
-import Component from 'my-project'
-
-function App() {
-  return <Component />
-}
-```
-
-<!-- Roadmap -->
-## :compass: Roadmap
-
-* [x] Todo 1
-* [ ] Todo 2
-
-
-<!-- Contributing -->
-## :wave: Contributing
-
-<a href="https://github.com/Louis3797/awesome-readme-template/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Louis3797/awesome-readme-template" />
-</a>
-
-
-Contributions are always welcome!
-
-See `contributing.md` for ways to get started.
-
-
-<!-- Code of Conduct -->
-### :scroll: Code of Conduct
-
-Please read the [Code of Conduct](https://github.com/Louis3797/awesome-readme-template/blob/master/CODE_OF_CONDUCT.md)
-
-<!-- FAQ -->
-## :grey_question: FAQ
-
-- Question 1
-
-  + Answer 1
-
-- Question 2
-
-  + Answer 2
-
-
-<!-- License -->
-## :warning: License
-
-Distributed under the no License. See LICENSE.txt for more information.
-
-
-<!-- Contact -->
-## :handshake: Contact
-
-Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email@email_client.com
-
-Project Link: [https://github.com/Louis3797/awesome-readme-template](https://github.com/Louis3797/awesome-readme-template)
-
-
-<!-- Acknowledgments -->
-## :gem: Acknowledgements
-
-Use this section to mention useful resources and libraries that you have used in your projects.
-
- - [Shields.io](https://shields.io/)
- - [Awesome README](https://github.com/matiassingers/awesome-readme)
- - [Emoji Cheat Sheet](https://github.com/ikatyang/emoji-cheat-sheet/blob/master/README.md#travel--places)
- - [Readme Template](https://github.com/othneildrew/Best-README-Template)
+Bot de telegram o dashboard con lectura del mensaje en morse en tiempo real ó implementar herramienta de codificador de morse para ayudar al usuario.  
