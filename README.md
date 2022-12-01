@@ -12,5 +12,19 @@ Prácticas de Informática Industrial
 
 ## Contenidos
 - Fuentes: https://github.com/users/izanamador/projects/1/views/1
-- Documentos: Google Drive pte enlace
-- Ideas: 
+- Documentos: Drive: https://drive.google.com/drive/u/2/folders/1Kx6C7Q5txanDhCqWfFEGEfk3odDSAP90
+- Ideas: Pte enlace herramienta
+
+## Estructura
+
+### Estructura Github
+
+la-caja: carpeta raíz
+la-caja/arduino: fuentes de Arduino
+la-caja/libraries: librerías de Arduino
+la-caja/nodered: exports de flujos 
+la-caja
+
+### Estructura Google Drive
+
+
