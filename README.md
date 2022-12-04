@@ -11,9 +11,18 @@ Prácticas de Informática Industrial - Curso 2022/23
 
 
 ## Contenidos
-- Fuentes: https://github.com/users/izanamador/projects/1/views/1
-- Documentos: Drive: https://drive.google.com/drive/u/2/folders/1Kx6C7Q5txanDhCqWfFEGEfk3odDSAP90
-- Ideas: Pte enlace herramienta
+
+- Fuentes: 
+
+https://github.com/users/izanamador/projects/1/views/1
+
+- Documentos: Drive:
+
+ https://drive.google.com/drive/u/2/folders/1Kx6C7Q5txanDhCqWfFEGEfk3odDSAP90
+ 
+- Ideas:
+
+ https://app.mural.co/t/uma4220/m/uma4220/1669277710422/77199a5208eee5953b0f578fe008e71d1ad21dee?sender=u3bf51b20c63cb017bc5a1776
 
 ## Estructura
 
@@ -43,5 +52,25 @@ Prácticas de Informática Industrial - Curso 2022/23
   
   
 ### Estructura Google Drive
- (pte Izan)
+ - la-caja/web: landing page en google sites
+ - la-caja/storyline: información referente a la historia del juego
+    - la-caja/storyline/telegram
+      - la-caja/storyline/texto: diálogos del ChiquiBot
+      - la-caja/storyline/audio: archivos de audios en FakeYou
+    - la-caja/storyline/dashboard
+      - la-caja/storyline/dashboard/imagenes: recursos gráficos para animación dashboard
+- la-caja/presupuesto: excel para generar pdf a incluir en memoria
+- la-caja/memoria: pdfs e imágenes vectorizadas para documento final
+  - la-caja/memoria/figuras
+  - la-caja/memoria/anexos
+- la-caja/doc: documentación en pdf
 
+  - la-caja/doc/hardware: esquemáticos KiCAD y Circuit.io
+  - la-caja/doc/software: diagramas de desarrollo para memoria (hardware, base de datos, arquitectura, topics ...)
+  - la-caja/doc/usuario: manual organizadores de juego (parametrización, organización de partidas, estadísticas...)
+  - la-caja/doc/jugador: manual para jugadores en Canva
+
+- la-caja/branding: recursos gráficos sobre el juego a ser usados en planos, web, documentación etc.
+
+  
+  
