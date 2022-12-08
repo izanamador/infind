@@ -1,7 +1,9 @@
+//#include "Arduino.h"
+
 // Objeto - infraestructura
 #include "infra.h"
-#include "infra.cpp"
-Infra objInfra();
+//#include "infra.cpp"
+Infra objInfra;
 
 
 // Objeto - sensor de temperatura
@@ -23,12 +25,14 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   mensaje[length]='\0'; // caracter cero marca el final de la cadena
   Serial.printf("Mensaje recibido [%s] %s\n", topic, mensaje);
   // compruebo el topic
-  if(strcmp(topic, mqttTopicsSub[0])==0) 
+  if (strcmp(topic, objInfra.mqttTopicsSub[0])==0) 
   {
     if (mensaje[0] == '1') {
-        digitalWrite(LED1, LOW);   // Turn the LED on (Note that LOW is the voltage level 
+        Serial.printf("Uno\n", topic, mensaje);
+        digitalWrite(LED2, LOW);   // Turn the LED on (Note that LOW is the voltage level 
       } else {
-        digitalWrite(LED1, HIGH);  // Turn the LED off by making the voltage HIGH
+        Serial.printf("Cero\n", topic, mensaje);
+        digitalWrite(LED2, HIGH);  // Turn the LED off by making the voltage HIGH
       }
   }
   free(mensaje);
@@ -36,8 +40,8 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
 
 void setup() {
   // inicializaciones genéricas de la infraestructura
-    sprintf(mqttTopicPub, "infind/%s/ricardo/dht11", objInfra.boardId);
-    sprintf(mqttTopicsSub[0], "infind/%s/ricardo/sub", objInfra.boardId);
+    sprintf(objInfra.mqttTopicPub, "infind/%s/ricardo/dht11", objInfra.espId);
+    sprintf(objInfra.mqttTopicsSub[0], "infind/%s/ricardo/sub", objInfra.espId);
     objInfra.Setup(mqttCallback);
 
   // configuración de pines
@@ -53,13 +57,15 @@ void setup() {
     Serial.println("Status\tHumidity (%)\tTemperature (C)\t(F)\tHeatIndex (C)\t(F)");
     String thisBoard= ARDUINO_BOARD;
     Serial.println(thisBoard);
-    dht.setup(PIN_DHT11, DHTesp::DHT11); // DHT22->DHT11
+    objDht.setup(PIN_DHT11, DHTesp::DHT11); // DHT22->DHT11
 }
 
 
 void loop() {
+  objInfra.Loop();
+
   const unsigned long msInterval = 5000; // five seconds
-  const unsigned long msSampling = dht.getMinimumSamplingPeriod();
+  const unsigned long msSampling = objDht.getMinimumSamplingPeriod();
   static unsigned long msPrevious = 0; // last update time  
   static long ledState = LOW;          // led lighted
   unsigned long msCurrent = millis(); // current time
@@ -74,13 +80,15 @@ void loop() {
     {
       char strMessage[128];
       delay(msSampling);
-      float humidity = dht.getHumidity();
-      float temperature = dht.getTemperature();
+      float humidity = objDht.getHumidity();
+      float temperature = objDht.getTemperature();
       sprintf(strMessage, "Status=%s, Hum=%0.2f, Temp=%0.1f ºC=%0.1f ºF, Heat=", 
-        dht.getStatusString(), humidity, temperature, dht.toFahrenheit(temperature));
+        objDht.getStatusString(), humidity, temperature, objDht.toFahrenheit(temperature));
       Serial.print(strMessage);
-      Serial.print(dht.computeHeatIndex(temperature, humidity, false), 1);
+      Serial.print(objDht.computeHeatIndex(temperature, humidity, false), 1);
       Serial.println("ºC");
+      snprintf(strMessage, MQTT_MAX_MESSAGE, "{\"temperatura\": %0.2f, \"humedad\": %0.2f}", temperature, humidity);
+      objInfra.MqttPublish(strMessage);
       //Serial.println(dht.computeHeatIndex(dht.toFahrenheit(temperature), humidity, true), 1);//char strMessage[80];
     }
   }
