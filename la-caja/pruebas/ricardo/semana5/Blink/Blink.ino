@@ -29,15 +29,22 @@ void setup() {
   Serial.begin(115200);
   delay(1000);                      // wait for a second
   Serial.println("Hellow world!"); 
-  delay(5000);                      // wait for a second
+  delay(5000);                      // wait for 5 seconds
 }
 
 // the loop function runs over and over again forever
 void loop() {
-  Serial.println("apagando"); 
-  digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
-  delay(5000);                      // wait for a second
-  Serial.println("Encendiendo"); 
-  digitalWrite(LED_BUILTIN, LOW);   // turn the LED off by making the voltage LOW
-  delay(5000);                      // wait for a second
+  const unsigned long msInterval = 5000; // five seconds
+  static unsigned long msPrevious = 0; // last update time  
+  static long ledState = LOW;          // led lighted
+  unsigned long msCurrent = millis(); // current time
+
+  if (msCurrent > msPrevious + msInterval)
+  {
+    msPrevious = msCurrent;
+//    strAction = ledState==LOW ? "apagando": "encendiendo";
+    Serial.println(ledState==LOW ? "apagando": "encendiendo");  // next action   
+    ledState = ledState==LOW ? HIGH: LOW; // set next state
+    digitalWrite(LED_BUILTIN, ledState);  // write to led pin
+  }
 }
