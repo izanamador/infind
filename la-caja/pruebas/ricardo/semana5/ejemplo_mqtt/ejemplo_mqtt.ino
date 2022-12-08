@@ -97,8 +97,8 @@ void setup() {
   digitalWrite(LED2, HIGH); 
   // crea topics usando id de la placa
   sprintf(ID_PLACA, "ESP_%d", ESP.getChipId());
-  sprintf(topic_PUB, "infind/%s/pub", ID_PLACA);
-  sprintf(topic_SUB, "infind/%s/sub", ID_PLACA);
+  sprintf(topic_PUB, "infind/%s/Ricardo/pub", ID_PLACA);
+  sprintf(topic_SUB, "infind/%s/Ricardo/sub", ID_PLACA);
   conecta_wifi();
   mqtt_client.setServer(mqtt_server, 1883);
   mqtt_client.setBufferSize(512); // para poder enviar mensajes de hasta X bytes

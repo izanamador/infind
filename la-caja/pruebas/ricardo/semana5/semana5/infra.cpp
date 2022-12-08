@@ -1,3 +1,7 @@
+#ifndef INFRACPP_
+#define INFRACPP_
+
+#include "Arduino.h"
 #include "infra.h"
 
 Infra::Infra()
@@ -13,25 +17,26 @@ Infra::Infra()
     sprintf(_mqttServer, "iot.ac.uma.es");
     sprintf(_mqttUser,"infind");
     sprintf(_mqttPassword,"zancudo");
+
+    ptrMqtt = new PubSubClient(objWifi);
+      
 }
 
-int Setup(char *topicPub, char **topicsSub, void (*callback)(char*, byte*, unsigend int));
+int Setup(char *topicPub, char **topicsSub, void (*callback)(char*, byte*, unsigned int));
 
 
-int Infra::Setup(char *topicPub, char **topicsSub, void (*callback)(char*, byte*, unsigend int))
+int Infra::Setup(void (*mqttCallback)(char*, byte*, unsigned int))
 {
   //---------------------------------------------- ESP Setup
   Serial.begin(115200);
   Serial.println();
-  Serial.println("Empieza setup en %lu ms...", millis());
-  pinMode(LED1, OUTPUT);    // inicializa GPIO como salida
-  pinMode(LED2, OUTPUT);    
+  Serial.printf("Empieza setup en %lu ms...", millis());
 
   //---------------------------------------------- WIFI Setup
     Serial.printf("\nConnecting to %s:\n", _wifiSsid);
-    objWifi.mode(WIFI_STA);
-    objWifi.begin(_wifiSsid, _wifiPassword);
-    while (objWifi.status() != WL_CONNECTED) {
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(_wifiSsid, _wifiPassword);
+    while (WiFi.status() != WL_CONNECTED) {
       delay(200);
       Serial.print(".");
     }
@@ -39,20 +44,16 @@ int Infra::Setup(char *topicPub, char **topicsSub, void (*callback)(char*, byte*
       objWifi.localIP().toString().c_str());
 
   //---------------------------------------------- MQTT Setup
-    objMqtt.setServer(_mqttServer, 1883);
-    objMqtt.setBufferSize(512); 
-    mqttTopicPub = topicPub;
-    mqttTopicsSub = topicsSub;
-    objMqtt.setCallback(mqttCallback);
+    ptrMqtt->setServer(_mqttServer, 1883);
+    ptrMqtt->setBufferSize(512); 
+    ptrMqtt->setCallback(mqttCallback);
     MqttConnect();
 
   //---------------------------------------------- Setup summary
-    Serial.printf("Identificador placa: %s\n", _boardId );
-    Serial.printf("Topic publicacion  : %s\n", _mqttTopicPub);
-    Serial.printf("Topic subscripcion : %s\n", _mqttTopicSub);
+    Serial.printf("Identificador placa: %s\n", espId);
+    Serial.printf("Topic publicacion  : %s\n", mqttTopicPub);
+    Serial.printf("Topic subscripcion : %s\n", mqttTopicsSub[0]);
     Serial.printf("Termina setup en %lu ms\n\n",millis());
-
-
 
   return 0;
 }
@@ -60,11 +61,11 @@ int Infra::Setup(char *topicPub, char **topicsSub, void (*callback)(char*, byte*
 
 int Infra::Loop()
 {
-  objMqtt.loop(); // para que la librería recupere el control
+  ptrMqtt->loop(); // para que la librería recupere el control
   return 0;
 }
 
-void Infra::~Infra()
+Infra::~Infra()
 {
   ;
 }
@@ -75,14 +76,14 @@ void Infra::MqttConnect()
   const char* mqtt_pass = "zancudo";
     
   // Loop until we're reconnected
-    while (!objMqtt.connected()) {
+    while (!ptrMqtt->connected()) {
       Serial.print("Attempting MQTT connection...");
       // Attempt to connect
-      if (objMqtt.connect(_boardId, _mqttUser, _mqttPassword)) {
+      if (ptrMqtt->connect(espId, _mqttUser, _mqttPassword)) {
         Serial.printf(" conectado a broker: %s\n", _mqttServer);
-        objMqtt.subscribe(mqttTopicsSub[0]);
+        ptrMqtt->subscribe(mqttTopicsSub[0]);
     } else {
-      Serial.printf("failed, rc=%d  try again in 5s\n", objMqtt.state());
+      Serial.printf("failed, rc=%d  try again in 5s\n", ptrMqtt->state());
       // Wait 5 seconds before retrying
       delay(5000);
     }
@@ -92,14 +93,16 @@ void Infra::MqttConnect()
 
 void Infra::MqttPublish(char *message)
 {
-  char Buffer[MQTT_MAX_MESSAGE];
+  //char Buffer[MQTT_MAX_MESSAGE];
 
-  if (!objMqtt.connected)
+  if (!ptrMqtt->connected())
     MqttConnect();
 
-  if (len(message) < MQTT_MAX_MESSAGE)
+  if (strlen(message) < MQTT_MAX_MESSAGE)
   { 
     Serial.println(message);
-    objMqtt.publish(mqttTopicPub, Buffer);
+    ptrMqtt->publish(mqttTopicPub, message);
   }
 }
+
+#endif

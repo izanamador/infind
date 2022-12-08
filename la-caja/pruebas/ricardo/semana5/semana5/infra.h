@@ -12,6 +12,9 @@
     - PubSub-Cient by Nick O'Leary
 */
 
+#ifndef INFRAH_
+#define INFRAH_
+
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #define MQTT_MAX_TOPIC   128
@@ -22,7 +25,7 @@ class Infra
 {
   public:
     Infra();
-    int Setup(void (*callback)(char*, byte*, unsigend int));
+    int Setup(void (*mqttCallback)(char*, byte*, unsigned int));
     int Loop();
     ~Infra();
     
@@ -33,7 +36,7 @@ class Infra
       WiFiClient    objWifi;
 
     // mqtt object
-      PubSubClient  objMqtt(objWifi);
+      PubSubClient  *ptrMqtt;;
       void          MqttSetup();
       void          MqttConnect();
       void          MqttPublish(char *message);
@@ -49,3 +52,5 @@ class Infra
     char _mqttUser[40];
     char _mqttPassword[40];
 };
+
+#endif
