@@ -1,4 +1,9 @@
 /*
+  Librerías requeridas
+    - DHT sensor library for ESPx
+    - PubSub-Cient by Nick O'Leary
+*/
+/*
   Blink
 
   Turns an LED on for one second, then off for one second, repeatedly.
