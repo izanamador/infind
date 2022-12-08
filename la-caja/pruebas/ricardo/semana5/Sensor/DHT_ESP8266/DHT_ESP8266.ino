@@ -7,7 +7,7 @@
 
 DHTesp dht;
 
-void setup()
+void setup()perd
 {
   Serial.begin(115200);
   Serial.println();
@@ -18,7 +18,7 @@ void setup()
   // Autodetect is not working reliable, don't use the following line
   // dht.setup(17);
   // use this instead: 
-  dht.setup(2, DHTesp::DHT22); // Connect DHT sensor to GPIO 17
+  dht.setup(2, DHTesp::DHT11); // Connect DHT sensor to GPIO 17
 }
 
 void loop()
