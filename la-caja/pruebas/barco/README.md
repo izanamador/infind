@@ -79,6 +79,8 @@ El hardware de la prueba consistirá únicamente en un sensor LDR conectado a la
 https://datasheetspdf.com/pdf-file/1402029/Joy-IT/KY-018/1
 https://www.nteinc.com/resistor_web/pdf/LDR-Series.pdf
 
+https://datasheet.lcsc.com/szlcsc/Shenzhen-Jing-Chuang-He-Li-Tech-GL5528-10-20_C10081.pdf
+
 Pines:
 
 - Data (Analog)
@@ -137,3 +139,5 @@ Módulo adherido a la caja emisor de luz mediante led, cable y accionado mediant
 ## Opción 2
 
 Bot de telegram o dashboard con lectura del mensaje en morse en tiempo real ó implementar herramienta de codificador de morse para ayudar al usuario.  
+
+Esto es una prueba
