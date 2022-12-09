@@ -64,9 +64,9 @@
 #define MQTT_LASTWILL         "{\"online\":false}"
 #define MQTT_CONNECT_MSG      "{\"online\":true}"
 
-#define TOPIC_MAIN           0 // publicacion
+#define TOPIC_MAIN            0 // publicacion y lastwill
 #define TOPIC_NUM_CFG         1 // configuración
-#define TOPIC_NUM_CMD         1 // ejecución de comandos
+#define TOPIC_NUM_CMD         2 // ejecución de comandos
 #define TOPIC_NUM_MAX         5
 
 

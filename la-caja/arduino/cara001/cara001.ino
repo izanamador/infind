@@ -1,9 +1,9 @@
 #include <infra.h>
 
 Infra objInfra;
-char *strTopicPub = "la-caja/pub/cara001";
-char *strTopicCfg = "la-caja/cfg/cara001";
-char *strTopicCmd = "la-caja/cmd/cara001";
+char *strTopicPub = "la-caja/pub/cara001"; // topic principal para publicar contenido y lastwill
+char *strTopicCfg = "la-caja/cfg/cara001"; // topic para recibir parametros de configuracion
+char *strTopicCmd = "la-caja/cmd/cara001"; // topic para recibir peticiones de comando
 
 void mqttCallback(char* topic, byte* payload, unsigned int length) 
 {
