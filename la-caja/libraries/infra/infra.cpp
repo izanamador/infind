@@ -17,8 +17,10 @@ Infra::Infra()
 
     ptrMqtt = new PubSubClient(objWifi);
     for (int i=0; i<TOPIC_NUM_MAX; i++)
+    {
+      mqttTopicsPub[i] = NULL;
       mqttTopicsSub[i] = NULL;
-      
+    } 
 }
 
 void OTA_CB_Start(){Serial.println("Nuevo Firmware encontrado. Actualizando...");}
@@ -92,17 +94,25 @@ int Infra::Setup(void (*mqttCallback)(char*, byte*, unsigned int))
 
   //---------------------------------------------- Setup summary
     Serial.printf("Identificador placa: %s\n", espId);
-    Serial.printf("Topic publicación  : %s\n", mqttTopicPub);
-    for (int i=0; i<TOPIC_NUM_MAX; i++)
+    for (int i=0; i<TOPIC_NUM_MAX; i++) 
+    {
+      if (mqttTopicsPub[i] != NULL)
+        Serial.printf("TopicPub[%d]: %s\n", i, mqttTopicsPub[i]);
       if (mqttTopicsSub[i] != NULL)
-        Serial.printf("Topic subscripción %d: %s\n", i, mqttTopicsSub[i]);
-      else
-        Serial.printf("Topic subscripción %d no usado\n", i);
+        Serial.printf("TopicSub[%d]: %s\n", i, mqttTopicsSub[i]);
+    }
     Serial.printf("Termina setup en %lu ms\n\n",millis());
+    PrintConfig();
 
   return 0;
 }
 
+void Infra::PrintConfig()
+{
+  char strAux[JSON_MESSAGE_SIZE];
+  serializeJsonPretty(objConfig, strAux);
+  Serial.println(strAux);
+}
 
 int Infra::Loop()
 {
@@ -124,19 +134,23 @@ void Infra::MqttConnect()
     while (!ptrMqtt->connected()) 
     {
       Serial.print("Attempting MQTT connection...");
-      if (ptrMqtt->connect(espId, MQTT_USER, MQTT_PASSWORD, mqttTopicPub, 1, true, MQTT_LASTWILL)) {
+      if (ptrMqtt->connect(espId, MQTT_USER, MQTT_PASSWORD, 
+          mqttTopicsPub[TOPIC_MAIN], 1, true, MQTT_LASTWILL)) 
+      {
         Serial.printf(" conectado a broker: %s\n", MQTT_SERVER);
-        for (int i=0; i<TOPIC_NUM_MAX; i++)
+        for (int i=0; i<TOPIC_NUM_MAX; i++) 
+        {
           if (mqttTopicsSub[i]!=NULL)
             ptrMqtt->subscribe(mqttTopicsSub[i]);
-        ptrMqtt->publish(mqttTopicPub, MQTT_CONNECT_MSG, true);
-    } 
-    else 
-    {
-      Serial.printf("failed, rc=%d  try again in 5s\n", ptrMqtt->state());
-      delay(MQTT_RETRY_DELAY); // Wait 5 seconds before retrying
-    }
-  }
+        }
+        ptrMqtt->publish(mqttTopicsPub[TOPIC_MAIN], MQTT_CONNECT_MSG, true);
+      } 
+      else 
+      {
+        Serial.printf("failed, rc=%d  try again in 5s\n", ptrMqtt->state());
+        delay(MQTT_RETRY_DELAY); // Wait 5 seconds before retrying
+      }
+    } // while
 }
     
  
@@ -151,6 +165,6 @@ void Infra::MqttPublish(char *message)
 //  if (strlen(message) < MQTT_MAX_MESSAGE)
 //  { 
     Serial.println(message);
-    ptrMqtt->publish(mqttTopicPub, message);
+    ptrMqtt->publish(mqttTopicsPub[TOPIC_MAIN], message);
 //  }
 }

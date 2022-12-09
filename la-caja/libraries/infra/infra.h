@@ -7,19 +7,29 @@
     - Tratamiento de datos JSON
     - OTA
 
+  Config IDE:
+    - File > Preferences > Additional Boards Manager:
+      http://arduino.esp8266.com/stable/package_esp8266com_index.json
+    - Tools > Board > Boards Manager: 
+      esp8266 by ESP8266 Community
+    - Tools > Board > ESP8266:
+      NodeMCU 1.0 ESP-12E Module
+
+  Librerías requeridas
+    - DHT sensor library for ESPx
+    - PubSub-Cient by Nick O'Leary
+    - ArduinoJson by Benoit Blanchon 6.19.4
+
   Enlaces:
     - https://www.arduino.cc/en/Main/Products
     - https://www.arduino.cc/en/Tutorial/BuiltInExamples/Blink
     - http://librarymanager/All#DHTesp
     - https://arduinojson.org/v6/doc/
 
+
   Constantes
     - LED_BUILTIN is set to the correct LED pin independent of which board is used.
 
-  Librerías requeridas
-    - DHT sensor library for ESPx
-    - PubSub-Cient by Nick O'Leary
-    - ArduinoJson by Benoit Blanchon 6.19.4
 
 */
 
@@ -54,7 +64,8 @@
 #define MQTT_LASTWILL         "{\"online\":false}"
 #define MQTT_CONNECT_MSG      "{\"online\":true}"
 
-#define TOPIC_NUM_CFG         0 // configuración
+#define TOPIC_MAIN           0 // publicacion
+#define TOPIC_NUM_CFG         1 // configuración
 #define TOPIC_NUM_CMD         1 // ejecución de comandos
 #define TOPIC_NUM_MAX         5
 
@@ -84,12 +95,13 @@ class Infra
       void          MqttSetup();
       void          MqttConnect();
       void          MqttPublish(char *message);
-      char          *mqttTopicPub;
+      char          *mqttTopicsPub[TOPIC_NUM_MAX];
       char          *mqttTopicsSub[TOPIC_NUM_MAX];
     
     // JSON
       StaticJsonDocument<JSON_MESSAGE_SIZE> objConfig;
   private:
+      void          PrintConfig();
     
 };
 

@@ -1,9 +1,9 @@
 #include <infra.h>
 
 Infra objInfra;
-char *strTopicPub = "la-caja/cara001/pub";
-char *strTopicCfg = "la-caja/cara001/cfg";
-char *strTopicCmd = "la-caja/cara001/cmd";
+char *strTopicPub = "la-caja/pub/cara001";
+char *strTopicCfg = "la-caja/cfg/cara001";
+char *strTopicCmd = "la-caja/cmd/cara001";
 
 void mqttCallback(char* topic, byte* payload, unsigned int length) 
 {
@@ -28,9 +28,19 @@ void mqttCallback(char* topic, byte* payload, unsigned int length)
 
 void setup() {
   // setup de infrastructura
-  objInfra.mqttTopicPub = strTopicPub;
+  objInfra.mqttTopicsPub[TOPIC_MAIN] = strTopicPub;
   objInfra.mqttTopicsSub[TOPIC_NUM_CFG] = strTopicCfg;
   objInfra.mqttTopicsSub[TOPIC_NUM_CMD] = strTopicCmd;
+  objInfra.objConfig["CRONO_INI"] ="30:00";
+  objInfra.objConfig["CRONO_MAX"] ="90:00";
+  objInfra.objConfig["CRONO_ADD"] ="10:00";
+  objInfra.objConfig["FREQ_START"]=1200;
+  objInfra.objConfig["FREQ_CARA"] =1300;
+  objInfra.objConfig["FREQ_FIN"]  =1400;
+  objInfra.objConfig["DURA_START"]=5000;
+  objInfra.objConfig["DURA_CARA"] =2000;
+  objInfra.objConfig["DURA_FIN"]  =10000;
+
   objInfra.Setup(mqttCallback);
 
 }
