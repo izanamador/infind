@@ -1,4 +1,6 @@
 **/build
+la-caja/libraries/ArduinoJson
+la-caja/libraries/PubSubClient
 
 # Prerequisites
 *.d
