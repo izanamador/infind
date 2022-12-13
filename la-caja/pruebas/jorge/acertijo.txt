@@ -1,0 +1,5 @@
+{
+    "content":"Se ha perdido un pequeño número de cartas de una baraja completa. Si reparto entre cuatro personas, quedan tres cartas. Si reparto entre tres personas, quedan dos y si reparto entre cinco personas, quedan dos cartas. ¿Cuántas cartas hay?",
+    "ans" : 47
+
+}
