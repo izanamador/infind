@@ -40,18 +40,29 @@
 class Joystick{
 private:
 
-  void          PrintConfig();
-  int offsets[2] = {0, 0};
+  struct coordenada{
+    char channel = 0;
+    short value = 0;
+    int  offset = 0;
+  };
+
+  struct coordenadas{
+    coordenada x;
+    coordenada y;
+  };
+
 
 public:
   Joystick();
-  void Setup();
+
   void deg2rad();
   void rad2deg();
   void AvailableSerial();
-  void GetX();
-  void GetY();
-  void Calibration(short analog_value, char channel);
+
+  void Setup();
+  short GetX();
+  short GetY();
+  void Calibration();
   ~Joystick();
 
 

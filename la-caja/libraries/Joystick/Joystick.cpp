@@ -8,11 +8,9 @@
 
 
 /* Constructor */
-Joystick::Joystick(){
-  /* Si el puerto serie está disponible está modo debug imprimir valores */
-  /* Serial.println() */
-  /* this->Calibration(x,0); */
-  /* this->Calibration(y,0); */
+Joystick::Joystick(char x_channel, char y_channel){
+  coordenadas.x.channel = x_channel;
+  coordenadas.y.channel = y_channel;
 }
 
 /* Destructor */
@@ -21,12 +19,32 @@ Joystick::~Joystick()
   ;
 }
 
-void Joystick::Calibration(short analog_value, char channel){
+void Joystick::Setup(){
+  coordenadas.x.value = ads.readADC_SingleEnded(coordenadas.x.channel);
+  coordenadas.y.value = ads.readADC_SingleEnded(coordenadas.y.channel);
+  this->Calibration();
+}
+
+short Joystick::GetX(){
+  return coordenadas.x.value;
+};
+
+short Joystick::GetY(){
+  return coordenadas.y.value;
+};
+
+
+void Joystick::Calibration(){
   for (int i = 0; i <= MAX_VALUE; i++) {
-     if(analog_value-(offsets[channel]+i) == 0){
-      offsets[channel] = offsets[channel] + i;
-     }else if(analog_value-(offsets[channel]-i) == 0){
-      offsets[channel] = offsets[channel] - i;
+     if(coordenadas.x.value-(coordenadas.x.offset+i) == 0){
+      coordenadas.x.offset = coordenadas.x.offset + i;
+     }else if(coordenadas.x.value-(coordenadas.x.offset-i) == 0){
+      coordenadas.x.offset = coordenadas.x.offset - i;
+     }
+     if(coordenadas.y.value-(coordenadas.y.offset+i) == 0){
+      coordenadas.y.offset = coordenadas.y.offset + i;
+     }else if(coordenadas.y.value-(coordenadas.y.offset-i) == 0){
+      coordenadas.y.offset = coordenadas.y.offset - i;
      }
     }
 }
