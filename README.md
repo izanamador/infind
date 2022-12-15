@@ -1,4 +1,4 @@
-# infind
+ # infind
 
 Prácticas de Informática Industrial - Curso 2022/23
 
