@@ -1,10 +1,13 @@
+#include <infra.h>
 #include <Wire.h>
 #include <Adafruit_ADS1X15.h>
+#include <Adafruit_SSD1306.h>
 #include <math.h>
 #include <array>
-#include <Adafruit_SSD1306.h>
 #include <Adafruit_GFX.h>
 #include <string.h>
+
+
 #define SEND_TIME_ 1
 const float DEG2RAD = PI / 180.0f;
 const float RAD2DEG = 180.0f / PI;
