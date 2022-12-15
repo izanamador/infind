@@ -1,4 +1,6 @@
 **/build
+**/*.pdf
+
 la-caja/libraries/ArduinoJson
 la-caja/libraries/PubSubClient
 
