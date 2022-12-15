@@ -1,0 +1,217 @@
+[
+    {
+        "id": "434416693417df8a",
+        "type": "tab",
+        "label": "Simon_flow",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "2c4184700ffa04d5",
+        "type": "telegram command",
+        "z": "434416693417df8a",
+        "name": "",
+        "command": "/no",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "e7a4db69ee7c69e7",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 150,
+        "y": 260,
+        "wires": [
+            [
+                "3327c4eeb660372f"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "d8384c1f3726b077",
+        "type": "comment",
+        "z": "434416693417df8a",
+        "name": "Recibe de Telegram, su función es solo iluminar dos iconos en caso de ser selecionada alguna opción",
+        "info": "",
+        "x": 470,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "3327c4eeb660372f",
+        "type": "function",
+        "z": "434416693417df8a",
+        "name": "",
+        "func": "msg.payload = {};\nmsg.payload = 0;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 260,
+        "wires": [
+            [
+                "4d33e2856f156a91",
+                "37a26c27f0839347"
+            ]
+        ]
+    },
+    {
+        "id": "13c9bfd6cafc2b32",
+        "type": "telegram command",
+        "z": "434416693417df8a",
+        "name": "",
+        "command": "/ayuda",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "e7a4db69ee7c69e7",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 146.56666564941406,
+        "y": 186.566650390625,
+        "wires": [
+            [
+                "adb8ce50d60b0c5c"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "adb8ce50d60b0c5c",
+        "type": "function",
+        "z": "434416693417df8a",
+        "name": "",
+        "func": "msg.payload = {};\nmsg.payload = 1;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 366.56666564941406,
+        "y": 186.566650390625,
+        "wires": [
+            [
+                "37a26c27f0839347",
+                "4d33e2856f156a91"
+            ]
+        ]
+    },
+    {
+        "id": "37a26c27f0839347",
+        "type": "ui_led",
+        "z": "434416693417df8a",
+        "order": 0,
+        "group": "5359497a2a301f2a",
+        "width": 0,
+        "height": 0,
+        "label": "Ayuda solicitada",
+        "labelPlacement": "left",
+        "labelAlignment": "left",
+        "colorForValue": [
+            {
+                "color": "#c0c0c0",
+                "value": "0",
+                "valueType": "num"
+            },
+            {
+                "color": "#008000",
+                "value": "1",
+                "valueType": "num"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "shape": "circle",
+        "showGlow": true,
+        "name": "ayuda solicitada",
+        "x": 650,
+        "y": 180,
+        "wires": [],
+        "icon": "node-red/light.svg"
+    },
+    {
+        "id": "4d33e2856f156a91",
+        "type": "ui_led",
+        "z": "434416693417df8a",
+        "order": 1,
+        "group": "5359497a2a301f2a",
+        "width": 0,
+        "height": 0,
+        "label": "No, continua",
+        "labelPlacement": "left",
+        "labelAlignment": "left",
+        "colorForValue": [
+            {
+                "color": "#c0c0c0",
+                "value": "1",
+                "valueType": "num"
+            },
+            {
+                "color": "#ff0000",
+                "value": "0",
+                "valueType": "num"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "shape": "circle",
+        "showGlow": true,
+        "name": "no, continua",
+        "x": 640,
+        "y": 260,
+        "wires": [],
+        "icon": "font-awesome/fa-forward"
+    },
+    {
+        "id": "e7a4db69ee7c69e7",
+        "type": "telegram bot",
+        "botname": "Tarea_9_Irene",
+        "usernames": "",
+        "chatids": "",
+        "baseapiurl": "",
+        "updatemode": "polling",
+        "pollinterval": "300",
+        "usesocks": false,
+        "sockshost": "",
+        "socksprotocol": "socks5",
+        "socksport": "6667",
+        "socksusername": "anonymous",
+        "sockspassword": "",
+        "bothost": "",
+        "botpath": "",
+        "localbotport": "8443",
+        "publicbotport": "8443",
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "sslterminated": false,
+        "verboselogging": false
+    },
+    {
+        "id": "5359497a2a301f2a",
+        "type": "ui_group",
+        "name": "JuegoSimon",
+        "tab": "2ec127612123211b",
+        "order": 1,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "2ec127612123211b",
+        "type": "ui_tab",
+        "name": "LaCaja",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
