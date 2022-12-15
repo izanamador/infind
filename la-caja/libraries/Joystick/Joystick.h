@@ -33,37 +33,47 @@
 
 */
 
+/* Libreria convertidor A/D ADS1015 */
+#include <Adafruit_ADS1X15.h>
+
 #ifndef Joystick_
 #define Joystick_
 
 #define MAX_VALUE 1000
+#define CALIBRATION_VALUE 800
 class Joystick{
 private:
 
-  struct coordenada{
-    char channel = 0;
-    short value = 0;
-    int  offset = 0;
-  };
+    struct coordenada{
+        char channel = 0;
+        short value = 0;
+        int value_read = 0;
+        int value_fixed = 0;
+        int  offset = 0;
+    };
 
-  struct coordenadas{
-    coordenada x;
-    coordenada y;
-  };
+    struct coordenadas{
+        coordenada x;
+        coordenada y;
+    } coordenadas;
 
+    float angle;
+    char direction = 0;
+    Adafruit_ADS1015 adss;
 
 public:
-  Joystick();
+    Joystick(char x_channel, char y_channel,Adafruit_ADS1015 ads);
 
-  void deg2rad();
-  void rad2deg();
-  void AvailableSerial();
+    // void deg2rad();
+    // void rad2deg();
+    // void AvailableSerial();
 
-  void Setup();
-  short GetX();
-  short GetY();
-  void Calibration();
-  ~Joystick();
+    void Loop();
+    void Setup();
+    short GetX();
+    short GetY();
+    void Calibration();
+    ~Joystick();
 
 
 
