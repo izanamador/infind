@@ -1,21 +1,30 @@
+/* Librería general  */
 #include <infra.h>
-#include <Wire.h>
+
+/* Libreria convertidor A/D ADS1015 */
 #include <Adafruit_ADS1X15.h>
+
+/* Librerías Pantalla Oled SSD1306 */
 #include <Adafruit_SSD1306.h>
-#include <math.h>
-#include <array>
 #include <Adafruit_GFX.h>
+
+/* Librerías Generales*/
+#include <array>
+#include <math.h>
 #include <string.h>
+#include <Wire.h>
+
+/* Librería de cosecha propia*/
+#include <Joystick.h>
 
 
 #define SEND_TIME_ 1
+
 const float DEG2RAD = PI / 180.0f;
 const float RAD2DEG = 180.0f / PI;
 const int SCREEN_WIDTH = 128; // OLED display width, in pixels
 const int SCREEN_HEIGHT = 64; // OLED display height, in pixels
- 
 
- 
 
 // Crear objeto de la clase
 //Adafruit_ADS1115 ads;         /* Use this for the 16-bit version */
@@ -23,18 +32,19 @@ Adafruit_ADS1015 ads;     /* Use this for the 12-bit version */
 
 // initialize the display:
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT);
+Joystick joystick;
 
 int offsets[2] = {0, 0};
 
-void Calibration(short input, int channel){
-  for (int i = 0; i <= 1000; i++) {
-     if(input-(offsets[channel]+i) == 0){
-      offsets[channel] = offsets[channel] + i;
-     }else if(input-(offsets[channel]-i) == 0){
-      offsets[channel] = offsets[channel] - i;
-     }
-    }
-}
+/* void Calibration(short input, int channel){ */
+/*   for (int i = 0; i <= 1000; i++) { */
+/*      if(input-(offsets[channel]+i) == 0){ */
+/*       offsets[channel] = offsets[channel] + i; */
+/*      }else if(input-(offsets[channel]-i) == 0){ */
+/*       offsets[channel] = offsets[channel] - i; */
+/*      } */
+/*     } */
+/* } */
 
 String teststr = "rhyloo";
 
@@ -73,9 +83,9 @@ void setup(void)
   // Iniciar el ADS1115
   ads.begin();
   short x = ads.readADC_SingleEnded(1);
-  Calibration(x,1);
+  joystick.Calibration(x,1);
   short y = ads.readADC_SingleEnded(0);
-  Calibration(y,0);
+  joystick.Calibration(y,0);
   
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
     Serial.println("Display setup failed");
