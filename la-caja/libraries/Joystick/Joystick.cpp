@@ -79,11 +79,11 @@ void Joystick::Loop(){
     coordenadas.y.value_read = coordenadas.y.value_fixed;
   }
 
-  if(abs(coordenadas.x.value_fixed) < 800){
+  if(abs(coordenadas.x.value_fixed) < DIFFERENCE_ERROR_VALUE){
     coordenadas.x.value_fixed = 0;
   }
 
-  if(abs(coordenadas.y.value_fixed) < 800){
+  if(abs(coordenadas.y.value_fixed) < DIFFERENCE_ERROR_VALUE){
     coordenadas.y.value_fixed = 0;
   }
 
@@ -121,7 +121,7 @@ short Joystick::GetY(){
 
 
 void Joystick::Calibration(){
-  for (int i = 0; i <= MAX_VALUE; i++) {
+  for (int i = 0; i <= CALIBRATION_VALUE; i++) {
     if(coordenadas.x.value-(coordenadas.x.offset+i) == 0){
       coordenadas.x.offset = coordenadas.x.offset + i;
     }else if(coordenadas.x.value-(coordenadas.x.offset-i) == 0){
