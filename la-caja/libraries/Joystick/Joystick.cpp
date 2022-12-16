@@ -11,8 +11,7 @@
 
 
 /* Constructor */
-Joystick::Joystick(char x_channel, char y_channel, Adafruit_ADS1015 ads){
-  adss = ads;
+Joystick::Joystick(char x_channel, char y_channel){
   coordenadas.x.channel = x_channel;
   coordenadas.y.channel = y_channel;
 }
@@ -55,8 +54,9 @@ void Direction(int direction){
 }
 
 void Joystick::Setup(){
-  coordenadas.x.value = adss.readADC_SingleEnded(coordenadas.x.channel);
-  coordenadas.y.value = adss.readADC_SingleEnded(coordenadas.y.channel);
+  begin();
+  coordenadas.x.value = readADC_SingleEnded(coordenadas.x.channel);
+  coordenadas.y.value = readADC_SingleEnded(coordenadas.y.channel);
   this->Calibration();
 }
 
@@ -65,8 +65,8 @@ void Joystick::Loop(){
   const float DEG2RAD = PI / 180.0f;
   const float RAD2DEG = 180.0f / PI;
 
-  coordenadas.x.value = adss.readADC_SingleEnded(coordenadas.x.channel);
-  coordenadas.y.value = adss.readADC_SingleEnded(coordenadas.y.channel);
+  coordenadas.x.value = readADC_SingleEnded(coordenadas.x.channel);
+  coordenadas.y.value = readADC_SingleEnded(coordenadas.y.channel);
 
   coordenadas.x.value_fixed = coordenadas.x.value - coordenadas.x.offset;
   coordenadas.y.value_fixed = coordenadas.y.value - coordenadas.y.offset;

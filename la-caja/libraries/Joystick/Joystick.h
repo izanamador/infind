@@ -41,10 +41,11 @@
 
 #define MAX_VALUE 1000
 #define CALIBRATION_VALUE 800
-class Joystick{
+
+class Joystick: public Adafruit_ADS1015{
 private:
 
-    struct coordenada{
+    struct datos{
         char channel = 0;
         short value = 0;
         int value_read = 0;
@@ -52,9 +53,9 @@ private:
         int  offset = 0;
     };
 
-    struct coordenadas{
-        coordenada x;
-        coordenada y;
+    struct coords{
+        datos x;
+        datos y;
     } coordenadas;
 
     float angle;
@@ -62,7 +63,7 @@ private:
     Adafruit_ADS1015 adss;
 
 public:
-    Joystick(char x_channel, char y_channel,Adafruit_ADS1015 ads);
+    Joystick(char x_channel, char y_channel);
 
     // void deg2rad();
     // void rad2deg();
