@@ -41,7 +41,7 @@ private:
 
 public:
     Joystick(char x_channel, char y_channel);
-    void Loop();
+    int Loop();
     void Setup();
     short GetX();
     short GetY();

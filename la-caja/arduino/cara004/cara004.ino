@@ -53,8 +53,9 @@ void setup(void){
 
 
 void loop(void){
+  static int direction = 0;
   display.clearDisplay();
-  joystick.Loop();
+  direction = joystick.Loop();
 
   if (Serial.available() > 0) {
     teststr = Serial.readString();
@@ -72,6 +73,6 @@ void loop(void){
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(0, 20);
   /****************************************************************************/
-  display.print(teststr);
+  display.print(direction);
   display.display();
 }

@@ -60,7 +60,7 @@ void Joystick::Setup(){
   this->Calibration();
 }
 
-void Joystick::Loop(){
+int Joystick::Loop(){
 
   const float DEG2RAD = PI / 180.0f;
   const float RAD2DEG = 180.0f / PI;
@@ -108,7 +108,7 @@ void Joystick::Loop(){
   }
 
   Direction(direction);
-
+  return direction;
 }
 
 short Joystick::GetX(){
