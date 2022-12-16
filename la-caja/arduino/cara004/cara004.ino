@@ -39,7 +39,7 @@ void setup(void){
   /* Las siguientes lineas son muy importantes, desconozco el motivo, mi idea */
   /*    es que si no las pones intenta leer el bus I2C más rápido de lo que   */
   /*    puede y peta, o que directamente se lo salta y hace un clean display  */
-  /*    al aire.                                                               */
+  /*    al aire.                                                              */
   /****************************************************************************/
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
     Serial.println("Display setup failed");
