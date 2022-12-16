@@ -20,11 +20,13 @@
 
 #define x_channel 1
 #define y_channel 0
-#define SCREEN_WIDTH = 128; // OLED display width, in pixels
-#define SCREEN_HEIGHT = 64; // OLED display height, in pixels
+#define SCREEN_WIDTH = 128; /* Units in px */
+#define SCREEN_HEIGHT = 64; /* Units in px */
 
-/* Initialize the display */
+/* Create display */
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT);
+
+/* Create joystick */
 Joystick joystick(x_channel,y_channel);
 
 String teststr = "rhyloo";
@@ -32,10 +34,12 @@ String teststr = "rhyloo";
 void setup(void){
   Serial.begin(9600);
 
-  joystick.Setup();
+  joystick.Setup(); /* Initialize joystick*/
 
-  /* Las siguientes lineas son muy importantes, desconozco el motivo, mi idea es
-     que si no las pones intenta el bus I2C más rápido de lo que puede y peta */
+  /* Las siguientes lineas son muy importantes, desconozco el motivo, mi idea */
+  /*    es que si no las pones intenta leer el bus I2C más rápido de lo que   */
+  /*    puede y peta, o que directamente se lo salta y hace un clean display  */
+  /*    al aire.                                                               */
   /****************************************************************************/
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
     Serial.println("Display setup failed");
@@ -46,15 +50,13 @@ void setup(void){
 }
 
 
-
-
 void loop(void){
   display.clearDisplay();
   joystick.Loop();
 
   if (Serial.available() > 0) {
-    teststr = Serial.readString();  //read until timeout
-    teststr.trim();                        // remove any \r \n whitespace at the end of the String
+    teststr = Serial.readString();
+    teststr.trim(); /* remove any \r \n whitespace at the end of the String */
   }
 
   display.setTextSize(3);
