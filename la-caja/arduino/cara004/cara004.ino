@@ -37,6 +37,7 @@ void setup(void){
   /* Initialize joystick*/
   joystick.Setup();
 
+  /****************************************************************************/
   /* Las siguientes lineas son muy importantes, desconozco el motivo, mi idea */
   /*    es que si no las pones intenta leer el bus I2C más rápido de lo que   */
   /*    puede y peta, o que directamente se lo salta y hace un clean display  */
@@ -60,6 +61,7 @@ void loop(void){
     teststr.trim(); /* remove any \r \n whitespace at the end of the String */
   }
 
+  /****************************************************************************/
   /* Por alguna extraña razón, la placa se bloquea si las siguientes líneas   */
   /*    de codigo si hay código de por medio antes del print, no estoy muy    */
   /*    seguro  del problema, mientras escribía esto he pensado en el hecho   */
