@@ -112,11 +112,11 @@ int Joystick::Loop(){
 }
 
 short Joystick::GetX(){
-  return coordenadas.x.value;
+  return coordenadas.x.value_read;
 };
 
 short Joystick::GetY(){
-  return coordenadas.y.value;
+  return coordenadas.y.value_read;
 };
 
 

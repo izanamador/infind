@@ -23,30 +23,30 @@
 class Joystick: public Adafruit_ADS1015{
 private:
 
-    struct datos{
-        char channel = 0;
-        short value = 0;
-        int value_read = 0;
-        int value_fixed = 0;
-        int  offset = 0;
-    };
+  struct datos{
+    char channel = 0;
+    short value = 0;
+    int value_read = 0;
+    int value_fixed = 0;
+    int  offset = 0;
+  };
 
-    struct coords{
-        datos x;
-        datos y;
-    } coordenadas;
+  struct coords{
+    datos x;
+    datos y;
+  } coordenadas;
 
-    float angle;
-    char direction = 0;
+  float angle;
+  char direction = 0;
 
 public:
-    Joystick(char x_channel, char y_channel);
-    int Loop();
-    void Setup();
-    short GetX();
-    short GetY();
-    void Calibration();
-    ~Joystick();
+  Joystick(char x_channel, char y_channel);
+  void Setup();
+  void Calibration();
+  int Loop();
+  short GetX();
+  short GetY();
+  ~Joystick();
 
 
 
