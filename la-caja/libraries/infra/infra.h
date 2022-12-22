@@ -58,8 +58,8 @@
 #define MQTT_SERVER           "iot.ac.uma.es"
 #define MQTT_PORT             1883
 #define MQTT_BUFFER_SIZE      512
-#define MQTT_USER             "infind"
-#define MQTT_PASSWORD         "zancudo"
+#define MQTT_USER             "II3"
+#define MQTT_PASSWORD         "qW30SImD"
 #define MQTT_RETRY_DELAY      5000
 #define MQTT_LASTWILL         "{\"online\":false}"
 #define MQTT_CONNECT_MSG      "{\"online\":true}"

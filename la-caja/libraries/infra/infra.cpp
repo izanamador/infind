@@ -44,6 +44,9 @@ void OTA_CB_End() {Serial.println("Fin OTA. Reiniciando...");}
 
 int Infra::Setup(void (*mqttCallback)(char*, byte*, unsigned int))
 {
+  //---------------------------------------------- Arduino Pin Mode Setup
+  pinMode(LED_BUILTIN, OUTPUT);
+
   //---------------------------------------------- ESP Setup
   Serial.begin(ESP_BAUD_RATE);
   Serial.println();
@@ -127,8 +130,8 @@ Infra::~Infra()
 
 void Infra::MqttConnect()
 {
-  const char* mqtt_user = "infind";
-  const char* mqtt_pass = "zancudo";
+  const char* mqtt_user = "II3";
+  const char* mqtt_pass = "qW30SImD";
     
   // Loop until we're reconnected
     while (!ptrMqtt->connected()) 
