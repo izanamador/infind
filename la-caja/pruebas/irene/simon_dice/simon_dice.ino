@@ -1,12 +1,35 @@
 //*****************************
 // Adicionales
 //*****************************
-int fin_del_juego = 0;
+#include <ESP8266WiFi.h>
+#include <PubSubClient.h>
+#include <ArduinoJson.h>
+#include <Arduino_JSON.h>
+
 int cancion_Mario = 0;
 int aciertos = 0;
+int aciertos_por_partida = 0;
 int HIGH_PWM = 0;
-int tiempo_partida = 0;
+int tiempo_partida_total = 0;
+int tiempo_partida_actual = 0;
 int empieza_juego2 = 1;
+int fin_juego=0;
+int actualiza = 0;
+
+// cadenas para topics e ID
+char ID_PLACA[16];
+String TOPIC_PUB_ = "II3/ESP" + String(ESP.getChipId()) + "/resultados_juego2";
+String TOPIC_SUB_ = "II3/ESP" + String(ESP.getChipId()) + "/datos_juego2";
+
+WiFiClient wClient;
+PubSubClient mqtt_client(wClient);
+
+// Update these with values suitable for your network.
+const char* ssid = "infind";
+const char* password = "1518wifi";
+const char* mqtt_server = "iot.ac.uma.es";
+const char* mqtt_user = "infind";
+const char* mqtt_pass = "zancudo";
 
 
 //********************************
@@ -45,8 +68,60 @@ int empieza_juego2 = 1;
   char notes[] = "ccggaagffeeddc "; // Notas de la melodia (cada letra es una nota distinta)
   int beats[] = { 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 4 };  // Duracion de cada tono en un array
   int tempo = 100;  //Tempo de la melodia
+
+
  
+//********************************
+// Creando mensaje JSON
+//********************************
+String serializa_JSON()
+{
+  JSONVar jsonRoot;
+
+  jsonRoot["tiempo_partida_total"] = tiempo_partida_total;
+  jsonRoot["tiempo_partida_actual"] = tiempo_partida_actual;
+  jsonRoot["aciertos_por_partida"] = aciertos_por_partida;
+  jsonRoot["fin_juego"] = fin_juego;
+
+  return JSON.stringify(jsonRoot);
+}
+
+
+//********************************
+// Conectando mqtt
+//********************************
+void conecta_mqtt() {
+  // Loop until we're reconnected
+  while (!mqtt_client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    if (mqtt_client.connect(ID_PLACA, mqtt_user, mqtt_pass)) {
+      Serial.printf(" conectado a broker: %s\n",mqtt_server);
+    } else {
+      Serial.printf("failed, rc=%d  try again in 5s\n", mqtt_client.state());
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }
+}
+
+
+//********************************
+// Conectando wifi
+//********************************
+void conecta_wifi() {
+  Serial.printf("\nConnecting to %s:\n", ssid);
  
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(200);
+    Serial.print(".");
+  }
+  Serial.printf("\nWiFi connected, IP address: %s\n", WiFi.localIP().toString().c_str());
+}
+
 
 //********************************
 // Setup
@@ -69,6 +144,10 @@ int empieza_juego2 = 1;
     felicitacion();
 
     Serial.begin(115200);
+    conecta_wifi();
+    mqtt_client.setServer(mqtt_server, 1883);
+    mqtt_client.setBufferSize(512); // para poder enviar mensajes de hasta X bytes
+    conecta_mqtt();
   }
   
  
@@ -78,17 +157,30 @@ int empieza_juego2 = 1;
   void loop() {
     if (empieza_juego2 == 1)
     {
-    tiempo_partida = millis();
-    Serial.println(tiempo_partida);
-    HIGH_PWM = round((255/puntuacion_maxima) + ((255*aciertos)/puntuacion_maxima)); // Control PWM de los led
-    mostrar_secuencia();  // Reproduce la sequencia
-    Serial.println(HIGH_PWM);
-    leer_secuencia();     // Lee la sequencia
-    delay(1000);          // Espera 1 segundo
-    // enviar tiempo partida total
-    // enviar tiempo de cada partida fallada
-    // enviar numero aciertos de cada partida fallada
-    // enviar fin del juego
+      if (!mqtt_client.connected()) conecta_mqtt();
+      mqtt_client.loop(); // esta llamada para que la librería recupere el control
+        tiempo_partida_total = millis();
+        Serial.println(tiempo_partida_total);
+        HIGH_PWM = round((255/puntuacion_maxima) + ((255*aciertos)/puntuacion_maxima)); // Control PWM de los led
+        mostrar_secuencia();  // Reproduce la sequencia
+        Serial.println(HIGH_PWM);
+        leer_secuencia();     // Lee la sequencia
+        delay(1000);          // Espera 1 segundo
+        
+        if (fin_juego==1 || actualiza==1)
+        {
+            tiempo_partida_actual = tiempo_partida_total - tiempo_partida_actual;
+            const char* msg = serializa_JSON().c_str();
+            Serial.print("Message published: ");
+            Serial.println(msg);
+            mqtt_client.publish(TOPIC_PUB_.c_str(), msg);
+            actualiza = 0;
+            aciertos_por_partida = 0;
+            // enviar tiempo partida total
+            // enviar tiempo de cada partida fallada
+            // enviar numero aciertos de cada partida fallada
+            // enviar fin del juego
+        }
     }
   }
   
@@ -209,7 +301,7 @@ int empieza_juego2 = 1;
 
     if (cancion_Mario == 1)
     {
-      fin_del_juego = 1;
+      fin_juego = 1;
     }
     
   }
@@ -356,7 +448,8 @@ int empieza_juego2 = 1;
     
       if (sequence[i-1] == input) {             
         mostrar_boton_correcto(input);
-        aciertos = i;                          
+        aciertos = i;
+        aciertos_por_partida = i;                          
         if (i == puntuacion_maxima) {
           cancion_Mario = 1;                        
           felicitacion();                        
@@ -370,6 +463,7 @@ int empieza_juego2 = 1;
           mostrar_boton_correcto(sequence[i-1]);
           delay(1000);
           aciertos = 0;
+          actualiza = 1;
           felicitacion();
           resetcontador();                          
       } 
