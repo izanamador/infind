@@ -3,6 +3,10 @@
 //*****************************
 int fin_del_juego = 0;
 int cancion_Mario = 0;
+int aciertos = 0;
+int HIGH_PWM = 0;
+int tiempo_partida = 0;
+int empieza_juego2 = 1;
 
 
 //********************************
@@ -34,7 +38,7 @@ int cancion_Mario = 0;
   int contador = 0;              // Contador
   long input = 5;                // Indicador de boton pulsado
   int wait = 500;                // Retraso segun la secuencia se incrementa
-  int puntuacion_maxima = 3;    // Puntuación máxima donde acaba el juego 
+  int puntuacion_maxima = 5;    // Puntuación máxima donde acaba el juego 
  
  // Variables para los efectos musicales
   int length = 15;                  // Numero de notas de la melodia
@@ -72,9 +76,20 @@ int cancion_Mario = 0;
 // Programa principal
 //********************************
   void loop() {
+    if (empieza_juego2 == 1)
+    {
+    tiempo_partida = millis();
+    Serial.println(tiempo_partida);
+    HIGH_PWM = round((255/puntuacion_maxima) + ((255*aciertos)/puntuacion_maxima)); // Control PWM de los led
     mostrar_secuencia();  // Reproduce la sequencia
+    Serial.println(HIGH_PWM);
     leer_secuencia();     // Lee la sequencia
     delay(1000);          // Espera 1 segundo
+    // enviar tiempo partida total
+    // enviar tiempo de cada partida fallada
+    // enviar numero aciertos de cada partida fallada
+    // enviar fin del juego
+    }
   }
   
   
@@ -109,25 +124,29 @@ int cancion_Mario = 0;
  
  // Funciones para encender los leds y reproducir el tono correspondiente
   void flash_rojo() {
-    digitalWrite(led_rojo, HIGH);
+    analogWrite(led_rojo, HIGH_PWM);
+    Serial.println(HIGH_PWM);
     playtone(2273,wait);            
     digitalWrite(led_rojo, LOW);
   }
   
   void flash_azul() {
-    digitalWrite(led_azul, HIGH);
+    analogWrite(led_azul, HIGH_PWM);
+    Serial.println(HIGH_PWM);
     playtone(1700,wait);            
     digitalWrite(led_azul, LOW);
   }
   
   void flash_amarillo() {
-    digitalWrite(led_amarillo, HIGH);
+    analogWrite(led_amarillo, HIGH_PWM);
+    Serial.println(HIGH_PWM);
     playtone(1275,wait);             
     digitalWrite(led_amarillo, LOW);
   } 
   
   void flash_verde() {
-    digitalWrite(led_verde, HIGH);
+    analogWrite(led_verde, HIGH_PWM);
+    Serial.println(HIGH_PWM);
     playtone(1136,wait);             
     digitalWrite(led_verde, LOW);
   }
@@ -336,7 +355,8 @@ int cancion_Mario = 0;
       }// while
     
       if (sequence[i-1] == input) {             
-        mostrar_boton_correcto(input);                           
+        mostrar_boton_correcto(input);
+        aciertos = i;                          
         if (i == puntuacion_maxima) {
           cancion_Mario = 1;                        
           felicitacion();                        
@@ -349,6 +369,7 @@ int cancion_Mario = 0;
           mostrar_boton_correcto(sequence[i-1]);                 
           mostrar_boton_correcto(sequence[i-1]);
           delay(1000);
+          aciertos = 0;
           felicitacion();
           resetcontador();                          
       } 
