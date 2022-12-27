@@ -1,0 +1,41 @@
+* Controlar el tiempo con la clase infra
+Sería interesante gestionar la función miles con la clase, no sé si es posible pero molaría.
+
+* Dormir las placas¿?
+
+* El FOTA consume mucho tiempo de inicialización
+Solución: Solo actualizar una vez al día.
+- FOTA: Probar a sumar números con tiempo límite
+
+* Formato de envío al node-red 
+- Todo en un JSON.
+- Crear distintos topics para publicación y suscripción.
+- Gestión del tiempo.
+
+* Tiempo de actualización del estado¿?
+
+* Codificar los estados, para usar uniformidad
+#+begin_src c++
+/* Codificacion de estados */
+/* STATES */
+/* Waiting : 0 */
+/* InGame : 1 */
+/* Finished : 2 */
+
+  if(states == 0){
+      objInfra.MqttPublish("{\"state\": \"waiting\"}");
+      states = 1;
+  }else if(states == 1){
+      objInfra.MqttPublish("{\"state\": \"ingame\"}");
+      states = 2;
+  }else if(states == 2){
+      objInfra.MqttPublish("{\"state\": \"finished\"}");
+      states = 3;
+  }else{
+    Serial.println("States failed!");
+    states = 0;
+  }
+#+end_src
+
+* Eliminar de la clase infra lo Serial.print activar o desactivar con un parámetro en el setup
+- Ahorra tiempo en general y no será necesario en el deploy.
