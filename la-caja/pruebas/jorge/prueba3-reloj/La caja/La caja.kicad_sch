@@ -238,7 +238,7 @@
 
   (symbol_instances
     (path "/b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae/d47603e8-7716-4ed5-9df4-8b41bd5ce6c1"
-      (reference "96BB2-006-F?") (unit 1) (value "4x4_Keypad") (footprint "")
+      (reference "KeyPad1") (unit 1) (value "4x4_Keypad") (footprint "")
     )
     (path "/b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae/7cceb1ec-ef66-4300-b14a-a6d5885566c6"
       (reference "PRUEBA1") (unit 1) (value "NodeMCU1.0(ESP-12E)") (footprint "")
