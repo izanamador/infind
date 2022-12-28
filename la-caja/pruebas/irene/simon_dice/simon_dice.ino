@@ -6,6 +6,7 @@
 #include <ArduinoJson.h>
 #include <Arduino_JSON.h>
 
+// Declaracion de variables para el control de la partida
 int cancion_Mario = 0;
 int aciertos = 0;
 int aciertos_por_partida = 0;
@@ -13,23 +14,27 @@ int HIGH_PWM = 0;
 int tiempo_partida_total = 0;
 int tiempo_partida_actual = 0;
 int empieza_juego2 = 1;
+int reducir_secuencia = 0;
 int fin_juego=0;
 int actualiza = 0;
+#define MESSAGE_SIZE_ 300
 
 // cadenas para topics e ID
 char ID_PLACA[16];
-String TOPIC_PUB_ = "II3/ESP" + String(ESP.getChipId()) + "/resultados_juego2";
-String TOPIC_SUB_ = "II3/ESP" + String(ESP.getChipId()) + "/datos_juego2";
+String TOPIC_PUB_ "II3/ESP" + String(ESP.getChipId()) + "/resultados_juego2";
+String TOPIC_SUB_ "II3/ESP" + String(ESP.getChipId()) + "/datos_juego2";
 
 WiFiClient wClient;
 PubSubClient mqtt_client(wClient);
 
-// Update these with values suitable for your network.
-const char* ssid = "infind";
-const char* password = "1518wifi";
-const char* mqtt_server = "iot.ac.uma.es";
-const char* mqtt_user = "infind";
-const char* mqtt_pass = "zancudo";
+/* Function: CONECTA_WIFI */
+#define ssid "infind"
+#define password "1518wifi"
+
+/* Function: CONECTA_MQTT */
+#define mqtt_server "iot.ac.uma.es"
+#define mqtt_user "infind"
+#define mqtt_pass "zancudo"
 
 
 //********************************
@@ -37,20 +42,20 @@ const char* mqtt_pass = "zancudo";
 //********************************
  
  // Pins de salida para los LED
-  const int led_rojo = 5;  // 2 en arduino   // D1-5      
-  const int led_azul = 4;  // 3 en arduino  // D2-4 
-  const int led_amarillo = 2;  // 4 en arduino   // D4-2
-  const int led_verde = 14;  // 5 en arduino  // D5-14
+  const int led_rojo = 5;  // D1-5      
+  const int led_azul = 4;  // D2-4 
+  const int led_amarillo = 2;  //  D4-2
+  const int led_verde = 14;  //  D5-14
   
  // Pin para el zumbador piezoelectrico
-  const int zumbador = 12;  // 6 en arduino  // D6-12
+  const int zumbador = 12;  // D6-12
   const int tonePin = 12;
   
  // Pins de salida para los botones
-  const int boton_rojo = 13;   // 8 en arduino   // D7-13
-  const int boton_azul = 16;  // 9 en arduino  // D0-16 // ojo, el 15 no va
-  const int boton_amarillo = 10;  // 10 en arduino  // SSD3-10
-  const int boton_verde = 9;   // 11 en arduino  //  SSD2-9
+  const int boton_rojo = 13;   //  D7-13
+  const int boton_azul = 16;  //  D0-16 // ojo, el 15 no va
+  const int boton_amarillo = 10;  // SSD3-10
+  const int boton_verde = 9;   // SSD2-9
 
 
 //********************************
@@ -124,6 +129,35 @@ void conecta_wifi() {
 
 
 //********************************
+// Recepción mensaje
+//********************************
+void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
+
+  StaticJsonDocument<MESSAGE_SIZE_> json_recibido;
+
+  char *mensaje_recibido = (char *)malloc(length+1);
+  /* copio el mensaje_recibido en cadena de caracteres */
+  strncpy(mensaje_recibido, (char*)payload, length);
+
+  mensaje_recibido[length]='\0'; // caracter cero marca el final de la cadena
+
+  if(strcmp(topic, TOPIC_SUB_.c_str())==0){
+
+      deserializeJson(json_recibido,mensaje_recibido);
+
+      empieza_juego2 = json_recibido["empieza_juego2"]; // leo de JSON
+      reducir_secuencia = json_recibido["reducir_secuencia"];
+
+      }
+  /* HAY QUE LIBERAR/LIMPIAR EL BUFFER */
+  json_recibido.clear();
+  free(mensaje_recibido);
+}
+
+
+
+
+//********************************
 // Setup
 //********************************
   void setup() {
@@ -157,6 +191,11 @@ void conecta_wifi() {
   void loop() {
     if (empieza_juego2 == 1)
     {
+      if (reducir_secuencia ==1)
+      {
+        puntuacion_maxima = puntuacion_maxima - 1;
+        reducir_secuencia = 0;
+      }
       if (!mqtt_client.connected()) conecta_mqtt();
       mqtt_client.loop(); // esta llamada para que la librería recupere el control
         tiempo_partida_total = millis();
@@ -173,6 +212,8 @@ void conecta_wifi() {
             const char* msg = serializa_JSON().c_str();
             Serial.print("Message published: ");
             Serial.println(msg);
+            Serial.print("Using topic: ");
+            Serial.println(TOPIC_PUB_.c_str());
             mqtt_client.publish(TOPIC_PUB_.c_str(), msg);
             actualiza = 0;
             aciertos_por_partida = 0;
