@@ -5,7 +5,7 @@
 
 
 // Pin Definitions
-#define PUSHBUTTON_PIN_2  5
+#define PUSHBUTTON_PIN_2  3
 #define TOGGLESWITCH_1_PIN_2  4
 #define TOGGLESWITCH_2_PIN_2  10
 #define TOGGLESWITCH_3_PIN_2  2
