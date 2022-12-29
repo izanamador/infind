@@ -237,8 +237,8 @@
   )
 
   (symbol_instances
-    (path "/b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae/d47603e8-7716-4ed5-9df4-8b41bd5ce6c1"
-      (reference "KeyPad1") (unit 1) (value "4x4_Keypad") (footprint "")
+    (path "/b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae/9ada7447-77bd-475b-9c82-50f8082f4129"
+      (reference "Device?") (unit 1) (value "4x4_Keypad") (footprint "")
     )
     (path "/b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae/7cceb1ec-ef66-4300-b14a-a6d5885566c6"
       (reference "PRUEBA1") (unit 1) (value "NodeMCU1.0(ESP-12E)") (footprint "")
@@ -254,6 +254,54 @@
     )
     (path "/fa6a7ee8-bd0b-4726-91a3-4faa7c7b558b/7cceb1ec-ef66-4300-b14a-a6d5885566c6"
       (reference "PRUEBA5") (unit 1) (value "NodeMCU1.0(ESP-12E)") (footprint "")
+    )
+    (path "/b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae/0326ef12-3010-4501-a84f-510fb2e9a186"
+      (reference "SW?") (unit 1) (value "SW_Push") (footprint "")
+    )
+    (path "/b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae/34e85265-8dfa-4407-95d1-cb187b7ab5e5"
+      (reference "SW?") (unit 1) (value "SW_Push") (footprint "")
+    )
+    (path "/b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae/3ea3a82f-19d8-4696-9004-99bc1a757183"
+      (reference "SW?") (unit 1) (value "SW_Push") (footprint "")
+    )
+    (path "/b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae/4a9b80e8-b314-444b-8214-e2133bc36ee5"
+      (reference "SW?") (unit 1) (value "SW_Push") (footprint "")
+    )
+    (path "/b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae/4f1bab8c-2adb-4433-a581-b9e24ad219c7"
+      (reference "SW?") (unit 1) (value "SW_Push") (footprint "")
+    )
+    (path "/b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae/608b354e-4737-4a8b-b39f-585c83abcedf"
+      (reference "SW?") (unit 1) (value "SW_Push") (footprint "")
+    )
+    (path "/b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae/79b530ea-6a0e-4b43-a730-0948d6487c48"
+      (reference "SW?") (unit 1) (value "SW_Push") (footprint "")
+    )
+    (path "/b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae/95775075-b174-43e7-8d9b-2bbcceec5cca"
+      (reference "SW?") (unit 1) (value "SW_Push") (footprint "")
+    )
+    (path "/b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae/99a81abe-c334-419b-9168-aea5914729df"
+      (reference "SW?") (unit 1) (value "SW_Push") (footprint "")
+    )
+    (path "/b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae/9d8c7d1e-9f0e-4e53-a342-65886605beb3"
+      (reference "SW?") (unit 1) (value "SW_Push") (footprint "")
+    )
+    (path "/b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae/b1139c2e-588f-41b7-b7fb-bb2318d0bc0d"
+      (reference "SW?") (unit 1) (value "SW_Push") (footprint "")
+    )
+    (path "/b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae/cceb2764-3f8e-495f-a576-b3a72bd27faf"
+      (reference "SW?") (unit 1) (value "SW_Push") (footprint "")
+    )
+    (path "/b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae/e4224aa3-ca8b-41fd-9f47-da89c432a4c3"
+      (reference "SW?") (unit 1) (value "SW_Push") (footprint "")
+    )
+    (path "/b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae/ec3917f6-c5a0-492c-af90-007a00773433"
+      (reference "SW?") (unit 1) (value "SW_Push") (footprint "")
+    )
+    (path "/b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae/f712b072-6679-49cc-94bc-b3e7d16d8c4f"
+      (reference "SW?") (unit 1) (value "SW_Push") (footprint "")
+    )
+    (path "/b46e5ed6-9b2f-46ad-8a6e-2c61aa21e8ae/fb2a994c-24b4-42f3-98b2-212da4da0654"
+      (reference "SW?") (unit 1) (value "SW_Push") (footprint "")
     )
   )
 )
