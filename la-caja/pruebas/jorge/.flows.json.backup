@@ -3884,7 +3884,8 @@
         "wires": [
             [
                 "e2682dfe44891292",
-                "6173734f83d2a26f"
+                "6173734f83d2a26f",
+                "01f722175d46f796"
             ]
         ]
     },
@@ -3900,7 +3901,7 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 460,
+        "x": 660,
         "y": 540,
         "wires": []
     },
@@ -3937,6 +3938,23 @@
         "statusType": "auto",
         "x": 660,
         "y": 600,
+        "wires": []
+    },
+    {
+        "id": "01f722175d46f796",
+        "type": "ui_text",
+        "z": "7cbc96056c55979a",
+        "group": "f870df7d6c3cc2e9",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Número introducido",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 470,
+        "y": 500,
         "wires": []
     },
     {
