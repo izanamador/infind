@@ -11,26 +11,21 @@
 /* Libreria keypad */
 #include <Keypad.h>
 
-#define n_rows 4
-#define n_cols 4
-#define caracter_send '#'
-#define caracter_0 '0'
-#define caracter_9 '9'
-#define max_digits 9
+#define NUM_ROWS 4
+#define NUM_COLS 4
 
-
-char keys[n_rows][n_cols] = {
+char keys[NUM_ROWS][NUM_COLS] = {
   {'1','2','3','A'},
   {'4','5','6','B'},
   {'7','8','9','C'},
   {'*','0','#','D'}
 };
 
-byte rowPins[n_rows] = {D0, D1, D2, D3};
-byte colPins[n_cols] = {D4, D5, D6, D7};
+byte rowPins[NUM_ROWS] = {D0, D1, D2, D3};
+byte colPins[NUM_COLS] = {D4, D5, D6, D7};
 
 /* Create keypad */
-Keypad myKeypad = Keypad( makeKeymap(keys), rowPins, colPins, n_rows, n_cols);
+Keypad myKeypad = Keypad( makeKeymap(keys), rowPins, colPins, NUM_ROWS, NUM_COLS);
 
 /* Create objInfra */
 Infra objInfra;
@@ -38,9 +33,9 @@ char *strTopicPub = "II3/ESP002/pub/cara002"; // topic principal para publicar c
 char *strTopicCfg = "II3/ESP002/cfg/cara002"; // topic para recibir parametros de configuracion
 char *strTopicCmd = "II3/ESP002/cmd/cara002"; // topic para recibir peticiones de comando
 
-
+/* Resupuesta del acertijo */
 int game_ans = NULL;
-int state = 0;
+
 
 void mqttCallback(char* topic, byte* payload, unsigned int length)
 {
@@ -75,15 +70,91 @@ void setup() {
   objInfra.Setup(mqttCallback);
 }
 
+/* --------------------------------------------- GAME */
+/* MACROS */
+#define CHAR_0 '0'
+#define CHAR_9 '9'
+#define CHAR_SEND '#'
+#define MAX_DIGITS 9
+#define MESSAGE_SIZE_ 300
 
-/* Codificacion de estados */
-/* STATES */
-/* Waiting : 0 */
-/* InGame : 1 */
-/* Finished : 2 */
+/* VARIABLES GLOBALES */
+int state = 0;
 
+void loop() {
 
+  /* VARIABLES */
+  StaticJsonDocument<MESSAGE_SIZE_> json;
+  static char message[MESSAGE_SIZE_];
+  static int number = 0;
+  static int intentos = 0;
+  char *msg;
+  
+  objInfra.Loop();
+
+  if(state == 0){/* WAITING -- Espero hasta que reciba la respuesta a comparar por MQTT */
+    if(game_ans != NULL){
+      state = 1;
+    }
+  }else if(state == 1){/* INGAME -- Estoy en el juego hasta que el usuario acierte */
+
+    char key = myKeypad.getKey(); /* Recibo una tecla del numpad */
+    
+    if ((key != NULL && key >= CHAR_0 && key <= CHAR_9) || key == CHAR_SEND){/* Compruebo si es válida (0,1,..,9, #)*/
+      
+      if(key != CHAR_SEND){
+        if(CountDigit(number) < MAX_DIGITS){ /* Evito el overflow */
+          number = 10*number + (key-48); /* Concateno dígito a digíto para formar un número */
+        }
+        
+        sprintf(message,"%d" ,number);
+        objInfra.MqttPublish(message); 
+        
+      }else{                    /* Si el usuario le ha dado a enviar compruebo si ha acertado */
+        sprintf(message," ");   /* Limpio el dashboard, da la sensación de que ha sido enviado */
+        objInfra.MqttPublish(message);
+
+        Serial.println(number);
+        
+        if (game_ans == number){ /* Comparo si la respuesta del usuario coincide con la correcta */
+          
+          Serial.println("You win!");
+          state = 2;
+          
+        }else{
+          intentos++;           /* Aumento el número de intentos hechos por el usuario */
+          number = 0;           /* Reinicio el número */
+        }        
+      }
+    }
+  }else if(state == 2){/* FINISHED -- Envio los resultados en un JSON*/
+    json["state"] = "finished";
+    json["intentos"] = intentos+1;
+    json["tiempo"] = "3600";
+
+    serializeJson(json,message);
+    objInfra.MqttPublish(message);
+    Serial.println("El juego ha terminado!");
+    state = 0;
+  }else{
+    Serial.println("States failed!"); /* Por si el juego falla en algún momento, es una medida de seguridad */
+  }
+
+  SendState();
+}
+
+/****************************/
+/* Declaración de funciones */
+/****************************/
 void SendState(){
+  /* Selecciona un estado del juego y compone un JSON para enviarlo 
+     como mensaje a Node-Red*/
+  /********** STATES *********/
+  /* WAITING  : 0            */
+  /* INGAME   : 1            */
+  /* FINISHED : 2            */
+  /***************************/
+  
   char *msg = "{\"state\": \"\"}";
   switch(state) 
     {
@@ -99,74 +170,12 @@ void SendState(){
     default:
       Serial.println("States failed!");
     }
-  
-  // objInfra.MqttPublish(msg);
+
+  /* Desactivado hasta que nos pogamos de acuerdo con el envío de este tipo de datos*/
+  // objInfra.MqttPublish(msg); 
 }
 
-int count_digit(int number) {
+int CountDigit(int number) {
+  /* Calcula el número de dígitos que tiene un número cualquiera */
   return int(log10(number) + 1);
-}
-
-#define MESSAGE_SIZE_ 300
-
-void loop() {
-  StaticJsonDocument<MESSAGE_SIZE_> json;
-  static char message[MESSAGE_SIZE_];
-  
-  static int digits = 0;
-  static int number = 0;
-  static int intentos = 0;
-  char *msg;
-  
-  objInfra.Loop();
-
-  if(state == 0){/* Waiting */
-    if(game_ans != NULL){
-      digits = count_digit(game_ans);
-      state = 1;
-    }
-  }else if(state == 1){/* InGame */
-
-    char key = myKeypad.getKey();
-    
-    if ((key != NULL && key >= caracter_0 && key <= caracter_9) || key == symbol_send){
-      if(key != caracter_send){
-        if(count_digit(number) < max_digits){
-          number = 10*number + (key-48);
-        }
-        
-        sprintf(message,"%d" ,number);
-        objInfra.MqttPublish(message);
-        
-      }else{
-        sprintf(message," ");
-        objInfra.MqttPublish(message);
-
-        Serial.println(number);
-        
-        if (game_ans == number){
-          
-          Serial.println("You win!");
-          state = 2;
-          
-        }else{
-          intentos++;
-          number = 0;
-        }        
-      }
-    }
-  }else if(state == 2){/* Finishes */
-    json["state"] = "finished";
-    json["intentos"] = intentos+1;
-    json["tiempo"] = "3600";
-
-    serializeJson(json,message);
-    objInfra.MqttPublish(message);
-    Serial.println("El juego ha terminado!");
-    state = 0;
-  }else{
-    Serial.println("States failed!");
-  }
-
-  SendState();
 }
