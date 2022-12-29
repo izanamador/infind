@@ -1,79 +1,83 @@
-//*****************************
-// Adicionales
-//*****************************
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 #include <Arduino_JSON.h>
 
-// Declaracion de variables para el control de la partida
-int cancion_Mario = 0;
-int aciertos = 0;
-int aciertos_por_partida = 0;
-int HIGH_PWM = 0;
-int tiempo_partida_total = 0;
-int tiempo_partida_actual = 0;
-int empieza_juego2 = 1;
-int reducir_secuencia = 0;
-int fin_juego=0;
-int actualiza = 0;
-#define MESSAGE_SIZE_ 300
 
-// cadenas para topics e ID
-char ID_PLACA[16];
-String TOPIC_PUB_ "II3/ESP" + String(ESP.getChipId()) + "/resultados_juego2";
-String TOPIC_SUB_ "II3/ESP" + String(ESP.getChipId()) + "/datos_juego2";
-
-WiFiClient wClient;
-PubSubClient mqtt_client(wClient);
+//***************************************
+// Declaración de variables y constantes
+//***************************************
 
 /* Function: CONECTA_WIFI */
-#define ssid "infind"
-#define password "1518wifi"
+#define SSID_ "infind"
+#define PASSWORD_ "1518wifi"
 
 /* Function: CONECTA_MQTT */
-#define mqtt_server "iot.ac.uma.es"
-#define mqtt_user "infind"
-#define mqtt_pass "zancudo"
+#define MQTT_SERVER_ "iot.ac.uma.es"
+#define MQTT_USER_ "infind"
+#define MQTT_PASS_ "zancudo"
 
 
-//********************************
-// Declaración de constantes
-//********************************
- 
+/* TOPICS PUB */
+String TOPIC_PUB_ = "II3/ESP" + String(ESP.getChipId()) + "/resultados_juego2";
+
+/* TOPICS SUB */
+String TOPIC_SUB_ = "II3/ESP" + String(ESP.getChipId()) + "/datos_juego2";
+
+
+ /* HARDWARE PIN NAME */
  // Pins de salida para los LED
-  const int led_rojo = 5;  // D1-5      
-  const int led_azul = 4;  // D2-4 
-  const int led_amarillo = 2;  //  D4-2
-  const int led_verde = 14;  //  D5-14
+  #define LED_ROJO_ 5           // D1-5      
+  #define LED_AZUL_ 4           // D2-4 
+  #define LED_AMARILLO_ 2       //  D4-2
+  #define LED_VERDE_ 14         //  D5-14
   
- // Pin para el zumbador piezoelectrico
-  const int zumbador = 12;  // D6-12
-  const int tonePin = 12;
+ // Pin para el ZUMBADOR_ piezoelectrico
+  #define ZUMBADOR_ 12          // D6-12
+  #define tonePin 12
   
  // Pins de salida para los botones
-  const int boton_rojo = 13;   //  D7-13
-  const int boton_azul = 16;  //  D0-16 // ojo, el 15 no va
-  const int boton_amarillo = 10;  // SSD3-10
-  const int boton_verde = 9;   // SSD2-9
+  #define BOTON_ROJO_ 13        //  D7-13
+  #define BOTON_AZUL_ 16        //  D0-16 // ojo, el 15 no va
+  #define BOTON_AMARILLO_ 10    // SSD3-10
+  #define BOTON_VERDE_ 9        // SSD2-9
 
 
-//********************************
-// Declaración de variables
-//********************************
+  /* SETUP */
 
+  
+  /* LOOP */
+  int empieza_juego2 = 1;           // Variable que permite el comienzo del juego
+  int reducir_secuencia = 0;        // Variable que reduce la puntuación máxima si se pide ayuda
+  int HIGH_PWM = 0;                 // Variable que realiza el control PWM de los leds
+  int tiempo_partida_total = 0;
+  int tiempo_partida_actual = 0;
+  int aciertos = 0;                 // Variable que ayuda al control PWM de los leds, se reinicia al perder cada partida
+  int aciertos_por_partida = 0;     // Variable que indica los aciertos en cada partida, se reinicia tras cargar su valor en el json a publicar por mqtt
+  int actualiza = 0;                // Variable que indica que se ha perdido la partida y se han de actualizar ciertos valores
+  int fin_juego=0;                  // Variable que indica el fin del juego
+
+  
+  /* GLOBAL */
+  #define MESSAGE_SIZE_ 300
   long sequence[20];             // Array que alberga la secuencia
   int contador = 0;              // Contador
   long input = 5;                // Indicador de boton pulsado
   int wait = 500;                // Retraso segun la secuencia se incrementa
   int puntuacion_maxima = 5;    // Puntuación máxima donde acaba el juego 
+  char ID_PLACA[16];
  
- // Variables para los efectos musicales
-  int length = 15;                  // Numero de notas de la melodia
-  char notes[] = "ccggaagffeeddc "; // Notas de la melodia (cada letra es una nota distinta)
+   
+  /* Function: FELICITACION */
+  int length = 15;                                                // Numero de notas de la melodia
+  char notes[] = "ccggaagffeeddc ";                               // Notas de la melodia (cada letra es una nota distinta)
   int beats[] = { 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 4 };  // Duracion de cada tono en un array
-  int tempo = 100;  //Tempo de la melodia
+  int tempo = 100;                                                // Tempo de la melodia
+  int cancion_Mario = 0;                                          // Variable que activa la melodía de Mario al ganar el juego
 
+
+  WiFiClient wClient;
+  PubSubClient mqtt_client(wClient);
 
  
 //********************************
@@ -88,7 +92,7 @@ String serializa_JSON()
   jsonRoot["aciertos_por_partida"] = aciertos_por_partida;
   jsonRoot["fin_juego"] = fin_juego;
 
-  return JSON.stringify(jsonRoot);
+ JSON.stringify(jsonRoot);
 }
 
 
@@ -100,8 +104,9 @@ void conecta_mqtt() {
   while (!mqtt_client.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (mqtt_client.connect(ID_PLACA, mqtt_user, mqtt_pass)) {
-      Serial.printf(" conectado a broker: %s\n",mqtt_server);
+    if (mqtt_client.connect(ID_PLACA, MQTT_USER_, MQTT_PASS_)) {
+      Serial.printf(" conectado a broker: %s\n",MQTT_SERVER_);
+      mqtt_client.subscribe(TOPIC_SUB_.c_str());
     } else {
       Serial.printf("failed, rc=%d  try again in 5s\n", mqtt_client.state());
       // Wait 5 seconds before retrying
@@ -115,10 +120,10 @@ void conecta_mqtt() {
 // Conectando wifi
 //********************************
 void conecta_wifi() {
-  Serial.printf("\nConnecting to %s:\n", ssid);
+  Serial.printf("\nConnecting to %s:\n", SSID_);
  
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
+  WiFi.begin(SSID_, PASSWORD_);
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(200);
@@ -161,25 +166,25 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
 // Setup
 //********************************
   void setup() {
-   // Configuración de los pines de los leds y del zumbador como salidas
-    pinMode(led_rojo, OUTPUT);      
-    pinMode(led_verde, OUTPUT); 
-    pinMode(led_amarillo, OUTPUT); 
-    pinMode(led_azul, OUTPUT); 
-    pinMode(zumbador, OUTPUT);
+   // Configuración de los pines de los leds y del ZUMBADOR_ como salidas
+    pinMode(LED_ROJO_, OUTPUT);      
+    pinMode(LED_VERDE_, OUTPUT); 
+    pinMode(LED_AMARILLO_, OUTPUT); 
+    pinMode(LED_AZUL_, OUTPUT); 
+    pinMode(ZUMBADOR_, OUTPUT);
       
    // Configuración de los pines de los botones como entradas
-    pinMode(boton_rojo, INPUT);    
-    pinMode(boton_verde, INPUT);
-    pinMode(boton_amarillo, INPUT);
-    pinMode(boton_azul, INPUT);
+    pinMode(BOTON_ROJO_, INPUT);    
+    pinMode(BOTON_VERDE_, INPUT);
+    pinMode(BOTON_AMARILLO_, INPUT);
+    pinMode(BOTON_AZUL_, INPUT);
       
     // Melodia de inicio al arrancar el Arduino    
     felicitacion();
 
     Serial.begin(115200);
     conecta_wifi();
-    mqtt_client.setServer(mqtt_server, 1883);
+    mqtt_client.setServer(MQTT_SERVER_, 1883);
     mqtt_client.setBufferSize(512); // para poder enviar mensajes de hasta X bytes
     conecta_mqtt();
   }
@@ -197,12 +202,10 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
         reducir_secuencia = 0;
       }
       if (!mqtt_client.connected()) conecta_mqtt();
-      mqtt_client.loop(); // esta llamada para que la librería recupere el control
-        tiempo_partida_total = millis();
-        Serial.println(tiempo_partida_total);
+        mqtt_client.loop(); // esta llamada para que la librería recupere el control
         HIGH_PWM = round((255/puntuacion_maxima) + ((255*aciertos)/puntuacion_maxima)); // Control PWM de los led
+        tiempo_partida_total = millis();
         mostrar_secuencia();  // Reproduce la sequencia
-        Serial.println(HIGH_PWM);
         leer_secuencia();     // Lee la sequencia
         delay(1000);          // Espera 1 segundo
         
@@ -210,17 +213,18 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
         {
             tiempo_partida_actual = tiempo_partida_total - tiempo_partida_actual;
             const char* msg = serializa_JSON().c_str();
+            //serializeJson(jsonRoot,message_send);
             Serial.print("Message published: ");
             Serial.println(msg);
             Serial.print("Using topic: ");
             Serial.println(TOPIC_PUB_.c_str());
             mqtt_client.publish(TOPIC_PUB_.c_str(), msg);
+            //message_send.clear();  // hay que limpiar el buffer
             actualiza = 0;
             aciertos_por_partida = 0;
-            // enviar tiempo partida total
-            // enviar tiempo de cada partida fallada
-            // enviar numero aciertos de cada partida fallada
-            // enviar fin del juego
+            if (fin_juego==1){
+                empieza_juego2 = 0;  
+            }
         }
     }
   }
@@ -246,9 +250,9 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
  // Funcion para definir las notas segun la duración y el tono
   void playtone(int tone, int duration) {
     for (long i = 0; i < duration * 1000L; i += tone *2) {
-      digitalWrite(zumbador, HIGH);
+      digitalWrite(ZUMBADOR_, HIGH);
       delayMicroseconds(tone);
-      digitalWrite(zumbador, LOW);
+      digitalWrite(ZUMBADOR_, LOW);
       delayMicroseconds(tone);
     }
   }
@@ -257,31 +261,27 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
  
  // Funciones para encender los leds y reproducir el tono correspondiente
   void flash_rojo() {
-    analogWrite(led_rojo, HIGH_PWM);
-    Serial.println(HIGH_PWM);
+    analogWrite(LED_ROJO_, HIGH_PWM);
     playtone(2273,wait);            
-    digitalWrite(led_rojo, LOW);
+    digitalWrite(LED_ROJO_, LOW);
   }
   
   void flash_azul() {
-    analogWrite(led_azul, HIGH_PWM);
-    Serial.println(HIGH_PWM);
+    analogWrite(LED_AZUL_, HIGH_PWM);
     playtone(1700,wait);            
-    digitalWrite(led_azul, LOW);
+    digitalWrite(LED_AZUL_, LOW);
   }
   
   void flash_amarillo() {
-    analogWrite(led_amarillo, HIGH_PWM);
-    Serial.println(HIGH_PWM);
+    analogWrite(LED_AMARILLO_, HIGH_PWM);
     playtone(1275,wait);             
-    digitalWrite(led_amarillo, LOW);
+    digitalWrite(LED_AMARILLO_, LOW);
   } 
   
   void flash_verde() {
-    analogWrite(led_verde, HIGH_PWM);
-    Serial.println(HIGH_PWM);
+    analogWrite(LED_VERDE_, HIGH_PWM);
     playtone(1136,wait);             
-    digitalWrite(led_verde, LOW);
+    digitalWrite(LED_VERDE_, LOW);
   }
   
   
@@ -310,10 +310,10 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
  // Función que reproduce la canción al arrancar el arduino y para el juego cuando se llega a la puntuacion maxima
   void felicitacion() {
     // Encedemos todos los led
-    digitalWrite(led_rojo, HIGH);       
-    digitalWrite(led_verde, HIGH);
-    digitalWrite(led_amarillo, HIGH);
-    digitalWrite(led_azul, HIGH);
+    digitalWrite(LED_ROJO_, HIGH);       
+    digitalWrite(LED_VERDE_, HIGH);
+    digitalWrite(LED_AMARILLO_, HIGH);
+    digitalWrite(LED_AZUL_, HIGH);
 
     if (cancion_Mario == 1)
     {
@@ -334,10 +334,10 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
      
     delay(500);   
     // Apagar todos los led
-    digitalWrite(led_rojo, LOW);   
-    digitalWrite(led_verde, LOW);
-    digitalWrite(led_amarillo, LOW);
-    digitalWrite(led_azul, LOW);
+    digitalWrite(LED_ROJO_, LOW);   
+    digitalWrite(LED_VERDE_, LOW);
+    digitalWrite(LED_AMARILLO_, LOW);
+    digitalWrite(LED_AZUL_, LOW);
     resetcontador();
 
     if (cancion_Mario == 1)
@@ -444,18 +444,10 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
  // Funcion para crear y reproducir los patrones
   void mostrar_secuencia() {
  
-    // Con esto, la función Random es aun más aleatoria
-    randomSeed(analogRead(8));
+    randomSeed(analogRead(8));    // Semilla para que la función Random sea más aleatoria
 
-    // random(4) nos dará un valor aleatorio entre 0 y 3 (0,1,2,3)
-    sequence[contador] = random(4); 
-    // Imprimir por el Serial print la secuencia
-    for (int i = 0; i < 20; i++) {  
-      Serial.print(sequence[i]);             
-    }
-    delay(1000);
-    Serial.println(" siguiente led");
-           
+    sequence[contador] = random(4);   // random(4) nos dará un valor aleatorio entre 0 y 3 (0,1,2,3)
+               
     for (int i = 0; i < contador; i++) {  
       mostrar_boton_correcto(sequence[i]);             
     }
@@ -469,21 +461,21 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
  void leer_secuencia() {
    for (int i=1; i < contador; i++) {              
       while (input==5){                          
-        if (digitalRead(boton_rojo) == LOW) {    // LOW para Arduino
+        if (digitalRead(BOTON_ROJO_) == LOW) {    // LOW para Arduino
           input = 0;
-            Serial.println(" boton_rojo_leido");
+            Serial.println("boton_rojo_leido");
         }
-        if (digitalRead(boton_verde) == LOW) {  
+        if (digitalRead(BOTON_VERDE_) == LOW) {  
           input = 1;
-        Serial.println(" boton_verde_leido");
+        Serial.println("boton_verde_leido");
         }
-        if (digitalRead(boton_amarillo) == LOW) {
+        if (digitalRead(BOTON_AMARILLO_) == LOW) {
           input = 2;
-        Serial.println(" boton_amarillo_leido");
+        Serial.println("boton_amarillo_leido");
         }
-        if (digitalRead(boton_azul) == LOW) {   
+        if (digitalRead(BOTON_AZUL_) == LOW) {   
           input = 3;
-          Serial.println(" boton_azul_leido");
+          Serial.println("boton_azul_leido");
         }
       }// while
     
