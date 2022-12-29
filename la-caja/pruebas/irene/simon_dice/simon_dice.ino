@@ -8,22 +8,23 @@
 // Declaración de variables y constantes
 //***************************************
 
-/* Function: CONECTA_WIFI */
-#define SSID_ "infind"
-#define PASSWORD_ "1518wifi"
+  /* Function: CONECTA_WIFI */
+  #define SSID_ "infind"
+  #define PASSWORD_ "1518wifi"
+  
+  /* Function: CONECTA_MQTT */
+  #define MQTT_SERVER_ "iot.ac.uma.es"
+  #define MQTT_USER_ "infind"
+  #define MQTT_PASS_ "zancudo"
 
-/* Function: CONECTA_MQTT */
-#define MQTT_SERVER_ "iot.ac.uma.es"
-#define MQTT_USER_ "infind"
-#define MQTT_PASS_ "zancudo"
 
-
-/* TOPICS PUB */
-String TOPIC_PUB_ = "II3/ESP" + String(ESP.getChipId()) + "/resultados_juego2";
-
-/* TOPICS SUB */
-String TOPIC_SUB_ = "II3/ESP" + String(ESP.getChipId()) + "/datos_juego2";
-
+  /* TOPICS PUB */
+  //#define TOPIC_PUB_ "II3/ESP" + String(ESP.getChipId()) + "/resultados_juego2"
+  #define TOPIC_PUB_ "infind/GRUPO3/led/cmd"
+  
+  /* TOPICS SUB */
+  //#define TOPIC_SUB_ "II3/ESP" + String(ESP.getChipId()) + "/datos_juego2"
+  #define TOPIC_SUB_ "infind/GRUPO3/conexion"
 
  /* HARDWARE PIN NAME */
  // Pins de salida para los LED
@@ -36,7 +37,7 @@ String TOPIC_SUB_ = "II3/ESP" + String(ESP.getChipId()) + "/datos_juego2";
   #define ZUMBADOR_ 12          // D6-12
   #define tonePin 12
   
- // Pins de salida para los botones
+  // Pins de salida para los botones
   #define BOTON_ROJO_ 13        //  D7-13
   #define BOTON_AZUL_ 16        //  D0-16 // ojo, el 15 no va
   #define BOTON_AMARILLO_ 10    // SSD3-10
@@ -66,7 +67,13 @@ String TOPIC_SUB_ = "II3/ESP" + String(ESP.getChipId()) + "/datos_juego2";
   int wait = 500;                // Retraso segun la secuencia se incrementa
   int puntuacion_maxima = 5;    // Puntuación máxima donde acaba el juego 
   char ID_PLACA[16];
+
+  /* Function: PROCESA_MENSAJE */
+  StaticJsonDocument<MESSAGE_SIZE_> json_recibido;
  
+  /* Function: ACTUALIZACION_NODERED */
+  static char message_send[MESSAGE_SIZE_];
+  StaticJsonDocument<MESSAGE_SIZE_> jsonRoot;
    
   /* Function: FELICITACION */
   int length = 15;                                                // Numero de notas de la melodia
@@ -80,19 +87,28 @@ String TOPIC_SUB_ = "II3/ESP" + String(ESP.getChipId()) + "/datos_juego2";
   PubSubClient mqtt_client(wClient);
 
  
-//********************************
-// Creando mensaje JSON
-//********************************
-String serializa_JSON()
-{
-  JSONVar jsonRoot;
+//*******************************************
+// Creando mensaje JSON para enviar a NodeRed
+//*******************************************
+void actualizacion_NodeRed()
+{    
+    jsonRoot.clear();
+    
+    jsonRoot["tiempo_partida_total"] = tiempo_partida_total;
+    jsonRoot["tiempo_partida_actual"] = tiempo_partida_actual;
+    jsonRoot["aciertos_por_partida"] = aciertos_por_partida;
+    jsonRoot["fin_juego"] = fin_juego;
 
-  jsonRoot["tiempo_partida_total"] = tiempo_partida_total;
-  jsonRoot["tiempo_partida_actual"] = tiempo_partida_actual;
-  jsonRoot["aciertos_por_partida"] = aciertos_por_partida;
-  jsonRoot["fin_juego"] = fin_juego;
-
- JSON.stringify(jsonRoot);
+    // Serializacion y envio mqtt
+    serializeJson(jsonRoot,message_send);
+    mqtt_client.publish(TOPIC_PUB_, message_send);
+            
+    Serial.print("Message published: ");
+    Serial.println(message_send);
+    Serial.print("Using topic: ");
+    Serial.println(TOPIC_PUB_);
+            
+    jsonRoot.clear(); // hay que limpiar el buffer
 }
 
 
@@ -106,7 +122,7 @@ void conecta_mqtt() {
     // Attempt to connect
     if (mqtt_client.connect(ID_PLACA, MQTT_USER_, MQTT_PASS_)) {
       Serial.printf(" conectado a broker: %s\n",MQTT_SERVER_);
-      mqtt_client.subscribe(TOPIC_SUB_.c_str());
+      mqtt_client.subscribe(TOPIC_SUB_);
     } else {
       Serial.printf("failed, rc=%d  try again in 5s\n", mqtt_client.state());
       // Wait 5 seconds before retrying
@@ -138,25 +154,19 @@ void conecta_wifi() {
 //********************************
 void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
 
-  StaticJsonDocument<MESSAGE_SIZE_> json_recibido;
-
   char *mensaje_recibido = (char *)malloc(length+1);
-  /* copio el mensaje_recibido en cadena de caracteres */
-  strncpy(mensaje_recibido, (char*)payload, length);
+  strncpy(mensaje_recibido, (char*)payload, length);    // copio el mensaje_recibido en cadena de caracteres
+  mensaje_recibido[length]='\0';                        // caracter cero marca el final de la cadena
 
-  mensaje_recibido[length]='\0'; // caracter cero marca el final de la cadena
+  if(strcmp(topic, TOPIC_SUB_)==0){
 
-  if(strcmp(topic, TOPIC_SUB_.c_str())==0){
-
-      deserializeJson(json_recibido,mensaje_recibido);
-
-      empieza_juego2 = json_recibido["empieza_juego2"]; // leo de JSON
+      deserializeJson(json_recibido,mensaje_recibido);  // leo de JSON
+      empieza_juego2 = json_recibido["empieza_juego2"]; 
       reducir_secuencia = json_recibido["reducir_secuencia"];
-
       }
-  /* HAY QUE LIBERAR/LIMPIAR EL BUFFER */
-  json_recibido.clear();
-  free(mensaje_recibido);
+      
+  json_recibido.clear();                                // limpiar buffer
+  free(mensaje_recibido);                               // liberar buffer
 }
 
 
@@ -212,14 +222,9 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
         if (fin_juego==1 || actualiza==1)
         {
             tiempo_partida_actual = tiempo_partida_total - tiempo_partida_actual;
-            const char* msg = serializa_JSON().c_str();
-            //serializeJson(jsonRoot,message_send);
-            Serial.print("Message published: ");
-            Serial.println(msg);
-            Serial.print("Using topic: ");
-            Serial.println(TOPIC_PUB_.c_str());
-            mqtt_client.publish(TOPIC_PUB_.c_str(), msg);
-            //message_send.clear();  // hay que limpiar el buffer
+
+            actualizacion_NodeRed();
+            
             actualiza = 0;
             aciertos_por_partida = 0;
             if (fin_juego==1){
@@ -461,19 +466,19 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
  void leer_secuencia() {
    for (int i=1; i < contador; i++) {              
       while (input==5){                          
-        if (digitalRead(BOTON_ROJO_) == LOW) {    // LOW para Arduino
+        if (digitalRead(BOTON_ROJO_) == LOW) {
           input = 0;
-            Serial.println("boton_rojo_leido");
+          Serial.println("boton_rojo_leido");
         }
-        if (digitalRead(BOTON_VERDE_) == LOW) {  
+        else if (digitalRead(BOTON_VERDE_) == LOW) {  
           input = 1;
-        Serial.println("boton_verde_leido");
+          Serial.println("boton_verde_leido");
         }
-        if (digitalRead(BOTON_AMARILLO_) == LOW) {
+        else if (digitalRead(BOTON_AMARILLO_) == LOW) {
           input = 2;
-        Serial.println("boton_amarillo_leido");
+          Serial.println("boton_amarillo_leido");
         }
-        if (digitalRead(BOTON_AZUL_) == LOW) {   
+        else if (digitalRead(BOTON_AZUL_) == LOW) {   
           input = 3;
           Serial.println("boton_azul_leido");
         }
