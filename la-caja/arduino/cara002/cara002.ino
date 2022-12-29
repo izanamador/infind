@@ -13,6 +13,11 @@
 
 #define n_rows 4
 #define n_cols 4
+#define caracter_send '#'
+#define caracter_0 '0'
+#define caracter_9 '9'
+#define max_digits 9
+
 
 char keys[n_rows][n_cols] = {
   {'1','2','3','A'},
@@ -124,12 +129,21 @@ void loop() {
 
     char key = myKeypad.getKey();
     
-    if (key != NULL && key >= 48 && key <= 59){
-      
-      number = 10*number + (key-48);
-      if(count_digit(number) == digits){
-        Serial.println(number);
+    if ((key != NULL && key >= caracter_0 && key <= caracter_9) || key == symbol_send){
+      if(key != caracter_send){
+        if(count_digit(number) < max_digits){
+          number = 10*number + (key-48);
+        }
+        
+        sprintf(message,"%d" ,number);
+        objInfra.MqttPublish(message);
+        
+      }else{
+        sprintf(message," ");
+        objInfra.MqttPublish(message);
 
+        Serial.println(number);
+        
         if (game_ans == number){
           
           Serial.println("You win!");
@@ -156,23 +170,3 @@ void loop() {
 
   SendState();
 }
-
-
-/* Bugs*/
-/* Si con dos dígitos intento escribir 01 o 02 no funciona porque */
-/* la función count calcula el log10 y no va bien por ahora me funciona */
-/* pero tendré que cambiarlo en el futuro */
-/* int count_digit(int number) { */
-/*    int count = 0; */
-/*    while(number != 0) { */
-/*       number = number / 10; */
-/*       count++; */
-/*    } */
-/*    return count; */
-
-
-/* Features */
-/* Activar una pista clásica en un texto del dashboard + o - caliente o frío*/
-/* Explicar un poco el acertijo, lo cual tiene más trabajo por parte del desarrollador */
-
-
