@@ -1,0 +1,11 @@
+#+title: Notas sobre la cara002
+
+* [2022-12-29 Thu]
+He sometido la cara002 a prueba, la interfaz de usuario ha sido todo un éxito, es fácil de usar y no requiere explicaciones, la landing page es todo un acierto por parte de Izan.
+** Cambios 
+*** Fallos [0/4]
+- [ ] Añadir un botón de envío.  
+- [ ] Feedback de lo que introduce el usuario no sabe lo que mete, mostrarlo en el dashboard.
+- [ ] Añadir formato en el texto, resaltando aspectos importantes.
+- [ ] Añadir papel y lapiz en materiales necesarios para el juego.
+** 
