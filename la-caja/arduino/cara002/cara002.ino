@@ -93,6 +93,7 @@ void loop() {
 
   /* VARIABLES */
 
+  static int una_vez = 0;
   static int number = 0;
   static int intentos = 0;
   static unsigned long ultimo_mensaje = 0;
@@ -146,7 +147,10 @@ void loop() {
     json["tiempo"] = "3600";
     json["clock"] = 0;
     serializeJson(json,message);
+    if(una_vez == 0){
     objInfra.MqttPublish(message);
+    una_vez = 1;
+    }
     Serial.println("El juego ha terminado!");
     
     game_ans = NULL;    
@@ -154,7 +158,7 @@ void loop() {
     Serial.println("States failed!"); /* Por si el juego falla en algún momento, es una medida de seguridad */
   }
   
-  if (ahora - ultimo_mensaje >= 1000) {
+  if (ahora - ultimo_mensaje >= 1000 && state !=2) {
     SendState();
   }
   
