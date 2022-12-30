@@ -13,6 +13,7 @@
 
 #define NUM_ROWS 4
 #define NUM_COLS 4
+#define MESSAGE_SIZE_ 300
 
 char keys[NUM_ROWS][NUM_COLS] = {
   {'1','2','3','A'},
@@ -35,7 +36,8 @@ char *strTopicCmd = "II3/ESP002/cmd/cara002"; // topic para recibir peticiones d
 
 /* Resupuesta del acertijo */
 int game_ans = NULL;
-
+static char message[MESSAGE_SIZE_];
+StaticJsonDocument<MESSAGE_SIZE_> json;
 
 void mqttCallback(char* topic, byte* payload, unsigned int length)
 {
@@ -47,6 +49,12 @@ void mqttCallback(char* topic, byte* payload, unsigned int length)
   if (strcmp(topic, strTopicCmd)==0)
     {
       game_ans = atoi(mensaje);
+      json["state"] = 1;
+      json["intentos"] = 0;
+      json["tiempo"] = 0;
+      json["clock"] = 1;
+      serializeJson(json,message);
+      objInfra.MqttPublish(message);
     }
   Serial.println(game_ans);
   free(mensaje);
@@ -76,7 +84,7 @@ void setup() {
 #define CHAR_9 '9'
 #define CHAR_SEND '#'
 #define MAX_DIGITS 9
-#define MESSAGE_SIZE_ 300
+
 
 /* VARIABLES GLOBALES */
 int state = 0;
@@ -84,20 +92,23 @@ int state = 0;
 void loop() {
 
   /* VARIABLES */
-  StaticJsonDocument<MESSAGE_SIZE_> json;
-  static char message[MESSAGE_SIZE_];
+
   static int number = 0;
   static int intentos = 0;
+  static unsigned long ultimo_mensaje = 0;
   char *msg;
   
   objInfra.Loop();
+  unsigned long ahora = millis();
 
+  
   if(state == 0){/* WAITING -- Espero hasta que reciba la respuesta a comparar por MQTT */
+    json["clock"] = 0;
     if(game_ans != NULL){
       state = 1;
     }
   }else if(state == 1){/* INGAME -- Estoy en el juego hasta que el usuario acierte */
-
+    json["clock"] = 1;
     char key = myKeypad.getKey(); /* Recibo una tecla del numpad */
     
     if ((key != NULL && key >= CHAR_0 && key <= CHAR_9) || key == CHAR_SEND){/* Compruebo si es válida (0,1,..,9, #)*/
@@ -106,13 +117,15 @@ void loop() {
         if(CountDigit(number) < MAX_DIGITS){ /* Evito el overflow */
           number = 10*number + (key-48); /* Concateno dígito a digíto para formar un número */
         }
-        
-        sprintf(message,"%d" ,number);
-        objInfra.MqttPublish(message); 
-        
+
+        json["numero"] = number;
+        serializeJson(json,message);
+        objInfra.MqttPublish(message);        
+          
       }else{                    /* Si el usuario le ha dado a enviar compruebo si ha acertado */
-        sprintf(message," ");   /* Limpio el dashboard, da la sensación de que ha sido enviado */
-        objInfra.MqttPublish(message);
+        json["numero"] = " ";   /* Limpio el dashboard, da la sensación de que ha sido enviado */
+        serializeJson(json,message);
+        objInfra.MqttPublish(message);        
 
         Serial.println(number);
         
@@ -128,19 +141,23 @@ void loop() {
       }
     }
   }else if(state == 2){/* FINISHED -- Envio los resultados en un JSON*/
-    json["state"] = "finished";
+    json["state"] = state;
     json["intentos"] = intentos+1;
     json["tiempo"] = "3600";
-
+    json["clock"] = 0;
     serializeJson(json,message);
     objInfra.MqttPublish(message);
     Serial.println("El juego ha terminado!");
-    state = 0;
+    
+    game_ans = NULL;    
   }else{
     Serial.println("States failed!"); /* Por si el juego falla en algún momento, es una medida de seguridad */
   }
-
-  SendState();
+  
+  if (ahora - ultimo_mensaje >= 1000) {
+    SendState();
+  }
+  
 }
 
 /****************************/
@@ -155,24 +172,11 @@ void SendState(){
   /* FINISHED : 2            */
   /***************************/
   
-  char *msg = "{\"state\": \"\"}";
-  switch(state) 
-    {
-    case 0:
-      msg = "{\"state\": \"waiting\"}";
-      break;
-    case 1:
-      msg = "{\"state\": \"ingame\"}";
-      break;
-    case 2:
-      msg = "{\"state\": \"finished\"}";      
-      break;
-    default:
-      Serial.println("States failed!");
-    }
+  json["state"] = state;
 
   /* Desactivado hasta que nos pogamos de acuerdo con el envío de este tipo de datos*/
-  // objInfra.MqttPublish(msg); 
+  serializeJson(json,message);
+  objInfra.MqttPublish(message);
 }
 
 int CountDigit(int number) {
