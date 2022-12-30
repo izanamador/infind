@@ -45,7 +45,7 @@ void OTA_CB_End() {Serial.println("Fin OTA. Reiniciando...");}
 int Infra::Setup(void (*mqttCallback)(char*, byte*, unsigned int))
 {
   //---------------------------------------------- Arduino Pin Mode Setup
-  pinMode(LED_BUILTIN, OUTPUT);
+  // pinMode(LED_BUILTIN, OUTPUT);
 
   //---------------------------------------------- ESP Setup
   Serial.begin(ESP_BAUD_RATE);
