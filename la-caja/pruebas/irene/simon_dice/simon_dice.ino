@@ -65,7 +65,7 @@
   int contador = 0;              // Contador
   long input = 5;                // Indicador de boton pulsado
   int wait = 500;                // Retraso segun la secuencia se incrementa
-  int puntuacion_maxima = 5;    // Puntuación máxima donde acaba el juego 
+  int puntuacion_maxima = 3;     // Puntuación máxima donde acaba el juego 
   char ID_PLACA[16];
 
   /* Function: PROCESA_MENSAJE */
