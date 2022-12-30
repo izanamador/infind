@@ -14,17 +14,17 @@
   
   /* Function: CONECTA_MQTT */
   #define MQTT_SERVER_ "iot.ac.uma.es"
-  #define MQTT_USER_ "infind"
-  #define MQTT_PASS_ "zancudo"
+  #define MQTT_USER_ "II3"  //"infind"
+  #define MQTT_PASS_ "qW30SImD"//"zancudo"
 
 
   /* TOPICS PUB */
   //#define TOPIC_PUB_ "II3/ESP" + String(ESP.getChipId()) + "/resultados_juego2"
-  #define TOPIC_PUB_ "infind/GRUPO3/led/cmd"
+  #define TOPIC_PUB_ "II3/ESP14440037/resultados_juego2"
   
   /* TOPICS SUB */
   //#define TOPIC_SUB_ "II3/ESP" + String(ESP.getChipId()) + "/datos_juego2"
-  #define TOPIC_SUB_ "infind/GRUPO3/conexion"
+  #define TOPIC_SUB_ "II3/ESP14440037/datos_juego2"
 
  /* HARDWARE PIN NAME */
  // Pins de salida para los LED
@@ -48,7 +48,7 @@
 
   
   /* LOOP */
-  int empieza_juego2 = 1;           // Variable que permite el comienzo del juego
+  int empieza_juego2 = 0;           // Variable que permite el comienzo del juego
   int reducir_secuencia = 0;        // Variable que reduce la puntuación máxima si se pide ayuda
   int HIGH_PWM = 0;                 // Variable que realiza el control PWM de los leds
   int tiempo_partida_total = 0;
@@ -157,6 +157,8 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   char *mensaje_recibido = (char *)malloc(length+1);
   strncpy(mensaje_recibido, (char*)payload, length);    // copio el mensaje_recibido en cadena de caracteres
   mensaje_recibido[length]='\0';                        // caracter cero marca el final de la cadena
+  Serial.print("Mensaje recibido"); 
+  Serial.println(mensaje_recibido);
 
   if(strcmp(topic, TOPIC_SUB_)==0){
 
@@ -164,7 +166,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
       empieza_juego2 = json_recibido["empieza_juego2"]; 
       reducir_secuencia = json_recibido["reducir_secuencia"];
       }
-      
+     
   json_recibido.clear();                                // limpiar buffer
   free(mensaje_recibido);                               // liberar buffer
 }
@@ -196,6 +198,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
     conecta_wifi();
     mqtt_client.setServer(MQTT_SERVER_, 1883);
     mqtt_client.setBufferSize(512); // para poder enviar mensajes de hasta X bytes
+    mqtt_client.setCallback(procesa_mensaje);
     conecta_mqtt();
   }
   
@@ -204,6 +207,9 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
 // Programa principal
 //********************************
   void loop() {
+    if (!mqtt_client.connected()) conecta_mqtt();
+    mqtt_client.loop(); // esta llamada para que la librería recupere el control
+    
     if (empieza_juego2 == 1)
     {
       if (reducir_secuencia ==1)
@@ -211,8 +217,6 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
         puntuacion_maxima = puntuacion_maxima - 1;
         reducir_secuencia = 0;
       }
-      if (!mqtt_client.connected()) conecta_mqtt();
-        mqtt_client.loop(); // esta llamada para que la librería recupere el control
         HIGH_PWM = round((255/puntuacion_maxima) + ((255*aciertos)/puntuacion_maxima)); // Control PWM de los led
         tiempo_partida_total = millis();
         mostrar_secuencia();  // Reproduce la sequencia
