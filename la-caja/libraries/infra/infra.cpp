@@ -166,8 +166,10 @@ void Infra::MqttPublish(char *message)
     MqttConnect();
 
 //  if (strlen(message) < MQTT_MAX_MESSAGE)
-//  { 
-    Serial.println(message);
-    ptrMqtt->publish(mqttTopicsPub[TOPIC_MAIN], message);
+//  {
+  Serial.print("MqttPublish: ");
+  Serial.print(message);
+  Serial.print("\n");    
+  ptrMqtt->publish(mqttTopicsPub[TOPIC_MAIN], message);
 //  }
 }
