@@ -45,7 +45,7 @@ void OTA_CB_End() {Serial.println("Fin OTA. Reiniciando...");}
 int Infra::Setup(void (*mqttCallback)(char*, byte*, unsigned int))
 {
   //---------------------------------------------- Arduino Pin Mode Setup
-  pinMode(LED_BUILTIN, OUTPUT);
+  // pinMode(LED_BUILTIN, OUTPUT);
 
   //---------------------------------------------- ESP Setup
   Serial.begin(ESP_BAUD_RATE);
@@ -94,6 +94,8 @@ int Infra::Setup(void (*mqttCallback)(char*, byte*, unsigned int))
     ptrMqtt->setBufferSize(MQTT_BUFFER_SIZE); 
     ptrMqtt->setCallback(mqttCallback);
     MqttConnect();
+    Serial.printf("\nWiFi connected, IP address: %s\n", 
+      objWifi.localIP().toString().c_str());
 
   //---------------------------------------------- Setup summary
     Serial.printf("Identificador placa: %s\n", espId);

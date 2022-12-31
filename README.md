@@ -42,6 +42,8 @@ https://github.com/users/izanamador/projects/1/views/1
   - la-caja/arduino/cara004: fuentes del barco
   - la-caja/arduino/cara005: fuentes del joystick
   - la-caja/arduino/cara006: fuentes del 
+- la-caja/base_de_datos: contiene toda la información que será rescatada o almacenada, cada carpeta es una colleción de la base de datos II3.
+  - la-caja/base_de_datos/recursos_de_las_pruebas: Información necesaria para el funcionamiento de las pruebas
 - la-caja/nodered: exports de flujos 
 - la-caja/doc: documentación en Markdown
   - la-caja/doc/hardware: esquemáticos, sensores, actuadores, BOM...

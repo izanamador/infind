@@ -48,7 +48,7 @@
 
 //--------------------------------------------- OTA
 #include <ESP8266httpUpdate.h>
-#define OTA_HTTP_ADDRESS      F("172.16.53.###")         // Address of OTA update server
+#define OTA_HTTP_ADDRESS      F("iot.ac.uma.es")         // Address of OTA update server
 #define OTA_HTTP_PATH         F("/esp8266-ota/update") // Path to update firmware
 #define OTA_HTTP_PORT         1880                     // Port of update server                                                       // Name of firmware
 #define OTA_HTTP_VERSION      String(__FILE__).substring(String(__FILE__).lastIndexOf('\\')+1) + ".nodemcu" 
