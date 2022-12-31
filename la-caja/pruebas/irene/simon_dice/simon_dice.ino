@@ -41,14 +41,14 @@
   #define BOTON_ROJO_ 13        //  D7-13
   #define BOTON_AZUL_ 16        //  D0-16 // ojo, el 15 no va
   #define BOTON_AMARILLO_ 10    // SSD3-10
-  #define BOTON_VERDE_ 9        // SSD2-9
+  #define BOTON_VERDE_ 0        // D3-0 // ojo, SSD2-9 no lee bien
 
 
   /* SETUP */
 
   
   /* LOOP */
-  int empieza_juego2 = 0;           // Variable que permite el comienzo del juego
+  int state = 0;                    // Variable que indica el estado del juego: 0 esperando, 1 en el juego, 2 fin de juego
   int reducir_secuencia = 0;        // Variable que reduce la puntuación máxima si se pide ayuda
   int HIGH_PWM = 0;                 // Variable que realiza el control PWM de los leds
   int tiempo_partida_total = 0;
@@ -56,7 +56,6 @@
   int aciertos = 0;                 // Variable que ayuda al control PWM de los leds, se reinicia al perder cada partida
   int aciertos_por_partida = 0;     // Variable que indica los aciertos en cada partida, se reinicia tras cargar su valor en el json a publicar por mqtt
   int actualiza = 0;                // Variable que indica que se ha perdido la partida y se han de actualizar ciertos valores
-  int fin_juego=0;                  // Variable que indica el fin del juego
 
   
   /* GLOBAL */
@@ -65,7 +64,7 @@
   int contador = 0;              // Contador
   long input = 5;                // Indicador de boton pulsado
   int wait = 500;                // Retraso segun la secuencia se incrementa
-  int puntuacion_maxima = 3;     // Puntuación máxima donde acaba el juego 
+  int puntuacion_maxima = 5;     // Puntuación máxima donde acaba el juego 
   char ID_PLACA[16];
 
   /* Function: PROCESA_MENSAJE */
@@ -97,7 +96,8 @@ void actualizacion_NodeRed()
     jsonRoot["tiempo_partida_total"] = tiempo_partida_total;
     jsonRoot["tiempo_partida_actual"] = tiempo_partida_actual;
     jsonRoot["aciertos_por_partida"] = aciertos_por_partida;
-    jsonRoot["fin_juego"] = fin_juego;
+    jsonRoot["ayudas_solicitadas"] = 5 - puntuacion_maxima;
+    jsonRoot["state"] = state;
 
     // Serializacion y envio mqtt
     serializeJson(jsonRoot,message_send);
@@ -163,7 +163,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   if(strcmp(topic, TOPIC_SUB_)==0){
 
       deserializeJson(json_recibido,mensaje_recibido);  // leo de JSON
-      empieza_juego2 = json_recibido["empieza_juego2"]; 
+      state = json_recibido["state"]; 
       reducir_secuencia = json_recibido["reducir_secuencia"];
       }
      
@@ -190,7 +190,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
     pinMode(BOTON_VERDE_, INPUT);
     pinMode(BOTON_AMARILLO_, INPUT);
     pinMode(BOTON_AZUL_, INPUT);
-      
+ 
     // Melodia de inicio al arrancar el Arduino    
     felicitacion();
 
@@ -201,7 +201,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
     mqtt_client.setCallback(procesa_mensaje);
     conecta_mqtt();
   }
-  
+
  
 //********************************
 // Programa principal
@@ -210,7 +210,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
     if (!mqtt_client.connected()) conecta_mqtt();
     mqtt_client.loop(); // esta llamada para que la librería recupere el control
     
-    if (empieza_juego2 == 1)
+    if (state == 1)
     {
       if (reducir_secuencia ==1)
       {
@@ -223,7 +223,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
         leer_secuencia();     // Lee la sequencia
         delay(1000);          // Espera 1 segundo
         
-        if (fin_juego==1 || actualiza==1)
+        if (state==2 || actualiza==1)
         {
             tiempo_partida_actual = tiempo_partida_total - tiempo_partida_actual;
 
@@ -231,9 +231,6 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
             
             actualiza = 0;
             aciertos_por_partida = 0;
-            if (fin_juego==1){
-                empieza_juego2 = 0;  
-            }
         }
     }
   }
@@ -351,7 +348,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
 
     if (cancion_Mario == 1)
     {
-      fin_juego = 1;
+      state = 2;
     }
     
   }
@@ -464,17 +461,17 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
     contador++;                          
   }
  
- 
+
  
   // Funcion para leer los botones que pulsa el jugador
  void leer_secuencia() {
-   for (int i=1; i < contador; i++) {              
-      while (input==5){                          
+   for (int i=1; i < contador; i++) {    
+      while (input==5){                
         if (digitalRead(BOTON_ROJO_) == LOW) {
           input = 0;
           Serial.println("boton_rojo_leido");
         }
-        else if (digitalRead(BOTON_VERDE_) == LOW) {  
+        else if (digitalRead(BOTON_VERDE_) == LOW) { 
           input = 1;
           Serial.println("boton_verde_leido");
         }
@@ -482,7 +479,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
           input = 2;
           Serial.println("boton_amarillo_leido");
         }
-        else if (digitalRead(BOTON_AZUL_) == LOW) {   
+        else if (digitalRead(BOTON_AZUL_) == LOW) {
           input = 3;
           Serial.println("boton_azul_leido");
         }
@@ -491,7 +488,8 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
       if (sequence[i-1] == input) {             
         mostrar_boton_correcto(input);
         aciertos = i;
-        aciertos_por_partida = i;                          
+        if (aciertos_por_partida < i) {
+        aciertos_por_partida = i;}                          
         if (i == puntuacion_maxima) {
           cancion_Mario = 1;                        
           felicitacion();                        
