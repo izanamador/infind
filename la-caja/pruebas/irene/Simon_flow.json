@@ -1,125 +1,316 @@
 [
     {
-        "id": "434416693417df8a",
+        "id": "4df0f1347905451e",
         "type": "tab",
-        "label": "Simon_flow",
+        "label": "Flujo_Simon_v0",
         "disabled": false,
         "info": ""
     },
     {
-        "id": "2c4184700ffa04d5",
-        "type": "telegram command",
-        "z": "434416693417df8a",
+        "id": "36dc34dee63d133c",
+        "type": "inject",
+        "z": "4df0f1347905451e",
         "name": "",
-        "command": "/no",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 680,
+        "wires": [
+            [
+                "bc5e1aff13f86696"
+            ]
+        ]
+    },
+    {
+        "id": "bc5e1aff13f86696",
+        "type": "function",
+        "z": "4df0f1347905451e",
+        "name": "",
+        "func": "msg.payload= {\"state\":1, \"reducir_secuencia\":0};\n//msg.topic = \"II3/ESP14440037/datos_juego2\";\nmsg.topic =\"II3/ESP14440037/datos_juego2\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 680,
+        "wires": [
+            [
+                "7e5b519a8d28c01f",
+                "3b79417fb97f3170",
+                "d7c9162e2454764e"
+            ]
+        ]
+    },
+    {
+        "id": "d5422d86349077ea",
+        "type": "function",
+        "z": "4df0f1347905451e",
+        "name": "mensaje respuesta",
+        "func": "msg.payload={};\nmsg.payload=msg.mensaje;\n\nmsg.payload.content= \"No abuses del comando que acabas de utilizar, tus puntaciones quedarán registradas. \\n\";\nmsg.payload.content+=\"Se ha reducido en '1' el número de secuencias que debes acertar para ganar el juego. Quizás con esta ayudita puedas conseguir superar la prueba, sino recuerda que puedes usar el comando: \\n/ayuda2\";\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 840,
+        "y": 960,
+        "wires": [
+            [
+                "8bd5b37f99b08ef0",
+                "bdd29bb0ee57f4cd"
+            ]
+        ]
+    },
+    {
+        "id": "4054417be5c9e8ed",
+        "type": "debug",
+        "z": "4df0f1347905451e",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 490,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "ac7dfeb5cf992750",
+        "type": "function",
+        "z": "4df0f1347905451e",
+        "name": "mensaje bienvenida",
+        "func": "if(msg.payload.content.substring(0,1)!=\"/\")\n{\n msg.payload.content=\"Hey amigo/a, ya estás en el segundo nivel del juego 'La Caja'. Enhorabuena, pero no sonrías tan pronto porque debes de superar esta prueba. Para resolver este nivel, juega al Simon y gana. Si necesitas algo, puedes pulsar el comando: \\n/ayuda2\";\n return msg;\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 540,
+        "y": 860,
+        "wires": [
+            [
+                "bdd29bb0ee57f4cd"
+            ]
+        ]
+    },
+    {
+        "id": "1699125b4b0f183c",
+        "type": "function",
+        "z": "4df0f1347905451e",
+        "name": "info telegram user",
+        "func": "msg.mensaje=msg.payload;\nmsg.payload={};\nmsg.payload= {\"state\":1, \"reducir_secuencia\":1};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 530,
+        "y": 960,
+        "wires": [
+            [
+                "d5422d86349077ea",
+                "020688710872725f",
+                "7e5b519a8d28c01f"
+            ]
+        ]
+    },
+    {
+        "id": "9f114dbce8fa9b53",
+        "type": "telegram command",
+        "z": "4df0f1347905451e",
+        "name": "",
+        "command": "/ayuda2",
         "description": "",
         "registercommand": false,
         "language": "",
         "scope": "default",
-        "bot": "e7a4db69ee7c69e7",
+        "bot": "7cf6359c4d55741a",
         "strict": false,
         "hasresponse": true,
         "useregex": false,
         "removeregexcommand": false,
         "outputs": 2,
         "x": 150,
-        "y": 260,
+        "y": 960,
         "wires": [
             [
-                "3327c4eeb660372f"
+                "1699125b4b0f183c"
             ],
             []
         ]
     },
     {
-        "id": "d8384c1f3726b077",
-        "type": "comment",
-        "z": "434416693417df8a",
-        "name": "Recibe de Telegram, su función es solo iluminar dos iconos en caso de ser selecionada alguna opción",
-        "info": "",
-        "x": 470,
-        "y": 100,
+        "id": "dd54f90f7227b204",
+        "type": "telegram receiver",
+        "z": "4df0f1347905451e",
+        "name": "",
+        "bot": "7cf6359c4d55741a",
+        "saveDataDir": "",
+        "filterCommands": true,
+        "x": 180,
+        "y": 860,
+        "wires": [
+            [
+                "4054417be5c9e8ed",
+                "ac7dfeb5cf992750"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "8bd5b37f99b08ef0",
+        "type": "debug",
+        "z": "4df0f1347905451e",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1070,
+        "y": 960,
         "wires": []
     },
     {
-        "id": "3327c4eeb660372f",
-        "type": "function",
-        "z": "434416693417df8a",
+        "id": "bdd29bb0ee57f4cd",
+        "type": "telegram sender",
+        "z": "4df0f1347905451e",
         "name": "",
-        "func": "msg.payload = {};\nmsg.payload = 0;\nreturn msg;",
+        "bot": "7cf6359c4d55741a",
+        "haserroroutput": false,
         "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 360,
-        "y": 260,
+        "x": 1110,
+        "y": 860,
         "wires": [
-            [
-                "4d33e2856f156a91",
-                "37a26c27f0839347"
-            ]
-        ]
-    },
-    {
-        "id": "13c9bfd6cafc2b32",
-        "type": "telegram command",
-        "z": "434416693417df8a",
-        "name": "",
-        "command": "/ayuda",
-        "description": "",
-        "registercommand": false,
-        "language": "",
-        "scope": "default",
-        "bot": "e7a4db69ee7c69e7",
-        "strict": false,
-        "hasresponse": true,
-        "useregex": false,
-        "removeregexcommand": false,
-        "outputs": 2,
-        "x": 146.56666564941406,
-        "y": 186.566650390625,
-        "wires": [
-            [
-                "adb8ce50d60b0c5c"
-            ],
             []
         ]
     },
     {
-        "id": "adb8ce50d60b0c5c",
-        "type": "function",
-        "z": "434416693417df8a",
+        "id": "020688710872725f",
+        "type": "debug",
+        "z": "4df0f1347905451e",
         "name": "",
-        "func": "msg.payload = {};\nmsg.payload = 1;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 366.56666564941406,
-        "y": 186.566650390625,
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 810,
+        "y": 1020,
+        "wires": []
+    },
+    {
+        "id": "3d485acc91c77202",
+        "type": "mqtt in",
+        "z": "4df0f1347905451e",
+        "name": "",
+        "topic": "II3/ESP14440037/resultados_juego2",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "f2d93db89ab63446",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "x": 240,
+        "y": 200,
         "wires": [
             [
-                "37a26c27f0839347",
-                "4d33e2856f156a91"
+                "9b144fe53ba456f6",
+                "f1be751ab3572989"
             ]
         ]
     },
     {
-        "id": "37a26c27f0839347",
+        "id": "9b144fe53ba456f6",
+        "type": "debug",
+        "z": "4df0f1347905451e",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 530,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "7e5b519a8d28c01f",
+        "type": "mqtt out",
+        "z": "4df0f1347905451e",
+        "name": "",
+        "topic": "II3/ESP14440037/datos_juego2",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "3999f8259e1b43de",
+        "x": 1160,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "3b79417fb97f3170",
+        "type": "debug",
+        "z": "4df0f1347905451e",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 750,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "e31b419666b54ad7",
         "type": "ui_led",
-        "z": "434416693417df8a",
-        "order": 0,
-        "group": "5359497a2a301f2a",
+        "z": "4df0f1347905451e",
+        "order": 4,
+        "group": "e3ef0ffc5cd3a0c2",
         "width": 0,
         "height": 0,
-        "label": "Ayuda solicitada",
+        "label": "",
         "labelPlacement": "left",
         "labelAlignment": "left",
         "colorForValue": [
             {
-                "color": "#c0c0c0",
+                "color": "#ffff00",
                 "value": "0",
                 "valueType": "num"
             },
@@ -127,53 +318,465 @@
                 "color": "#008000",
                 "value": "1",
                 "valueType": "num"
-            }
-        ],
-        "allowColorForValueInMessage": false,
-        "shape": "circle",
-        "showGlow": true,
-        "name": "ayuda solicitada",
-        "x": 650,
-        "y": 180,
-        "wires": [],
-        "icon": "node-red/light.svg"
-    },
-    {
-        "id": "4d33e2856f156a91",
-        "type": "ui_led",
-        "z": "434416693417df8a",
-        "order": 1,
-        "group": "5359497a2a301f2a",
-        "width": 0,
-        "height": 0,
-        "label": "No, continua",
-        "labelPlacement": "left",
-        "labelAlignment": "left",
-        "colorForValue": [
-            {
-                "color": "#c0c0c0",
-                "value": "1",
-                "valueType": "num"
             },
             {
                 "color": "#ff0000",
-                "value": "0",
+                "value": "2",
                 "valueType": "num"
             }
         ],
         "allowColorForValueInMessage": false,
         "shape": "circle",
         "showGlow": true,
-        "name": "no, continua",
-        "x": 640,
-        "y": 260,
-        "wires": [],
-        "icon": "font-awesome/fa-forward"
+        "name": "",
+        "x": 1070,
+        "y": 600,
+        "wires": []
     },
     {
-        "id": "e7a4db69ee7c69e7",
+        "id": "d7c9162e2454764e",
+        "type": "change",
+        "z": "4df0f1347905451e",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.state",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 780,
+        "y": 600,
+        "wires": [
+            [
+                "e31b419666b54ad7"
+            ]
+        ]
+    },
+    {
+        "id": "fef2e655d39a9183",
+        "type": "ui_text",
+        "z": "4df0f1347905451e",
+        "group": "e3ef0ffc5cd3a0c2",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Tiempo partida total: ",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1120,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "30ac0d35ab00d68d",
+        "type": "ui_text",
+        "z": "4df0f1347905451e",
+        "group": "e3ef0ffc5cd3a0c2",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Tiempo partida actual:  ",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1130,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "246a960c3d88250c",
+        "type": "change",
+        "z": "4df0f1347905451e",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.aciertos_por_partida",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 780,
+        "y": 260,
+        "wires": [
+            [
+                "13a31ea381ec9495"
+            ]
+        ]
+    },
+    {
+        "id": "13a31ea381ec9495",
+        "type": "ui_text",
+        "z": "4df0f1347905451e",
+        "group": "e3ef0ffc5cd3a0c2",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Aciertos por partida:  ",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1120,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "f1be751ab3572989",
+        "type": "json",
+        "z": "4df0f1347905451e",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 530,
+        "y": 200,
+        "wires": [
+            [
+                "246a960c3d88250c",
+                "6f5ff0610d396fad",
+                "5ce7fb7b9a236e30",
+                "c6895f8385f21a96",
+                "fdeb5718e85fed09"
+            ]
+        ]
+    },
+    {
+        "id": "6f5ff0610d396fad",
+        "type": "function",
+        "z": "4df0f1347905451e",
+        "name": "",
+        "func": "var tiempo = msg.payload.tiempo_partida_total;\n\nvar minutos = Math.trunc(tiempo/(1000*60));\n    tiempo = tiempo - minutos*60*1000;\nvar segundos = Math.trunc(tiempo/(1000));\n\nmsg.payload = minutos +\":\"+segundos;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 140,
+        "wires": [
+            [
+                "fef2e655d39a9183"
+            ]
+        ]
+    },
+    {
+        "id": "5ce7fb7b9a236e30",
+        "type": "function",
+        "z": "4df0f1347905451e",
+        "name": "",
+        "func": "var tiempo = msg.payload.tiempo_partida_actual;\n\nvar minutos = Math.trunc(tiempo/(1000*60));\n    tiempo = tiempo - minutos*60*1000;\nvar segundos = Math.trunc(tiempo/(1000));\n\nmsg.payload = minutos +\":\"+segundos;\nreturn msg;\n\n\n\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 200,
+        "wires": [
+            [
+                "30ac0d35ab00d68d"
+            ]
+        ]
+    },
+    {
+        "id": "11ea09acf91c3229",
+        "type": "ui_button",
+        "z": "4df0f1347905451e",
+        "name": "Start",
+        "group": "e3ef0ffc5cd3a0c2",
+        "order": 8,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Start",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 150,
+        "y": 740,
+        "wires": [
+            [
+                "bc5e1aff13f86696"
+            ]
+        ]
+    },
+    {
+        "id": "c2717fa3a42cac1e",
+        "type": "mqtt in",
+        "z": "4df0f1347905451e",
+        "name": "",
+        "topic": "II3/ESP14440037/estado_juego2",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "f2d93db89ab63446",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "x": 230,
+        "y": 600,
+        "wires": [
+            [
+                "a1396d1eb237c149"
+            ]
+        ]
+    },
+    {
+        "id": "a1396d1eb237c149",
+        "type": "json",
+        "z": "4df0f1347905451e",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 530,
+        "y": 600,
+        "wires": [
+            [
+                "d7c9162e2454764e"
+            ]
+        ]
+    },
+    {
+        "id": "7ebb4339eff0ac5f",
+        "type": "mongodb out",
+        "z": "4df0f1347905451e",
+        "mongodb": "f605fa69.8f5008",
+        "name": "",
+        "collection": "datos_json5",
+        "payonly": true,
+        "upsert": false,
+        "multi": false,
+        "operation": "store",
+        "x": 1150,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "c6895f8385f21a96",
+        "type": "function",
+        "z": "4df0f1347905451e",
+        "name": "+ fecha",
+        "func": "msg.payload.date = new Date();\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 320,
+        "wires": [
+            [
+                "7ebb4339eff0ac5f"
+            ]
+        ]
+    },
+    {
+        "id": "4f4b505fc24eb016",
+        "type": "mongodb in",
+        "z": "4df0f1347905451e",
+        "mongodb": "f605fa69.8f5008",
+        "name": "",
+        "collection": "datos_json5",
+        "operation": "find",
+        "x": 830,
+        "y": 480,
+        "wires": [
+            [
+                "06505c88ec279376",
+                "f8b95e9a36365e40"
+            ]
+        ]
+    },
+    {
+        "id": "06505c88ec279376",
+        "type": "function",
+        "z": "4df0f1347905451e",
+        "name": "genera datos gráfica",
+        "func": "var arraytiempo=[];\nvar arrayaciertos=[];\n\n// los arrays usados en la represenstación gráfica deben contener objetos JSON con dos campos: {x , y}\n// en x debemos poner la hora en formato \"timestamp\". Si tenemos un objeto fecha se puede convertir usando el método getTime()\n// en y debemos poner el valor de la variable\n// mas info en: https://github.com/node-red/node-red-dashboard/blob/master/Charts.md\n\nif(Array.isArray(msg.payload) && msg.payload.length>0)\n{\n    for (var i = 0; i < msg.payload.length; i++) { // añade datos a los arrays\n        //arraytiempo.push({x : msg.payload[i].date.getTime() , y : msg.payload[i].tiempo_partida_actual});\n        arraytiempo.push({x : Math.trunc(msg.payload[i].tiempo_partida_total/1000) , y : msg.payload[i].aciertos_por_partida});\n        //arrayaciertos.push({x : msg.payload[i].date.getTime() , y : msg.payload[i].aciertos_por_partida});\n    }\n}\n    \nmsg.payload = [{\n        //\"series\":[\"Tiempo_partida_actual\",\"Aciertos_por_partida\"],\n        //\"data\":[arraytiempo, arrayaciertos],\n        \"series\":[\"Aciertos_por_partida\"],\n        \"data\":[arraytiempo],\n        \"labels\":[\"\"]\n        }];\n\nreturn msg;  ",
+        "outputs": "1",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1120,
+        "y": 480,
+        "wires": [
+            [
+                "9a7e96bb51e58d12",
+                "b139cf7d8d54eaf9"
+            ]
+        ]
+    },
+    {
+        "id": "9a7e96bb51e58d12",
+        "type": "ui_chart",
+        "z": "4df0f1347905451e",
+        "name": "",
+        "group": "e3ef0ffc5cd3a0c2",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "label": "Registro resultados",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "auto",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "20",
+        "removeOlder": "10",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "60",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1390,
+        "y": 480,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d1359d3aed73a86d",
+        "type": "function",
+        "z": "4df0f1347905451e",
+        "name": "",
+        "func": "msg.sort = {\"date\" : -1}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 540,
+        "y": 480,
+        "wires": [
+            [
+                "4f4b505fc24eb016"
+            ]
+        ]
+    },
+    {
+        "id": "01365bc7e58e186c",
+        "type": "ui_button",
+        "z": "4df0f1347905451e",
+        "name": "",
+        "group": "e3ef0ffc5cd3a0c2",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Ver resultados",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "{ }",
+        "payloadType": "json",
+        "topic": "topic",
+        "topicType": "str",
+        "x": 170,
+        "y": 480,
+        "wires": [
+            [
+                "d1359d3aed73a86d"
+            ]
+        ]
+    },
+    {
+        "id": "f8b95e9a36365e40",
+        "type": "debug",
+        "z": "4df0f1347905451e",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1070,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "b139cf7d8d54eaf9",
+        "type": "debug",
+        "z": "4df0f1347905451e",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1350,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "fdeb5718e85fed09",
+        "type": "debug",
+        "z": "4df0f1347905451e",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 750,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "7cf6359c4d55741a",
         "type": "telegram bot",
-        "botname": "Tarea_9_Irene",
+        "botname": "Simonbot",
         "usernames": "",
         "chatids": "",
         "baseapiurl": "",
@@ -196,21 +799,81 @@
         "verboselogging": false
     },
     {
-        "id": "5359497a2a301f2a",
+        "id": "f2d93db89ab63446",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "3999f8259e1b43de",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "e3ef0ffc5cd3a0c2",
         "type": "ui_group",
-        "name": "JuegoSimon",
-        "tab": "2ec127612123211b",
+        "name": "Game Status",
+        "tab": "ad91238c593e90b5",
         "order": 1,
         "disp": true,
-        "width": "10",
+        "width": "6",
         "collapse": false,
         "className": ""
     },
     {
-        "id": "2ec127612123211b",
+        "id": "f605fa69.8f5008",
+        "type": "mongodb",
+        "hostname": "127.0.0.1",
+        "connectOptions": "",
+        "port": "27017",
+        "db": "ejercicio",
+        "name": ""
+    },
+    {
+        "id": "ad91238c593e90b5",
         "type": "ui_tab",
-        "name": "LaCaja",
+        "name": "LaCaja - User",
         "icon": "dashboard",
+        "order": 1,
         "disabled": false,
         "hidden": false
     }

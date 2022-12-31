@@ -21,6 +21,7 @@
   /* TOPICS PUB */
   //#define TOPIC_PUB_ "II3/ESP" + String(ESP.getChipId()) + "/resultados_juego2"
   #define TOPIC_PUB_ "II3/ESP14440037/resultados_juego2"
+  #define TOPIC_PUB_ESTADO_ "II3/ESP14440037/estado_juego2"
   
   /* TOPICS SUB */
   //#define TOPIC_SUB_ "II3/ESP" + String(ESP.getChipId()) + "/datos_juego2"
@@ -51,8 +52,9 @@
   int state = 0;                    // Variable que indica el estado del juego: 0 esperando, 1 en el juego, 2 fin de juego
   int reducir_secuencia = 0;        // Variable que reduce la puntuación máxima si se pide ayuda
   int HIGH_PWM = 0;                 // Variable que realiza el control PWM de los leds
-  int tiempo_partida_total = 0;
-  int tiempo_partida_actual = 0;
+  long unsigned tiempo_inicio = 0;
+  long unsigned tiempo_partida_total = 0;
+  long unsigned tiempo_partida_actual = 0;
   int aciertos = 0;                 // Variable que ayuda al control PWM de los leds, se reinicia al perder cada partida
   int aciertos_por_partida = 0;     // Variable que indica los aciertos en cada partida, se reinicia tras cargar su valor en el json a publicar por mqtt
   int actualiza = 0;                // Variable que indica que se ha perdido la partida y se han de actualizar ciertos valores
@@ -111,7 +113,18 @@ void actualizacion_NodeRed()
     jsonRoot.clear(); // hay que limpiar el buffer
 }
 
+void actualizacion_estado()
+{    
+    jsonRoot.clear();
+    
+    jsonRoot["state"] = state;
 
+    // Serializacion y envio mqtt
+    serializeJson(jsonRoot,message_send);
+    mqtt_client.publish(TOPIC_PUB_ESTADO_, message_send);
+               
+    jsonRoot.clear(); // hay que limpiar el buffer
+}
 //********************************
 // Conectando mqtt
 //********************************
@@ -209,7 +222,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   void loop() {
     if (!mqtt_client.connected()) conecta_mqtt();
     mqtt_client.loop(); // esta llamada para que la librería recupere el control
-    
+    actualizacion_estado();
     if (state == 1)
     {
       if (reducir_secuencia ==1)
@@ -218,19 +231,21 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
         reducir_secuencia = 0;
       }
         HIGH_PWM = round((255/puntuacion_maxima) + ((255*aciertos)/puntuacion_maxima)); // Control PWM de los led
-        tiempo_partida_total = millis();
+        tiempo_inicio = millis();
+        //tiempo_partida_actual = tiempo_partida_total;
         mostrar_secuencia();  // Reproduce la sequencia
         leer_secuencia();     // Lee la sequencia
         delay(1000);          // Espera 1 segundo
         
         if (state==2 || actualiza==1)
         {
-            tiempo_partida_actual = tiempo_partida_total - tiempo_partida_actual;
-
+            tiempo_partida_actual = millis() - tiempo_inicio;
+            tiempo_partida_total = tiempo_partida_total + tiempo_partida_actual;
             actualizacion_NodeRed();
             
             actualiza = 0;
             aciertos_por_partida = 0;
+            cancion_Mario = 0;
         }
     }
   }
@@ -324,6 +339,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
     if (cancion_Mario == 1)
     {
       midi();
+      state = 2;
     }
     else
     {
@@ -344,13 +360,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
     digitalWrite(LED_VERDE_, LOW);
     digitalWrite(LED_AMARILLO_, LOW);
     digitalWrite(LED_AZUL_, LOW);
-    resetcontador();
-
-    if (cancion_Mario == 1)
-    {
-      state = 2;
-    }
-    
+    resetcontador();    
   }
     
  // Resetear contadores
