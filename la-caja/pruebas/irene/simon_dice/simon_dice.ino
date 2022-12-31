@@ -68,6 +68,13 @@
   int wait = 500;                // Retraso segun la secuencia se incrementa
   int puntuacion_maxima = 5;     // Puntuación máxima donde acaba el juego 
   char ID_PLACA[16];
+  int una_vez = 0;
+  int CLK_=3;
+  #define CLOCK_STOP 0
+  #define CLOCK_START 1
+  #define CLOCK_RESET 2
+  #define CLOCK_PAUSE 3
+  #define CLOCK_CONTINUE 4
 
   /* Function: PROCESA_MENSAJE */
   StaticJsonDocument<MESSAGE_SIZE_> json_recibido;
@@ -118,7 +125,8 @@ void actualizacion_estado()
     jsonRoot.clear();
     
     jsonRoot["state"] = state;
-
+    jsonRoot["clock"] = CLK_;
+    
     // Serializacion y envio mqtt
     serializeJson(jsonRoot,message_send);
     mqtt_client.publish(TOPIC_PUB_ESTADO_, message_send);
@@ -222,9 +230,17 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   void loop() {
     if (!mqtt_client.connected()) conecta_mqtt();
     mqtt_client.loop(); // esta llamada para que la librería recupere el control
+    
+    if (una_vez== 0 && state!=0){
     actualizacion_estado();
+    if (state== 2){
+       una_vez=1;
+       CLK_ = CLOCK_STOP;
+    }
+    }
     if (state == 1)
     {
+      CLK_ = CLOCK_START;
       if (reducir_secuencia ==1)
       {
         puntuacion_maxima = puntuacion_maxima - 1;
