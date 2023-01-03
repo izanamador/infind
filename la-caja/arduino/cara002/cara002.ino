@@ -98,7 +98,9 @@ void loop() {
   static int intentos = 0;
   static unsigned long ultimo_mensaje = 0;
   char *msg;
-  
+  char strDigits[10]="    ";
+  static int iDigit = 0;
+
   objInfra.Loop();
 
   if (!objInfra.GameRunning())
@@ -106,36 +108,39 @@ void loop() {
 
   char key = myKeypad.getKey(); /* Recibo una tecla del numpad */  
 
-  if ((key != NULL && key >= CHAR_0 && key <= CHAR_9) || key == CHAR_SEND){/* Compruebo si es válida (0,1,..,9, #)*/
-    
-    // el jugador ha pulsado una tecla disinta de SEND
-    // dar feedback de la tecla que ha pulsado
-    if(key != CHAR_SEND){
-      if(CountDigit(number) < MAX_DIGITS){ /* Evito el overflow */
-        number = 10*number + (key-48); /* Concateno dígito a digíto para formar un número */
-      }
-
-      char strAux[10];
-      sprintf(strAux, "%d", number);
-      objInfra.ReportStatus(strAux);
-    }
-    else
-    // el jugador envía una respuesta
-    // vaciar el string con el número en el dashboard
-    {                    /* Si el usuario le ha dado a enviar compruebo si ha acertado */
-      Serial.println(number);
-      if (game_ans == number) // la respuesta introducida es la correcta
-      { 
-        objInfra.ReportSuccess(" ");
-        Serial.println("You win!");
-      }
-      else // introdujo una respuesta incorrecta
-      {
-        objInfra.ReportFailure(" ");
-        number = 0;           /* Reinicio el número */
-      }        
-    }
+  // si se pulsa enviar y la respuesta es correcta
+  if ((key == CHAR_SEND) && (game_ans == number)) 
+  {
+    Serial.println(number);
+    objInfra.ReportSuccess(" ");
+    Serial.println("You win!");
   }
+
+  // si se pulsa enviar y la respuesta es incorrecta
+  else if ((key == CHAR_SEND) && (game_ans != number))
+  {
+    Serial.println(number);
+    objInfra.ReportFailure(" ");
+    number = 0;           /* Reinicio el número */
+    strcpy(strDigits,"     ");
+    iDigit = 0;
+  }
+
+  // el jugador ha pulsado una tecla numérica disinta de SEND
+  // TODO REVISAR SI EL PRIMER TÉRMINO REALMENTE HACE FALTA (KEY!=NULL)
+  else if ((key != NULL) && (key >= CHAR_0 && key <= CHAR_9))
+  {
+    // dar feedback de la tecla que ha pulsado
+    if(CountDigit(number) < MAX_DIGITS){ /* Evito el overflow */
+      number = 10*number + (key-48); /* Concateno dígito a digíto para formar un número */
+    }
+    strDigits[iDigit++]=key;
+    objInfra.ReportStatus(strDigits);
+    //sprintf(strAux, "%d", number);
+    //objInfra.ReportStatus(strAux);     
+  }
+
+  
 }
 
 /****************************/
