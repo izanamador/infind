@@ -15,13 +15,6 @@ StaticJsonDocument<MESSAGE_SIZE_> json;
 #include <math.h>
 
 
-
-
-
-
-
-
-
 /* Create objInfra */
 // TODO Estandarizar los nombres de topics en la infrasestructura
 // Ejemplo de topic que cumple 
@@ -31,17 +24,6 @@ Infra objInfra;
 char *strTopicPub = "II3/ESP002/pub/cara002"; // topic principal para publicar contenido y lastwill
 char *strTopicCfg = "II3/ESP002/cfg/cara002"; // topic para recibir parametros de configuracion
 char *strTopicCmd = "II3/ESP002/cmd/cara002"; // topic para recibir peticiones de comando
-
-
-
-
-
-
-
-
-
-/* VARIABLES GLOBALES */
-//int CurrentState = STAT_SETUP;
 
 
 /* Libreria keypad */
@@ -72,26 +54,8 @@ void setup() {
   objInfra.mqttTopicsPub[TOPIC_MAIN] = strTopicPub;
   objInfra.mqttTopicsSub[TOPIC_NUM_CFG] = strTopicCfg;
   objInfra.mqttTopicsSub[TOPIC_NUM_CMD] = strTopicCmd;
-  //objInfra.objConfig["CRONO_INI"] ="30:00";
-  //objInfra.objConfig["CRONO_MAX"] ="90:00";
-  //objInfra.objConfig["CRONO_ADD"] ="10:00";
-  //objInfra.objConfig["FREQ_START"]=1200;
-  //objInfra.objConfig["FREQ_CARA"] =1300;
-  //objInfra.objConfig["FREQ_FIN"]  =1400;
-  //objInfra.objConfig["DURA_START"]=5000;
-  //objInfra.objConfig["DURA_CARA"] =2000;
-  //objInfra.objConfig["DURA_FIN"]  =10000;
-  
-  //CurrentState = STAT_SETUP;
-  //ReportStatus(CurrentState, NULL);
   objInfra.Setup(mqttCallback);
-
-  //CurrentState = STAT_WAITING;  
 }
-
-
-
-
 
 
 
@@ -108,16 +72,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length)
   if (strcmp(topic, strTopicCmd)==0)
     {
       game_ans = atoi(mensaje);
-      //CurrentState = STAT_RUNNING;
-      //ReportStatus(CurrentState, NULL);
       objInfra.ReportStart(NULL);
-
-      //json["state"] = 1;
-      //json["intentos"] = 0;
-      //json["tiempo"] = 0;
-      //json["clock"] = 1;
-      //serializeJson(json,message);
-      //objInfra.MqttPublish(message);
     }
   Serial.println(game_ans);
   free(mensaje);
@@ -145,115 +100,47 @@ void loop() {
   char *msg;
   
   objInfra.Loop();
-  // ReportStatus(CurrentState, NULL);
 
-  //unsigned long ahora = millis();
+  if (!objInfra.GameRunning())
+    return;
 
-  //if(state == 0){/* WAITING -- Espero hasta que reciba la respuesta a comparar por MQTT */
-  //  json["clock"] = 0;
-  //  if(game_ans != NULL){
-  //    state = 1;
-  //  }
-  //  }else if(state == 1){/* INGAME -- Estoy en el juego hasta que el usuario acierte */
+  char key = myKeypad.getKey(); /* Recibo una tecla del numpad */  
 
-  //if (CurrentState == STAT_RUNNING)
-  if (objInfra.GameRunning())
-  {
-    //json["clock"] = 1;
-
-    char key = myKeypad.getKey(); /* Recibo una tecla del numpad */
+  if ((key != NULL && key >= CHAR_0 && key <= CHAR_9) || key == CHAR_SEND){/* Compruebo si es válida (0,1,..,9, #)*/
     
-    if ((key != NULL && key >= CHAR_0 && key <= CHAR_9) || key == CHAR_SEND){/* Compruebo si es válida (0,1,..,9, #)*/
-      
-      // el jugador ha pulsado una tecla disinta de SEND
-      // dar feedback de la tecla que ha pulsado
-      if(key != CHAR_SEND){
-        if(CountDigit(number) < MAX_DIGITS){ /* Evito el overflow */
-          number = 10*number + (key-48); /* Concateno dígito a digíto para formar un número */
-        }
-
-        char strAux[10];
-        sprintf(strAux, "%d", number);
-        objInfra.ReportStatus(strAux);
-        //ReportStatus(CurrentState, strAux);
-
-
-        //json["numero"] = number;
-        //serializeJson(json,message);
-        //objInfra.MqttPublish(message);        
-          
+    // el jugador ha pulsado una tecla disinta de SEND
+    // dar feedback de la tecla que ha pulsado
+    if(key != CHAR_SEND){
+      if(CountDigit(number) < MAX_DIGITS){ /* Evito el overflow */
+        number = 10*number + (key-48); /* Concateno dígito a digíto para formar un número */
       }
-      else
-      // el jugador envía una respuesta
-      // vaciar el string con el número en el dashboard
-      {                    /* Si el usuario le ha dado a enviar compruebo si ha acertado */
 
-        //json["numero"] = " ";   /* Limpio el dashboard, da la sensación de que ha sido enviado */        
-        //serializeJson(json,message);
-        //objInfra.MqttPublish(message);
-
-        Serial.println(number);
-        if (game_ans == number)
-        { /* Comparo si la respuesta del usuario coincide con la correcta */
-          
-          objInfra.ReportSuccess(" ");
-          Serial.println("You win!");
-          //state = 2;
-          //CurrentState = STAT_RUNNING;
-  
-        }
-        else
-        {
-          //intentos++;           /* Aumento el número de intentos hechos por el usuario */
-          objInfra.ReportFailure(" ");
-          number = 0;           /* Reinicio el número */
-        }        
+      char strAux[10];
+      sprintf(strAux, "%d", number);
+      objInfra.ReportStatus(strAux);
+    }
+    else
+    // el jugador envía una respuesta
+    // vaciar el string con el número en el dashboard
+    {                    /* Si el usuario le ha dado a enviar compruebo si ha acertado */
+      Serial.println(number);
+      if (game_ans == number) // la respuesta introducida es la correcta
+      { 
+        objInfra.ReportSuccess(" ");
+        Serial.println("You win!");
       }
+      else // introdujo una respuesta incorrecta
+      {
+        objInfra.ReportFailure(" ");
+        number = 0;           /* Reinicio el número */
+      }        
     }
   }
-  //else if(state == 2){/* FINISHED -- Envio los resultados en un JSON*/
-  /*  json["state"] = state;
-    json["intentos"] = intentos+1;
-    json["tiempo"] = "3600";
-    json["clock"] = 0;
-    serializeJson(json,message);
-    if(una_vez == 0){
-    objInfra.MqttPublish(message);
-    una_vez = 1;
-    }
-    Serial.println("El juego ha terminado!");
-    
-    game_ans = NULL;    
-    */
-
-  //}else{
-  // Serial.println("States failed!"); /* Por si el juego falla en algún momento, es una medida de seguridad */
-  //}
-  
-  //if (ahora - ultimo_mensaje >= 1000 && state !=2) {
-  //  SendState();
-  //}
-  
 }
 
 /****************************/
 /* Declaración de funciones */
 /****************************/
-void SendState(){
-  /* Selecciona un estado del juego y compone un JSON para enviarlo 
-     como mensaje a Node-Red*/
-  /********** STATES *********/
-  /* WAITING  : 0            */
-  /* INGAME   : 1            */
-  /* FINISHED : 2            */
-  /***************************/
-  
-  //json["state"] = state;
-
-  /* Desactivado hasta que nos pogamos de acuerdo con el envío de este tipo de datos*/
-  serializeJson(json,message);
-  objInfra.MqttPublish(message);
-}
 
 int CountDigit(int number) {
   /* Calcula el número de dígitos que tiene un número cualquiera */
