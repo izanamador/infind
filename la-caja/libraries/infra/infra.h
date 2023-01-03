@@ -74,7 +74,7 @@
 #include <ArduinoJson.h>
 #define JSON_MESSAGE_SIZE    512
 
-
+//---------------------------------------------- GAME STATUS
 
 class Infra
 {
@@ -97,12 +97,25 @@ class Infra
       void          MqttPublish(char *message);
       char          *mqttTopicsPub[TOPIC_NUM_MAX];
       char          *mqttTopicsSub[TOPIC_NUM_MAX];
+      int           GameRunning();
+      void          ReportStatus(char* GameInfo);
+      void          ReportStart(char* GameInfo);
+      void          ReportFailure(char* GameInfo);
+      void          ReportSuccess(char* GameInfo);
     
     // JSON
       StaticJsonDocument<JSON_MESSAGE_SIZE> objConfig;
   private:
       void          PrintConfig();
-    
+      int           currStat_;
+      //int           lastStat_;
+      unsigned int  milLsRep_;
+      unsigned int  milStart_;
+      unsigned int  milTries_;
+      int           numTries_;
+      
 };
 
 #endif
+
+

@@ -1,6 +1,18 @@
 #include "Arduino.h"
 #include "infra.h"
 
+#define STAT_SETUP    0
+#define STAT_WAIT     1
+#define STAT_RESET    2
+#define STAT_PLAY     3
+#define STAT_LOST     4
+#define STAT_WON      5
+#define STAT_TIMEOUT  6
+#define STAT_END      7
+
+
+
+
 Infra::Infra()
 {
   // hardcodes relacionados con la placa
@@ -21,7 +33,115 @@ Infra::Infra()
       mqttTopicsPub[i] = NULL;
       mqttTopicsSub[i] = NULL;
     } 
+  
 }
+
+int Infra::GameRunning()
+{
+  return (currStat_== STAT_PLAY);
+}
+
+void Infra::ReportStatus(char* GameInfo)
+{
+  bool bReport = true;
+  static char message[JSON_MESSAGE_SIZE];
+  StaticJsonDocument<JSON_MESSAGE_SIZE> json;
+
+  // never report after completion of the game
+  if (currStat_ == STAT_END)
+    return;
+
+
+  // report once if the game is setting up
+  if (currStat_ == STAT_SETUP)
+    json["state"] = "Setting Up";
+
+  // report periodically if the game is waiting to start
+  else if (currStat_ == STAT_WAIT)
+  {
+    bReport = false;
+    json["state"] = "Waiting to start game";
+  }
+
+  // report once if the game is about to start
+  else if (currStat_ == STAT_RESET)
+    json["state"] = "Starting";
+  
+  // report periodically or forced if info about the game
+  else if (currStat_ == STAT_PLAY)
+  {
+    bReport = (GameInfo!=NULL); 
+    json["state"] = "Playing";
+  }
+
+  // report lost and retry
+  else if (currStat_ == STAT_LOST)
+    json["state"] = "You lose";
+
+  // win
+  else if (currStat_ == STAT_WON)
+    json["state"] = "You won";
+  
+  else if (currStat_ == STAT_TIMEOUT)
+    json["state"] = "Timeout! You lost";
+  
+  // report when event or periodically
+  // TODO QUITAR HARDCODE DE REPORTING CADA SEGUNDO
+  if (bReport || millis() > 1000+milLsRep_)
+  {
+    milLsRep_ = millis(); // refresh last report timestamp
+    json["gametime"] = millis()-milStart_;
+    json["trytime"]  = millis()-milTries_;
+    json["numtries"] = numTries_;
+
+
+    if (GameInfo==NULL)
+      json["gameinfo"] = "";
+    else
+      json["gameinfo"] = GameInfo;
+    
+    serializeJson(json,message);
+    MqttPublish(message);
+  }
+}
+
+void Infra::ReportStart(char* GameInfo)
+{
+  if (currStat_ == STAT_WAIT)
+  {    
+    currStat_ = STAT_RESET;
+    milStart_ = millis();
+    milTries_ = milStart_;
+    numTries_ = 1;
+    ReportStatus(GameInfo);    
+    currStat_ = STAT_PLAY;
+  }
+}
+
+void Infra::ReportFailure(char* GameInfo)
+{
+  if (currStat_ == STAT_PLAY)
+  {    
+    currStat_ = STAT_LOST;
+    numTries_++;
+    ReportStatus(GameInfo);
+    milTries_ = millis();    
+    currStat_ = STAT_PLAY;
+  }
+
+}
+
+void Infra::ReportSuccess(char* GameInfo)
+{
+  if (currStat_ == STAT_PLAY)
+  {    
+    currStat_ = STAT_WON;
+    numTries_++;
+    ReportStatus(GameInfo);
+    currStat_ = STAT_END;
+  }
+}
+
 
 void OTA_CB_Start(){Serial.println("Nuevo Firmware encontrado. Actualizando...");}
 void OTA_CB_Error(int e) {
@@ -44,13 +164,10 @@ void OTA_CB_End() {Serial.println("Fin OTA. Reiniciando...");}
 
 int Infra::Setup(void (*mqttCallback)(char*, byte*, unsigned int))
 {
-  //---------------------------------------------- Arduino Pin Mode Setup
-  // pinMode(LED_BUILTIN, OUTPUT);
-
   //---------------------------------------------- ESP Setup
-  Serial.begin(ESP_BAUD_RATE);
-  Serial.println();
-  Serial.printf("Empieza setup en %lu ms...", millis());
+    Serial.begin(ESP_BAUD_RATE);
+    Serial.println();
+    Serial.printf("Empieza setup en %lu ms...", millis());
 
   //---------------------------------------------- WIFI Setup
     Serial.printf("\nConnecting to %s:\n", WIFI_SSID);
@@ -109,6 +226,15 @@ int Infra::Setup(void (*mqttCallback)(char*, byte*, unsigned int))
     Serial.printf("Termina setup en %lu ms\n\n",millis());
     PrintConfig();
 
+  //---------------------------------------------- Status of the game
+    numTries_ = 0;
+    milLsRep_ = 0;
+    milStart_ = 0;
+    milTries_ = 0;
+    currStat_ = STAT_SETUP;
+    ReportStatus(NULL);  
+    currStat_ = STAT_WAIT;
+
   return 0;
 }
 
@@ -121,7 +247,21 @@ void Infra::PrintConfig()
 
 int Infra::Loop()
 {
-  ptrMqtt->loop(); // para que la librería recupere el control
+  // TODO QUITAR HARDCODE DE TIEMPO DE PARTIDA Y/O JUEGO
+  if ((currStat_== STAT_PLAY) && 
+      ((millis()-milTries_) > 60*15) || 
+      ((millis()-milStart_) > 60*60) )
+  {
+    currStat_ = STAT_TIMEOUT;
+    ReportStatus(NULL); // reporte periódico
+    currStat_ = STAT_END;
+  }
+  else
+  {
+    ptrMqtt->loop(); // para que la librería recupere el control
+    ReportStatus(NULL); // reporte periódico
+  }
+
   return 0;
 }
 
