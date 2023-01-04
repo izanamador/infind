@@ -13,6 +13,7 @@ StaticJsonDocument<MESSAGE_SIZE_> json;
 #include <string.h>
 #include <Wire.h>
 #include <math.h>
+#include <cstring>
 
 
 /* Create objInfra */
@@ -98,10 +99,10 @@ void loop() {
   static int intentos = 0;
   static unsigned long ultimo_mensaje = 0;
   char *msg;
-  char strDigits[10]="    ";
+  static char strDigits[10]= "";
   static int iDigit = 0;
 
-  objInfra.Loop();
+  objInfra.Loop(strDigits);
 
   if (!objInfra.GameRunning())
     return;
@@ -122,7 +123,7 @@ void loop() {
     Serial.println(number);
     objInfra.ReportFailure(" ");
     number = 0;           /* Reinicio el número */
-    strcpy(strDigits,"     ");
+    strcpy(strDigits,"");
     iDigit = 0;
   }
 
@@ -134,7 +135,9 @@ void loop() {
     if(CountDigit(number) < MAX_DIGITS){ /* Evito el overflow */
       number = 10*number + (key-48); /* Concateno dígito a digíto para formar un número */
     }
-    strDigits[iDigit++]=key;
+    /* strDigits[iDigit++]=key; */
+    String str = String(number);
+    str.toCharArray(strDigits, 10);
     objInfra.ReportStatus(strDigits);
     //sprintf(strAux, "%d", number);
     //objInfra.ReportStatus(strAux);     
