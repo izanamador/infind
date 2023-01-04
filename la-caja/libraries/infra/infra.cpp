@@ -245,7 +245,7 @@ void Infra::PrintConfig()
   Serial.println(strAux);
 }
 
-int Infra::Loop()
+int Infra::Loop(char* GameInfo = NULL)
 {
   // TODO QUITAR HARDCODE DE TIEMPO DE PARTIDA Y/O JUEGO
   if ((currStat_== STAT_PLAY) && 
@@ -253,13 +253,13 @@ int Infra::Loop()
       ((millis()-milStart_) > 60000*60) )
   {
     currStat_ = STAT_TIMEOUT;
-    ReportStatus(NULL); // reporte periódico
+    ReportStatus(GameInfo); // reporte periódico
     currStat_ = STAT_END;
   }
   else
   {
     ptrMqtt->loop(); // para que la librería recupere el control
-    ReportStatus(NULL); // reporte periódico
+    ReportStatus(GameInfo); // reporte periódico
   }
 
   return 0;
