@@ -121,7 +121,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length)
 void loop() 
 {
   // Declaración de variables
-    char GameInfo[100]; // TODO REPORTAR EL NUMERO DE AYUDAS Y LONGITUD DE SECUENCIA
+    char GameInfo[200]; // TODO REPORTAR EL NUMERO DE AYUDAS Y LONGITUD DE SECUENCIA
 
     static int estado = STAT_INICIAL;
     static int boton_pulsado;
@@ -171,15 +171,20 @@ void loop()
     { 
       estado = STAT_BOTON;
       if (digitalRead(PIN_BOTON_ROJO) == LOW)
-        boton_pulsado = COLOR_ROJO;
+        {boton_pulsado = COLOR_ROJO;
+        delay(500);}
       else if (digitalRead(PIN_BOTON_AZUL) == LOW)
-        boton_pulsado = COLOR_AZUL;
+        {boton_pulsado = COLOR_AZUL;
+        delay(500);}
       else if (digitalRead(PIN_BOTON_AMARILLO) == LOW)
-        boton_pulsado = COLOR_AMARILLO;
+        {boton_pulsado = COLOR_AMARILLO;
+        delay(500);}
       else if (digitalRead(PIN_BOTON_VERDE) == LOW)
-        boton_pulsado = COLOR_VERDE;
+        {boton_pulsado = COLOR_VERDE;
+        delay(500);}
       else
         estado = STAT_ESPERA;
+        //boton_pulsado = COLOR_NINGUNO;
     }
 
   // STAT_BOTON: Visualizar el botón y decidir si completó, acertó o falló
@@ -195,8 +200,11 @@ void loop()
       else if (iBoton + 1 == longParcial)
       {
         if (longParcial > SecuenciaMasLarga)
+        {
           SecuenciaMasLarga = longParcial;
+        }
         estado = STAT_SECUENCIA;
+        iBoton = 0;
       }
       else
         estado = STAT_BOTON_OK;
@@ -209,11 +217,12 @@ void loop()
       playTone(4545,1500);
       delay(500);
       
-      iBoton++;
+      
       // mostrar 3 veces a máxima luminosidad el botón que se debería haber pulsado
-      mostrar_color(SecuenciaCorrecta[iSecuencia], duracion_sonido, MAX_LUM_PWM);
-      mostrar_color(SecuenciaCorrecta[iSecuencia], duracion_sonido, MAX_LUM_PWM);
-      mostrar_color(SecuenciaCorrecta[iSecuencia], duracion_sonido, MAX_LUM_PWM);
+      mostrar_color(SecuenciaCorrecta[iBoton], duracion_sonido, MAX_LUM_PWM);
+      mostrar_color(SecuenciaCorrecta[iBoton], duracion_sonido, MAX_LUM_PWM);
+      mostrar_color(SecuenciaCorrecta[iBoton], duracion_sonido, MAX_LUM_PWM);
+      
       delay(1000);
       objInfra.ReportFailure(GameInfo);
       estado = STAT_INICIAL;
@@ -227,7 +236,7 @@ void loop()
       //luminosidad = 255-(17+(int)((iSecuencia*MIN_LUM_PWM)/(float)LongitudSecuencia)); 
       // HIGH_PWM = round((255/puntuacion_maxima) + ((255*aciertos)/puntuacion_maxima)); // Control PWM de los led
       // TODO REVISAR ESTO PARA VER SI FUNCIONA CORRECTAMENTE
-      luminosidad = round((255/LongitudSecuencia) + ((255*iSecuencia)/LongitudSecuencia));
+      luminosidad = round((255/LongitudSecuencia) + ((255*longParcial)/LongitudSecuencia));
       mostrar_color(boton_pulsado, duracion_sonido, luminosidad);
       
       // a medida que se acierta la secuencia se acorta la duración de los sonidos
