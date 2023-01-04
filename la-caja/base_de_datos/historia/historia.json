@@ -1,0 +1,186 @@
+[
+   {
+      "numero":1,
+      "content":"¡Bienvenidos a \"La Caja\"! Soy Chiquito de la Calzada, el bot encargado de guiaros en este juego creado por Google.\n"
+   },
+   {
+      "numero":2,
+      "content":"Estamos buscando ingenieros talentosos para nuestro nuevo centro en Málaga. Hemos creado este juego para poner a prueba vuestras habilidades.\n"
+   },
+   {
+      "numero":3,
+      "content":"En este juego, os enfrentaréis a pruebas de lógica y pensamiento lateral utilizando los sensores y actuadores disponibles en la caja.\n"
+   },
+   {
+      "numero":4,
+      "content":"Si necesitáis ayuda, no dudéis en poneros en contacto conmigo a través de Telegram.\n"
+   },
+   {
+      "numero":5,
+      "content":"¡Espero que disfrutéis del juego y que demostréis vuestras habilidades como ingenieros!\n"
+   },
+   {
+      "numero":6,
+      "content":"¡Buena suerte a todos! Hasta luego Lucas.\n"
+   },
+   {
+      "numero":7,
+      "content":"¡Bienvenidos a la primera prueba de \"La Caja\"! Para resolver esta prueba, tendréis que utilizar el numpad disponible en la caja para introducir un número de dos dígitos.\n"
+   },
+   {
+      "numero":8,
+      "content":"Este número será la respuesta al siguiente acertijo:\n"
+   },
+   {
+      "numero":9,
+      "content":"ACERTIJO\n"
+   },
+   {
+      "numero":10,
+      "content":"Recordad que podéis utilizar el botón de \"Pista\" para obtener una pista adicional. ¡Buena suerte a todos!\"\n"
+   },
+   {
+      "numero":11,
+      "content":"¡Felicidades por haber pasado la primera prueba de \"La Caja\"! Estamos impresionados por vuestra habilidad para resolver el acertijo. \n"
+   },
+   {
+      "numero":12,
+      "content":"Estamos seguros de que seguiréis demostrando vuestras habilidades a lo largo del juego. ¡Seguid adelante y no dejéis que nada os detenga! ¡Buena suerte en la siguiente prueba!\"\n"
+   },
+   {
+      "numero":13,
+      "content":"¡Bienvenidos a la segunda prueba de \"La Caja\"! Esta vez, os enfrentaréis a una versión del clásico juego \"Simon\" utilizando los botones disponibles en la caja. \n"
+   },
+   {
+      "numero":14,
+      "content":"¿Creéis que podéis superar este reto sin que se os olvide la secuencia? ¡Atención, que empezamos!\n"
+   },
+   {
+      "numero":15,
+      "content":"Por cierto, si necesitáis una pista, aquí va una: no os confundáis con los colores, que luego no podéis decir que no os avisé. ¡Buena suerte a todos!\n"
+   },
+   {
+      "numero":16,
+      "content":"¡Felicidades por superar la prueba del juego \"Simon\"! ¡Sois todo unos maestros de la memoria!\n"
+   },
+   {
+      "numero":17,
+      "content":"¡Pero ojo, no se os olvide que en el juego \"La Caja\" no todo es recordar, también hay que tener habilidades para resolver acertijos y enigmas!\n"
+   },
+   {
+      "numero":18,
+      "content":"¡Buena suerte en la siguiente prueba y no dejéis que se os apague la lucecita! ¡Eso sí que sería un fallo de memoria!\n"
+   },
+   {
+      "numero":19,
+      "content":"¡Bienvenidos a la tercera prueba de \"La Caja\"! Para resolver esta prueba, tendréis que utilizar el Joystick disponible en la caja para descifrar la combinación correcta.\n"
+   },
+   {
+      "numero":20,
+      "content":"En esta prueba, se os presentará una secuencia de números y tendréis que utilizar el Joystick para seleccionar la opción correcta.\n"
+   },
+   {
+      "numero":21,
+      "content":"¡Pero ojo, tendréis que tener en cuenta la posición de los números en la secuencia y la relación entre ellos para resolverla!\n"
+   },
+   {
+      "numero":22,
+      "content":"¡Buena suerte a todos y no dejéis que se os escape la combinación correcta! ¡Espero que demostréis vuestras habilidades con el Joystick!\n"
+   },
+   {
+      "numero":23,
+      "content":"¡Felicidades por superar la prueba del Joystick y demostrar que sois unos expertos en el manejo del tiempo! ¡Nunca llegaréis tarde a ningún sitio con esas habilidades!\n"
+   },
+   {
+      "numero":24,
+      "content":"¡Aunque ojo, no os confiéis demasiado, que el tiempo es el enemigo más traicionero de todos!\n\n"
+   },
+   {
+      "numero":25,
+      "content":"¡Buena suerte en la siguiente prueba y no dejéis que se os escape el tiempo! ¡Eso sí que sería un fallo de reloj!\n"
+   },
+   {
+      "numero":26,
+      "content":"¡Bienvenidos a la cuarta prueba de \"La Caja\", el juego que pone a prueba vuestro coeficiente intelectual!\n"
+   },
+   {
+      "numero":27,
+      "content":"Para resolver esta prueba, tendréis que utilizar los interruptores disponibles en la caja para completar la secuencia que se os proporcionará.\n"
+   },
+   {
+      "numero":28,
+      "content":"En esta prueba, se os presentará una secuencia de números y tendréis que utilizar los interruptores para seleccionar la opción correcta.\n"
+   },
+   {
+      "numero":29,
+      "content":"¡Pero ojo, tendréis que tener en cuenta la posición de los números en la secuencia y la relación entre ellos para resolverla!\n"
+   },
+   {
+      "numero":30,
+      "content":"¡Buena suerte a todos y no dejéis que se os escape la combinación correcta! ¡Espero que demostréis vuestras habilidades con los interruptores!\n"
+   },
+   {
+      "numero":31,
+      "content":"SECUENCIA DE NÚMEROS\n"
+   },
+   {
+      "numero":32,
+      "content":"¡Ay, qué suerte tienen los críos de hoy en día, que son tan listos como para superar la prueba de los interruptores! ¡Ni yo podría haberla resuelto cuando era joven!\n"
+   },
+   {
+      "numero":33,
+      "content":"¡Qué habilidosos sois, coño! ¡Por eso mismo me alegro de que Google os haya elegido para el juego \"La Caja\"! ¡Sois unos auténticos cerebritos!\n"
+   },
+   {
+      "numero":34,
+      "content":"¡Buena suerte en la siguiente prueba y no dejéis que se os escape la combinación correcta!\n"
+   },
+   {
+      "numero":35,
+      "content":"¡Ojalá me hubiera encontrado yo un juego así cuando era chaval, pero claro, entonces no había ni la mitad de tecnología que hay ahora! ¡Qué tiempos aquellos!\n"
+   },
+   {
+      "numero":36,
+      "content":"¡Bienvenidos a la quinta y última prueba de \"La Caja\"! En esta prueba, os encontraréis en una isla desierta, sin más compañía que vuestra propia astucia y la caja que tenéis delante.\n"
+   },
+   {
+      "numero":37,
+      "content":"¡Pero no os preocupéis, que Chiquito de la Calzada está aquí para guiaros y ayudaros a salir de este aprieto!\n"
+   },
+   {
+      "numero":38,
+      "content":"Para salvaros de la isla, tendréis que utilizar la caja para enviar un mensaje secreto que solo los más astutos podrán descifrar.\n"
+   },
+   {
+      "numero":39,
+      "content":"¡Pero ojo, tendréis que tener en cuenta una combinación especial de cosas para que el mensaje sea entendido! \n"
+   },
+   {
+      "numero":40,
+      "content":"¡Así que preparaos para demostrar vuestras habilidades y lograr salvaros de la isla desierta!\n"
+   },
+   {
+      "numero":41,
+      "content":"Buena suerte a todos y que no se os escape la combinación correcta! ¡Espero que demostréis vuestras habilidades con la caja y logréis escapar de la isla!\n"
+   },
+   {
+      "numero":42,
+      "content":"¡Quién sabe, quizás encontréis alguna sorpresa por el camino…\n"
+   },
+   {
+      "numero":43,
+      "content":"¡Ay, qué alegría me da ver que habéis conseguido terminar el juego \"La Caja\"! ¡Sois unos auténticos cerebritos!\n"
+   },
+   {
+      "numero":44,
+      "content":"¡Bueno, ahora que habéis terminado, espero que disfrutéis de una buena recompensa! ¡No sé qué será, pero seguro que os gustará!\n"
+   },
+   {
+      "numero":45,
+      "content":"¡Me voy a la siesta, que estoy más cansado que una panda de ratones en una rueda de hamster!\n"
+   },
+   {
+      "numero":46,
+      "content":" ¡Nos vemos en el próximo juego! ¡Un abrazo y gracias por jugar a \"La Caja\"!\n\n"
+   }
+]
