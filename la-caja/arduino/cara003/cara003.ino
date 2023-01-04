@@ -121,7 +121,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length)
 void loop() 
 {
   // Declaración de variables
-    char strAux[100]; // TODO REPORTAR EL NUMERO DE AYUDAS Y LONGITUD DE SECUENCIA
+    char GameInfo[100]; // TODO REPORTAR EL NUMERO DE AYUDAS Y LONGITUD DE SECUENCIA
 
     static int estado = STAT_INICIAL;
     static int boton_pulsado;
@@ -131,13 +131,16 @@ void loop()
     static int luminosidad;
 
 
+
   // Invocación a la infraestructura y salida si el juego no está activo
     objInfra.Loop();
     if (!objInfra.GameRunning())
       return;
       if (estado != STAT_ESPERA)
       {
-        Serial.println(estado);
+        sprintf(GameInfo, "{Estado: %d, iBoton: %d, longParcial: %d, LongitudSecuencia: %d}",
+          estado, iBoton, longParcial, LongitudSecuencia);
+        Serial.println(GameInfo);
       }
 
   // STAT_INICIAL: Inicialización del juego y melodía de inicio
@@ -212,7 +215,7 @@ void loop()
       mostrar_color(SecuenciaCorrecta[iSecuencia], duracion_sonido, MAX_LUM_PWM);
       mostrar_color(SecuenciaCorrecta[iSecuencia], duracion_sonido, MAX_LUM_PWM);
       delay(1000);
-      objInfra.ReportFailure(NULL);
+      objInfra.ReportFailure(GameInfo);
       estado = STAT_INICIAL;
     }
 
@@ -238,7 +241,7 @@ void loop()
     {
       mostrar_color(boton_pulsado, duracion_sonido, MAX_LUM_PWM);
       melodia_felicitacion();
-      objInfra.ReportSuccess(NULL);  
+      objInfra.ReportSuccess(GameInfo);  
     }
 
 } // setup
