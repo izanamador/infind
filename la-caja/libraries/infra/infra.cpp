@@ -249,8 +249,8 @@ int Infra::Loop()
 {
   // TODO QUITAR HARDCODE DE TIEMPO DE PARTIDA Y/O JUEGO
   if ((currStat_== STAT_PLAY) && 
-      ((millis()-milTries_) > 60*15) || 
-      ((millis()-milStart_) > 60*60) )
+      ((millis()-milTries_) > 60000*15) || 
+      ((millis()-milStart_) > 60000*60) )
   {
     currStat_ = STAT_TIMEOUT;
     ReportStatus(NULL); // reporte periódico
