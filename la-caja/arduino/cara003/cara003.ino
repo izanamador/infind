@@ -1,486 +1,487 @@
+// Infraestructura común de la caja
 #include <infra.h>
+char *strTopicPub = "II3/ESP14440037/resultados_juego2"; // topic principal para publicar contenido y lastwill
+char *strTopicCfg = "II3/ESP002/cfg/cara002"; // topic para recibir parametros de configuracion
+char *strTopicCmd = "II3/ESP14440037/datos_juego2"; // topic para recibir peticiones de comando
+
+// Variables globales
+Infra objInfra;
+#define MAX_SEQ   5 // TODO: EL NUMERO DE AYDUAS ES MAX_SEQ-LongitudSecuencia
+int LongitudSecuencia=MAX_SEQ;  // número de teclas que tiene que acertar
+int SecuenciaMasLarga=0;        // para reportarlo a nodered
 
 
-//***************************************
-// Declaración de variables y constantes
-//***************************************
-
-  /* TOPICS PUB */
-  //#define TOPIC_PUB_ "II3/ESP" + String(ESP.getChipId()) + "/resultados_juego2"
-  #define TOPIC_PUB_ "II3/ESP14440037/resultados_juego2"
-  #define TOPIC_PUB_ESTADO_ "II3/ESP14440037/estado_juego2"
+int SecuenciaCorrecta[20]; // secuencia de colores cada vez más larga
+#define COLOR_ROJO      0
+#define COLOR_VERDE     1
+#define COLOR_AMARILLO  2
+#define COLOR_AZUL      3
   
-  /* TOPICS SUB */
-  //#define TOPIC_SUB_ "II3/ESP" + String(ESP.getChipId()) + "/datos_juego2"
-  #define TOPIC_SUB_ "II3/ESP14440037/datos_juego2"
 
- /* HARDWARE PIN NAME */
- // Pins de salida para los LED
-  #define LED_ROJO_ 5           // D1-5      
-  #define LED_AZUL_ 4           // D2-4 
-  #define LED_AMARILLO_ 2       //  D4-2
-  #define LED_VERDE_ 14         //  D5-14
-  
- // Pin para el ZUMBADOR_ piezoelectrico
-  #define ZUMBADOR_ 12          // D6-12
-  #define tonePin 12
-  
-  // Pins de salida para los botones
-  #define BOTON_ROJO_ 13        //  D7-13
-  #define BOTON_AZUL_ 16        //  D0-16 // ojo, el 15 no va
-  #define BOTON_AMARILLO_ 10    // SSD3-10
-  #define BOTON_VERDE_ 0        // D3-0 // ojo, SSD2-9 no lee bien
-
-
-  /* SETUP */
+// Librerías específicas del juego
+#include <ArduinoJson.h>
 
   
-  /* LOOP */
-  int state = 0;                    // Variable que indica el estado del juego: 0 esperando, 1 en el juego, 2 fin de juego
-  int reducir_secuencia = 0;        // Variable que reduce la puntuación máxima si se pide ayuda
-  int HIGH_PWM = 0;                 // Variable que realiza el control PWM de los leds
-  long unsigned tiempo_inicio = 0;
-  long unsigned tiempo_partida_total = 0;
-  long unsigned tiempo_partida_actual = 0;
-  int aciertos = 0;                 // Variable que ayuda al control PWM de los leds, se reinicia al perder cada partida
-  int aciertos_por_partida = 0;     // Variable que indica los aciertos en cada partida, se reinicia tras cargar su valor en el json a publicar por mqtt
-  int actualiza = 0;                // Variable que indica que se ha perdido la partida y se han de actualizar ciertos valores
 
-  
-  /* GLOBAL */
-  #define MESSAGE_SIZE_ 300
-  long sequence[20];             // Array que alberga la secuencia
-  int contador = 0;              // Contador
-  long input = 5;                // Indicador de boton pulsado
-  int wait = 500;                // Retraso segun la secuencia se incrementa
-  int puntuacion_maxima = 5;     // Puntuación máxima donde acaba el juego 
-  char ID_PLACA[16];
-  int una_vez = 0;
-  int CLK_=3;
-  #define CLOCK_STOP 0
-  #define CLOCK_START 1
-  #define CLOCK_RESET 2
-  #define CLOCK_PAUSE 3
-  #define CLOCK_CONTINUE 4
-
-  /* Function: PROCESA_MENSAJE */
-  StaticJsonDocument<MESSAGE_SIZE_> json_recibido;
+// Pines de salida 
+#define PIN_LED_ROJO      5       // D1(serigrafiado)-GPIO5      
+#define PIN_LED_AZUL      4       // D2-GPIO4 
+#define PIN_LED_AMARILLO  2       // D4-GPIO2
+#define PIN_LED_VERDE     14      // D5-GPIO14
+#define PIN_TONO          12      // D6-GPIO12
  
-  /* Function: ACTUALIZACION_NODERED */
-  static char message_send[MESSAGE_SIZE_];
-  StaticJsonDocument<MESSAGE_SIZE_> jsonRoot;
-   
-  /* Function: FELICITACION */
-  int length = 15;                                                // Numero de notas de la melodia
-  char notes[] = "ccggaagffeeddc ";                               // Notas de la melodia (cada letra es una nota distinta)
-  int beats[] = { 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 4 };  // Duracion de cada tono en un array
-  int tempo = 100;                                                // Tempo de la melodia
-  int cancion_Mario = 0;                                          // Variable que activa la melodía de Mario al ganar el juego
+
+// Pines de entrada para los botones
+#define PIN_BOTON_ROJO     13      // D7-GPIO13
+#define PIN_BOTON_AZUL     16      // D0-GPIO16  // ojo, el 15 no va
+#define PIN_BOTON_AMARILLO 10      // SSD3-GPIO10
+#define PIN_BOTON_VERDE    0       // D3-GPIO0   // ojo, SSD2-9 no lee bien
 
 
-  Infra objInfra;
-  char *strTopicPub = "la-caja/pub/cara003"; // topic principal para publicar contenido y lastwill
-  char *strTopicCfg = "la-caja/cfg/cara003"; // topic para recibir parametros de configuracion
-  char *strTopicCmd = "la-caja/cmd/cara003"; // topic para recibir peticiones de comando
-
-
- 
-//*******************************************
-// Creando mensaje JSON para enviar a NodeRed
-//*******************************************
-void actualizacion_NodeRed()
-{    
-    jsonRoot.clear();
-    
-    jsonRoot["tiempo_partida_total"] = tiempo_partida_total;
-    jsonRoot["tiempo_partida_actual"] = tiempo_partida_actual;
-    jsonRoot["aciertos_por_partida"] = aciertos_por_partida;
-    jsonRoot["ayudas_solicitadas"] = 5 - puntuacion_maxima;
-    jsonRoot["state"] = state;
-
-    // Serializacion y envio mqtt
-    serializeJson(jsonRoot,message_send);
-    mqtt_client.publish(TOPIC_PUB_, message_send);
-            
-    Serial.print("Message published: ");
-    Serial.println(message_send);
-    Serial.print("Using topic: ");
-    Serial.println(TOPIC_PUB_);
-            
-    jsonRoot.clear(); // hay que limpiar el buffer
-}
-
-void actualizacion_estado()
-{    
-    jsonRoot.clear();
-    
-    jsonRoot["state"] = state;
-    jsonRoot["clock"] = CLK_;
-    
-    // Serializacion y envio mqtt
-    serializeJson(jsonRoot,message_send);
-    mqtt_client.publish(TOPIC_PUB_ESTADO_, message_send);
-               
-    jsonRoot.clear(); // hay que limpiar el buffer
-}
-
-
- void mqttCallback(char* topic, byte* payload, unsigned int length) 
-{
-  char *mensaje = (char *)malloc(length+1); 
-  strncpy(mensaje, (char*)payload, length); 
-  mensaje[length]='\0'; 
-  Serial.printf("Mensaje recibido [%s] %s\n", topic, mensaje);
-
-  //if(strcmp(topic, TOPIC_SUB_)==0){
-  if (strcmp(topic, strTopicCmd)==0) 
-  {
-      deserializeJson(json_recibido,mensaje_recibido);  // leo de JSON
-      state = json_recibido["state"]; 
-      reducir_secuencia = json_recibido["reducir_secuencia"];
-  }
-  free(mensaje);
-}
-
-  
 
 //********************************
 // Setup
 //********************************
-  void setup() {
-   // Configuración de los pines de los leds y del ZUMBADOR_ como salidas
-    pinMode(LED_ROJO_, OUTPUT);      
-    pinMode(LED_VERDE_, OUTPUT); 
-    pinMode(LED_AMARILLO_, OUTPUT); 
-    pinMode(LED_AZUL_, OUTPUT); 
-    pinMode(ZUMBADOR_, OUTPUT);
+void setup() {
+ // Configuración de los pines de los leds y del zumbador como salidas
+    pinMode(PIN_LED_ROJO,     OUTPUT);      
+    pinMode(PIN_LED_AZUL,     OUTPUT); 
+    pinMode(PIN_LED_AMARILLO, OUTPUT); 
+    pinMode(PIN_LED_VERDE,    OUTPUT); 
+    pinMode(PIN_TONO,         OUTPUT);
       
-   // Configuración de los pines de los botones como entradas
-    pinMode(BOTON_ROJO_, INPUT);    
-    pinMode(BOTON_VERDE_, INPUT);
-    pinMode(BOTON_AMARILLO_, INPUT);
-    pinMode(BOTON_AZUL_, INPUT);
+ // Configuración de los pines de los botones como entradas
+    pinMode(PIN_BOTON_ROJO,     INPUT);    
+    pinMode(PIN_BOTON_AZUL,     INPUT);
+    pinMode(PIN_BOTON_AMARILLO, INPUT);
+    pinMode(PIN_BOTON_VERDE,    INPUT);
  
-    // Melodia de inicio al arrancar el Arduino    
-    felicitacion();
+  // Melodia de inicio al arrancar el Arduino    
+  //   melodia_inicio();
+  //   resetcontador();    
 
-    // setup de infrastructura
+  // Inicialización de la infraestructura  
     objInfra.mqttTopicsPub[TOPIC_MAIN] = strTopicPub;
     objInfra.mqttTopicsSub[TOPIC_NUM_CFG] = strTopicCfg;
-    objInfra.mqttTopicsSub[TOPIC_NUM_CMD] = strTopicCmd;
-  
-    objInfra.Setup(mqttCallback);
+    objInfra.mqttTopicsSub[TOPIC_NUM_CMD] = strTopicCmd;  
+    objInfra.Setup(procesa_mensaje);
   }
 
+
+
+//********************************
+// Recepción mensaje
+//********************************
+#define MESSAGE_SIZE_ 300
+
+void procesa_mensaje(char* topic, byte* payload, unsigned int length) 
+{
+  StaticJsonDocument<MESSAGE_SIZE_> json_recibido;
+  int reducir_secuencia = 0;        // Variable que reduce la puntuación 
+  char *mensaje_recibido = (char *)malloc(length+1);
  
+  strncpy(mensaje_recibido, (char*)payload, length);    // copio el mensaje_recibido en cadena de caracteres
+  mensaje_recibido[length]='\0';                        // caracter cero marca el final de la cadena
+  Serial.print("Mensaje recibido"); 
+  Serial.println(mensaje_recibido);
+
+  if(strcmp(topic, strTopicCmd)==0)
+  {
+      deserializeJson(json_recibido,mensaje_recibido);  // leo de JSON
+      // state = json_recibido["state"]; 
+      reducir_secuencia = json_recibido["reducir_secuencia"];
+
+      // inicializamos contadores con el primer mensaje recibido
+      if (reducir_secuencia==0)
+        objInfra.ReportStart(NULL); 
+
+      // nos piden ayuda y reducimos la longitud de la secuencia
+      else
+        LongitudSecuencia -= reducir_secuencia; 
+  }     
+  json_recibido.clear();                                // limpiar buffer
+  free(mensaje_recibido);                               // liberar buffer
+}
+
 //********************************
 // Programa principal
 //********************************
-  void loop() {
+
+#define STAT_INICIAL    0 // estado inicial
+#define STAT_SECUENCIA  1 // alargar y reproducir la secuencia
+#define STAT_ESPERA     2 // esperar que el usuario pulse un botón
+#define STAT_BOTON      3 // el usuario ha pulsado un botón
+#define STAT_BOTON_OK   4 // el usuario pulsó el botón correcto
+#define STAT_BOTON_KO   5 // el usuario pulsó el botón erróneo
+#define STAT_COMPLETA   6 // el usuario completó la secuencia con éxito
+#define MILIS_BOTON_KO  500 // TODO CONFIRMAR QUE EL TIEMPO ES ADECUADO
+#define MAX_LUM_PWM     0  // TODO, LA LUMINOSIDAD ESTÁ AL REVES, AL SUBIR EL NÚMERO BAJA LA LUZ
+#define MIN_LUM_PWM     200 // TODO, CONFIRMAR QUE CON ESTE VALOR EL LED SE PUEDE VER
+void loop() 
+{
+  // Declaración de variables
+    char strAux[100]; // TODO REPORTAR EL NUMERO DE AYUDAS Y LONGITUD DE SECUENCIA
+
+    static int estado = STAT_INICIAL;
+    static int boton_pulsado;
+    static int iAciertos;
+    static int duarcion_sonido;
+    static int luminosidad;
+
+
+  // Invocación a la infraestructura y salida si el juego no está activo
     objInfra.Loop();
-    
-    if (una_vez== 0 && state!=0){
-    actualizacion_estado();
-    if (state== 2){
-       una_vez=1;
-       CLK_ = CLOCK_STOP;
-    }
-    }
-    if (state == 1)
+    if (!objInfra.GameRunning())
+      return;
+
+  // STAT_INICIAL: Inicialización del juego y melodía de inicio
+    if (estado == STAT_INICIAL)
     {
-      CLK_ = CLOCK_START;
-      if (reducir_secuencia ==1)
-      {
-        puntuacion_maxima = puntuacion_maxima - 1;
-        reducir_secuencia = 0;
-      }
-        HIGH_PWM = round((255/puntuacion_maxima) + ((255*aciertos)/puntuacion_maxima)); // Control PWM de los led
-        tiempo_inicio = millis();
-        //tiempo_partida_actual = tiempo_partida_total;
-        mostrar_secuencia();  // Reproduce la sequencia
-        leer_secuencia();     // Lee la sequencia
-        delay(1000);          // Espera 1 segundo
-        
-        if (state==2 || actualiza==1)
-        {
-            tiempo_partida_actual = millis() - tiempo_inicio;
-            tiempo_partida_total = tiempo_partida_total + tiempo_partida_actual;
-            actualizacion_NodeRed();
-            
-            actualiza = 0;
-            aciertos_por_partida = 0;
-            cancion_Mario = 0;
-        }
+      iAciertos = 0;
+      duarcion_sonido = 500;
+      luminosidad = MIN_LUM_PWM; // empezamos con poca luminosidad y vamos subiendo
+      melodia_inicio();
+      estado = STAT_SECUENCIA;
     }
+
+  // STAT_SECUENCIA: Crear una secuencia cada vez más larga y reproducirla
+    else if (estado == STAT_SECUENCIA) 
+    {            
+      randomSeed(analogRead(8));  // Semilla para que la función Random sea más aleatoria
+      SecuenciaCorrecta[iAciertos] = random(4); // valor aleatorio entre 0 y 3 (0,1,2,3)
+      for (int i = 0; i <= iAciertos; i++)   
+        mostrar_color(SecuenciaCorrecta[i], duarcion_sonido, luminosidad);
+    }
+
+  // STAT_ESPERA: Esperar a que el usuario pulse un botón
+    else if (estado == STAT_ESPERA) 
+    { 
+      estado = STAT_BOTON;
+      if (digitalRead(PIN_BOTON_ROJO) == LOW)
+        boton_pulsado = COLOR_ROJO;
+      else if (digitalRead(PIN_BOTON_AZUL) == LOW)
+        boton_pulsado = COLOR_AZUL;
+      else if (digitalRead(PIN_BOTON_AMARILLO) == LOW)
+        boton_pulsado = COLOR_AMARILLO;
+      else if (digitalRead(PIN_BOTON_VERDE) == LOW)
+        boton_pulsado = COLOR_VERDE;
+      else
+        estado = STAT_ESPERA;
+    }
+
+  // STAT_BOTON: Visualizar el botón y decidir si completó, acertó o falló
+    else if (estado == STAT_BOTON) 
+    { 
+      char *strBotones[] = {"rojo", "verde", "amarillo","azul"};
+      Serial.println(strBotones[boton_pulsado]);
+
+      if (SecuenciaCorrecta[iAciertos] != boton_pulsado)
+        estado = STAT_BOTON_KO;
+      else if (iAciertos+1 == LongitudSecuencia)
+        estado = STAT_COMPLETA;
+      else
+        estado = STAT_BOTON_OK;
+    }
+
+  // STAT_BOTON_KO: el usuario se equivoca de botón, volver a empezar
+    else if (estado == STAT_BOTON_KO)
+    {
+      playTone(4545,1500);
+      delay(500);
+      
+      // mostrar 3 veces a máxima luminosidad el botón que se debería haber pulsado
+      mostrar_color(SecuenciaCorrecta[iAciertos], duarcion_sonido, MAX_LUM_PWM);
+      mostrar_color(SecuenciaCorrecta[iAciertos], duarcion_sonido, MAX_LUM_PWM);
+      mostrar_color(SecuenciaCorrecta[iAciertos], duarcion_sonido, MAX_LUM_PWM);
+      delay(1000);
+      objInfra.ReportFailure(NULL);
+      estado = STAT_INICIAL;
+    }
+
+  // STAT_BOTON_OK: el usuario acierta pero no termina, seguir alargando
+    else if (estado == STAT_BOTON_OK)
+    {
+      // TODO CONFIRMAR SI HAY QUE HACER ALGO MÁS
+
+      // a medida que se acierta la secuencia la luminosidad de los leds se incrementa      
+      //luminosidad = 255-(17+(int)((iAciertos*MIN_LUM_PWM)/(float)LongitudSecuencia)); 
+      // HIGH_PWM = round((255/puntuacion_maxima) + ((255*aciertos)/puntuacion_maxima)); // Control PWM de los led
+      // TODO REVISAR ESTO PARA VER SI FUNCIONA CORRECTAMENTE
+      luminosidad = round((255/LongitudSecuencia) + ((255*iAciertos)/LongitudSecuencia));
+      mostrar_color(boton_pulsado, duarcion_sonido, luminosidad);
+      
+      // a medida que se acierta la secuencia se acorta la duración de los sonidos
+      duarcion_sonido -= 15; 
+      estado = STAT_SECUENCIA;
+      iAciertos++;
+      if (iAciertos > SecuenciaMasLarga)
+        SecuenciaMasLarga = iAciertos;
+
+    }
+
+  // STAT_COMPLETA: el usuario completa hasta el final y gana el juego
+    else if (estado == STAT_COMPLETA)
+    {
+      mostrar_color(boton_pulsado, duarcion_sonido, MAX_LUM_PWM);
+      melodia_felicitacion();
+      objInfra.ReportSuccess(NULL);  
+    }
+
+} // setup
+
+
+
+
+
+// Funcion para leer los botones que pulsa el jugador
+//int leer_secuencia(int aciertos) 
+//{
+//  for (int i=1; i < aciertos; i++) 
+//  {
+//    // espera a que pulse un botón
+//  while (input==5)
+//  {
+//    if (digitalRead(BOTON_ROJO_) == LOW)
+//      input = COLOR_ROJO;
+//    else if (digitalRead(BOTON_VERDE_) == LOW)
+//      input = COLOR_VERDE;
+//    else if (digitalRead(BOTON_AMARILLO_) == LOW)
+//      input = COLOR_AMARILLO;
+//    else if (digitalRead(BOTON_AZUL_) == LOW)
+//      input = COLOR_AZUL;
+//  } 
+//  char **strBotones = ["leido rojo", "leido verde", "leido amarillo","leido azul"];
+//    Serial.println(strBotones[input]);
+//    if (SecuenciaCorrecta[i-1] != input)
+//      break;
+//  }
+//  
+//  // el usuario se ha equivocado antes de terminar la secuencia
+//  if (i < aciertos)
+//  {
+//    if (i > SecuenciaMasLarga)
+//      SecuenciaMasLarga = i;
+//
+//    strAux[100]; // TODO REPORTAR EL NUMERO DE AYUDAS Y LONGITUD DE SECUENCIA
+//    delay(500);
+//    mostrar_color(SecuenciaCorrecta[i-1]);                 
+//    mostrar_color(SecuenciaCorrecta[i-1]);                 
+//    mostrar_color(SecuenciaCorrecta[i-1]);
+//    delay(1000);
+//    objInfra.ReportFailure(NULL);
+//    aciertos = 0;
+//  }
+//
+//  else if (i == aciertos && aciertos == LongitudSecuencia)
+//  {
+//    mostrar_color(input);
+//    melodia_felicitacion();
+//    objInfra.ReportSuccess(NULL);  
+//  }
+//
+//  // el usuario ha conseguido reproducir la secuencia hasta el final
+//  else
+//  {
+//    aciertos++;
+//  }
+//  return(aciertos);
+//}
+//
+//      if (SecuenciaCorrecta[i-1] == input) {             
+//        aciertos = i;
+//        if (aciertos_por_partida < i) {
+//        aciertos_por_partida = i;}                          
+//        if (i == puntuacion_maxima) {
+//          cancion_Mario = 1;                        
+//                                  
+//        }
+//      }
+//      else {
+//          playTone(4545,1500);                  
+//          aciertos = 0;
+//          actualiza = 1;
+//          felicitacion();
+//          resetcontador();                          
+//      } 
+//      input = 5;                                   
+//  }
+//    }// for
+//  } // void
+
+
+
+// ------------------------------- funciones relacionadas con los leds
+
+void mostrar_color(int color, int luminosidad, int tiempo) 
+{
+  switch (color) 
+  {
+    case COLOR_ROJO:
+      analogWrite(PIN_LED_ROJO, luminosidad);
+      playTone(2273,tiempo);            
+      digitalWrite(PIN_LED_ROJO, LOW);
+     break;
+    case COLOR_AZUL:
+      analogWrite(PIN_LED_AZUL, luminosidad);
+      playTone(1700,tiempo);            
+      digitalWrite(PIN_LED_AZUL, LOW);
+      break;
+    case COLOR_AMARILLO:
+      analogWrite(PIN_LED_AMARILLO, luminosidad);
+      playTone(1275,tiempo);             
+      digitalWrite(PIN_LED_AMARILLO, LOW);
+      break;
+    case COLOR_VERDE:
+      analogWrite(PIN_LED_VERDE, luminosidad);
+      playTone(1136,tiempo);             
+      digitalWrite(PIN_LED_VERDE, LOW);
+      break;
   }
-  
-  
-//********************************
-// Declaración de funciones
-//******************************** 
-  // Funcion para definir las notas y sus frecuencias
-  void playNote(char note, int duration) {
-    char names[] = { 'c', 'd', 'e', 'f', 'g', 'a', 'b', 'C' };
-    int tones[] = { 1915, 1700, 1519, 1432, 1275, 1136, 1014, 956 };
+  delay(50);
+}
+
+
+//------------------------------- funciones relacionadas con el altavoz
+
+
+void playTone(int tone, int duration) 
+{
+  for (long i = 0; i < duration * 1000L; i += tone *2) 
+  {
+    digitalWrite(PIN_TONO, HIGH);
+    delayMicroseconds(tone);
+    digitalWrite(PIN_TONO, LOW);
+    delayMicroseconds(tone);
+  }
+}
+ 
+void playNote(char note, int duration) 
+{
+  char names[] = { 'c', 'd', 'e', 'f', 'g', 'a', 'b', 'C' };
+  int tones[] = { 1915, 1700, 1519, 1432, 1275, 1136, 1014, 956 };
    
-    for (int i = 0; i < 8; i++) {
-       if (names[i] == note) {
-         playtone(tones[i], duration);
-       }
-    }
-  }
- 
- 
- 
- // Funcion para definir las notas segun la duración y el tono
-  void playtone(int tone, int duration) {
-    for (long i = 0; i < duration * 1000L; i += tone *2) {
-      digitalWrite(ZUMBADOR_, HIGH);
-      delayMicroseconds(tone);
-      digitalWrite(ZUMBADOR_, LOW);
-      delayMicroseconds(tone);
-    }
-  }
-     
-  
- 
- // Funciones para encender los leds y reproducir el tono correspondiente
-  void flash_rojo() {
-    analogWrite(LED_ROJO_, HIGH_PWM);
-    playtone(2273,wait);            
-    digitalWrite(LED_ROJO_, LOW);
-  }
-  
-  void flash_azul() {
-    analogWrite(LED_AZUL_, HIGH_PWM);
-    playtone(1700,wait);            
-    digitalWrite(LED_AZUL_, LOW);
-  }
-  
-  void flash_amarillo() {
-    analogWrite(LED_AMARILLO_, HIGH_PWM);
-    playtone(1275,wait);             
-    digitalWrite(LED_AMARILLO_, LOW);
-  } 
-  
-  void flash_verde() {
-    analogWrite(LED_VERDE_, HIGH_PWM);
-    playtone(1136,wait);             
-    digitalWrite(LED_VERDE_, LOW);
-  }
-  
-  
- 
- // Funcion para mostrar que botón se tenia que pulsar en caso de error del jugador
-  void mostrar_boton_correcto(long led) {
-    switch (led) {
-        case 0:
-          flash_rojo();
-          break;
-        case 1:
-          flash_verde();
-          break;
-        case 2:
-          flash_amarillo();
-          break;
-        case 3:
-          flash_azul();
-          break;
-      }
-      delay(50);
-  }
- 
- 
- 
- // Función que reproduce la canción al arrancar el arduino y para el juego cuando se llega a la puntuacion maxima
-  void felicitacion() {
-    // Encedemos todos los led
-    digitalWrite(LED_ROJO_, HIGH);       
-    digitalWrite(LED_VERDE_, HIGH);
-    digitalWrite(LED_AMARILLO_, HIGH);
-    digitalWrite(LED_AZUL_, HIGH);
-
-    if (cancion_Mario == 1)
+  for (int i = 0; i < 8; i++) 
+  {
+    if (names[i] == note) 
     {
-      midi();
-      state = 2;
+      playTone(tones[i], duration);
     }
-    else
+  }
+}
+
+
+void melodia_inicio() 
+{
+  // declaración de variables para notas y duración de cada nota
+    char notas[] = "ccggaagffeeddc "; // melodía de inicio
+    int duraciones[] = { 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 4 };
+    int length = 15;
+    int tempo = 100; // Delay entre notas y milisegundos por unidad de duración
+
+  // Encedemos todos los led
+    digitalWrite(PIN_LED_ROJO, HIGH);       
+    digitalWrite(PIN_LED_VERDE, HIGH);
+    digitalWrite(PIN_LED_AMARILLO, HIGH);
+    digitalWrite(PIN_LED_AZUL, HIGH);
+
+  // Reproducimos la melodía nota a nota
+    for (int i = 0; notas[i] != ' '; i++) 
     {
-    for (int i = 0; i < length; i++) {
-      if (notes[i] == ' ') {
-       delay(beats[i] * tempo); // rest
-      } else {
-       playNote(notes[i], beats[i] * tempo);
-      }
-      delay(tempo / 2); 
-    }
+      playNote(notas[i], duraciones[i] * tempo);
+      delay(duraciones[i] * tempo); 
     }
 
-     
-    delay(500);   
-    // Apagar todos los led
-    digitalWrite(LED_ROJO_, LOW);   
-    digitalWrite(LED_VERDE_, LOW);
-    digitalWrite(LED_AMARILLO_, LOW);
-    digitalWrite(LED_AZUL_, LOW);
-    resetcontador();    
-  }
-    
- // Resetear contadores
-  void resetcontador() {
-    contador = 0;
-    wait = 500;
-  }
- 
+  // Pausa al final de la melodía y apagado de leds
+    delay(600);   
+    digitalWrite(PIN_LED_ROJO, LOW);   
+    digitalWrite(PIN_LED_VERDE, LOW);
+    digitalWrite(PIN_LED_AMARILLO, LOW);
+    digitalWrite(PIN_LED_AZUL, LOW);
+}
 
-// Musica Mario
- void midi() {
 
-    tone(tonePin, 195, 98.2530375);
-    delay(109.170041667);
-    delay(5.02756770833);
-    tone(tonePin, 261, 98.2530375);
-    delay(109.170041667);
-    delay(5.74579166667);
-    tone(tonePin, 329, 97.6066359375);
-    delay(108.451817708);
-    delay(7.18223958333);
-    tone(tonePin, 391, 98.2530375);
-    delay(109.170041667);
-    delay(5.02756770833);
-    tone(tonePin, 523, 98.2530375);
-    delay(109.170041667);
-    delay(5.74579166667);
-    tone(tonePin, 659, 97.6066359375);
-    delay(108.451817708);
-    delay(7.18223958333);
-    tone(tonePin, 783, 294.7591125);
-    delay(327.510125);
-    delay(17.237375);
-    tone(tonePin, 659, 294.7591125);
-    delay(327.510125);
-    delay(17.237375);
-    tone(tonePin, 207, 98.2530375);
-    delay(109.170041667);
-    delay(5.02756770833);
-    tone(tonePin, 261, 98.2530375);
-    delay(109.170041667);
-    delay(5.74579166667);
-    tone(tonePin, 311, 97.6066359375);
-    delay(108.451817708);
-    delay(7.18223958333);
-    tone(tonePin, 415, 98.2530375);
-    delay(109.170041667);
-    delay(5.02756770833);
-    tone(tonePin, 523, 98.2530375);
-    delay(109.170041667);
-    delay(5.74579166667);
-    tone(tonePin, 622, 97.6066359375);
-    delay(108.451817708);
-    delay(7.18223958333);
-    tone(tonePin, 830, 294.7591125);
-    delay(327.510125);
-    delay(17.237375);
-    tone(tonePin, 622, 294.7591125);
-    delay(327.510125);
-    delay(17.237375);
-    tone(tonePin, 233, 98.2530375);
-    delay(109.170041667);
-    delay(5.02756770833);
-    tone(tonePin, 293, 98.2530375);
-    delay(109.170041667);
-    delay(5.74579166667);
-    tone(tonePin, 349, 97.6066359375);
-    delay(108.451817708);
-    delay(7.18223958333);
-    tone(tonePin, 466, 98.2530375);
-    delay(109.170041667);
-    delay(5.02756770833);
-    tone(tonePin, 587, 98.2530375);
-    delay(109.170041667);
-    delay(5.74579166667);
-    tone(tonePin, 698, 97.6066359375);
-    delay(108.451817708);
-    delay(7.18223958333);
-    tone(tonePin, 932, 294.7591125);
-    delay(327.510125);
-    delay(17.237375);
-    tone(tonePin, 932, 98.2530375);
-    delay(109.170041667);
-    delay(5.02756770833);
-    tone(tonePin, 932, 98.2530375);
-    delay(109.170041667);
-    delay(5.74579166667);
-    tone(tonePin, 932, 97.6066359375);
-    delay(108.451817708);
-    delay(7.18223958333);
-    tone(tonePin, 659, 294.7591125);
-    delay(327.510125);
-    noTone(tonePin);
- }
-  
-  
- // Funcion para crear y reproducir los patrones
-  void mostrar_secuencia() {
+void melodia_felicitacion() 
+{
+  tone(PIN_TONO, 195, 98.2530375);
+  delay(109.170041667);
+  delay(5.02756770833);
+  tone(PIN_TONO, 261, 98.2530375);
+  delay(109.170041667);
+  delay(5.74579166667);
+  tone(PIN_TONO, 329, 97.6066359375);
+  delay(108.451817708);
+  delay(7.18223958333);
+  tone(PIN_TONO, 391, 98.2530375);
+  delay(109.170041667);
+  delay(5.02756770833);
+  tone(PIN_TONO, 523, 98.2530375);
+  delay(109.170041667);
+  delay(5.74579166667);
+  tone(PIN_TONO, 659, 97.6066359375);
+  delay(108.451817708);
+  delay(7.18223958333);
+  tone(PIN_TONO, 783, 294.7591125);
+  delay(327.510125);
+  delay(17.237375);
+  tone(PIN_TONO, 659, 294.7591125);
+  delay(327.510125);
+  delay(17.237375);
+  tone(PIN_TONO, 207, 98.2530375);
+  delay(109.170041667);
+  delay(5.02756770833);
+  tone(PIN_TONO, 261, 98.2530375);
+  delay(109.170041667);
+  delay(5.74579166667);
+  tone(PIN_TONO, 311, 97.6066359375);
+  delay(108.451817708);
+  delay(7.18223958333);
+  tone(PIN_TONO, 415, 98.2530375);
+  delay(109.170041667);
+  delay(5.02756770833);
+  tone(PIN_TONO, 523, 98.2530375);
+  delay(109.170041667);
+  delay(5.74579166667);
+  tone(PIN_TONO, 622, 97.6066359375);
+  delay(108.451817708);
+  delay(7.18223958333);
+  tone(PIN_TONO, 830, 294.7591125);
+  delay(327.510125);
+  delay(17.237375);
+  tone(PIN_TONO, 622, 294.7591125);
+  delay(327.510125);
+  delay(17.237375);
+  tone(PIN_TONO, 233, 98.2530375);
+  delay(109.170041667);
+  delay(5.02756770833);
+  tone(PIN_TONO, 293, 98.2530375);
+  delay(109.170041667);
+  delay(5.74579166667);
+  tone(PIN_TONO, 349, 97.6066359375);
+  delay(108.451817708);
+  delay(7.18223958333);
+  tone(PIN_TONO, 466, 98.2530375);
+  delay(109.170041667);
+  delay(5.02756770833);
+  tone(PIN_TONO, 587, 98.2530375);
+  delay(109.170041667);
+  delay(5.74579166667);
+  tone(PIN_TONO, 698, 97.6066359375);
+  delay(108.451817708);
+  delay(7.18223958333);
+  tone(PIN_TONO, 932, 294.7591125);
+  delay(327.510125);
+  delay(17.237375);
+  tone(PIN_TONO, 932, 98.2530375);
+  delay(109.170041667);
+  delay(5.02756770833);
+  tone(PIN_TONO, 932, 98.2530375);
+  delay(109.170041667);
+  delay(5.74579166667);
+  tone(PIN_TONO, 932, 97.6066359375);
+  delay(108.451817708);
+  delay(7.18223958333);
+  tone(PIN_TONO, 659, 294.7591125);
+  delay(327.510125);
+  noTone(PIN_TONO);
+}
  
-    randomSeed(analogRead(8));    // Semilla para que la función Random sea más aleatoria
-
-    sequence[contador] = random(4);   // random(4) nos dará un valor aleatorio entre 0 y 3 (0,1,2,3)
-               
-    for (int i = 0; i < contador; i++) {  
-      mostrar_boton_correcto(sequence[i]);             
-    }
-    wait = 500 - (contador * 15);        
-    contador++;                          
-  }
- 
-
- 
-  // Funcion para leer los botones que pulsa el jugador
- void leer_secuencia() {
-   for (int i=1; i < contador; i++) {    
-      while (input==5){                
-        if (digitalRead(BOTON_ROJO_) == LOW) {
-          input = 0;
-          Serial.println("boton_rojo_leido");
-        }
-        else if (digitalRead(BOTON_VERDE_) == LOW) { 
-          input = 1;
-          Serial.println("boton_verde_leido");
-        }
-        else if (digitalRead(BOTON_AMARILLO_) == LOW) {
-          input = 2;
-          Serial.println("boton_amarillo_leido");
-        }
-        else if (digitalRead(BOTON_AZUL_) == LOW) {
-          input = 3;
-          Serial.println("boton_azul_leido");
-        }
-      }// while
-    
-      if (sequence[i-1] == input) {             
-        mostrar_boton_correcto(input);
-        aciertos = i;
-        if (aciertos_por_partida < i) {
-        aciertos_por_partida = i;}                          
-        if (i == puntuacion_maxima) {
-          cancion_Mario = 1;                        
-          felicitacion();                        
-        }
-      }
-      else {
-          playtone(4545,1500);                  
-          delay(500);
-          mostrar_boton_correcto(sequence[i-1]);                 
-          mostrar_boton_correcto(sequence[i-1]);                 
-          mostrar_boton_correcto(sequence[i-1]);
-          delay(1000);
-          aciertos = 0;
-          actualiza = 1;
-          felicitacion();
-          resetcontador();                          
-      } 
-      input = 5;                                   
-    }// for
-  } // void
