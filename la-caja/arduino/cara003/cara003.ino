@@ -126,7 +126,7 @@ void loop()
     static int estado = STAT_INICIAL;
     static int boton_pulsado;
     static int iBoton;
-    static int iAciertos;
+    static int longParcial;
     static int duracion_sonido;
     static int luminosidad;
 
@@ -143,7 +143,7 @@ void loop()
   // STAT_INICIAL: Inicialización del juego y melodía de inicio
     if (estado == STAT_INICIAL)
     {
-      iAciertos = 0;
+      longParcial = 0;
       iBoton = 0;
       duracion_sonido = 500;
       luminosidad = MIN_LUM_PWM; // empezamos con poca luminosidad y vamos subiendo
@@ -155,8 +155,10 @@ void loop()
     else if (estado == STAT_SECUENCIA) 
     {            
       randomSeed(analogRead(8));  // Semilla para que la función Random sea más aleatoria
-      SecuenciaCorrecta[iAciertos] = random(4); // valor aleatorio entre 0 y 3 (0,1,2,3)
-      for (int i = 0; i <= iAciertos; i++)   
+      SecuenciaCorrecta[longParcial] = random(4); // valor aleatorio entre 0 y 3 (0,1,2,3)
+      longParcial++;
+      iBoton = 0;
+      for (int i = 0; i < longParcial; i++)   
         mostrar_color(SecuenciaCorrecta[i], duracion_sonido, luminosidad);
       estado = STAT_ESPERA;
     }
@@ -187,8 +189,12 @@ void loop()
         estado = STAT_BOTON_KO;
       else if (iBoton + 1 == LongitudSecuencia)
         estado = STAT_COMPLETA;
-      else if (iBoton == iAciertos)
+      else if (iBoton + 1 == longParcial)
+      {
+        if (longParcial > SecuenciaMasLarga)
+          SecuenciaMasLarga = longParcial;
         estado = STAT_SECUENCIA;
+      }
       else
         estado = STAT_BOTON_OK;
       boton_pulsado = COLOR_NINGUNO;
@@ -200,10 +206,11 @@ void loop()
       playTone(4545,1500);
       delay(500);
       
+      iBoton++;
       // mostrar 3 veces a máxima luminosidad el botón que se debería haber pulsado
-      mostrar_color(SecuenciaCorrecta[iAciertos], duracion_sonido, MAX_LUM_PWM);
-      mostrar_color(SecuenciaCorrecta[iAciertos], duracion_sonido, MAX_LUM_PWM);
-      mostrar_color(SecuenciaCorrecta[iAciertos], duracion_sonido, MAX_LUM_PWM);
+      mostrar_color(SecuenciaCorrecta[iSecuencia], duracion_sonido, MAX_LUM_PWM);
+      mostrar_color(SecuenciaCorrecta[iSecuencia], duracion_sonido, MAX_LUM_PWM);
+      mostrar_color(SecuenciaCorrecta[iSecuencia], duracion_sonido, MAX_LUM_PWM);
       delay(1000);
       objInfra.ReportFailure(NULL);
       estado = STAT_INICIAL;
@@ -212,23 +219,18 @@ void loop()
   // STAT_BOTON_OK: el usuario acierta pero no termina, seguir alargando
     else if (estado == STAT_BOTON_OK)
     {
-      // TODO CONFIRMAR SI HAY QUE HACER ALGO MÁS
-      iBoton++;
       
       // a medida que se acierta la secuencia la luminosidad de los leds se incrementa      
-      //luminosidad = 255-(17+(int)((iAciertos*MIN_LUM_PWM)/(float)LongitudSecuencia)); 
+      //luminosidad = 255-(17+(int)((iSecuencia*MIN_LUM_PWM)/(float)LongitudSecuencia)); 
       // HIGH_PWM = round((255/puntuacion_maxima) + ((255*aciertos)/puntuacion_maxima)); // Control PWM de los led
       // TODO REVISAR ESTO PARA VER SI FUNCIONA CORRECTAMENTE
-      luminosidad = round((255/LongitudSecuencia) + ((255*iAciertos)/LongitudSecuencia));
+      luminosidad = round((255/LongitudSecuencia) + ((255*iSecuencia)/LongitudSecuencia));
       mostrar_color(boton_pulsado, duracion_sonido, luminosidad);
       
       // a medida que se acierta la secuencia se acorta la duración de los sonidos
-      duracion_sonido -= 15; 
-      estado = STAT_SECUENCIA;
-      iAciertos++;
-      if (iAciertos > SecuenciaMasLarga)
-        SecuenciaMasLarga = iAciertos;
-
+      duracion_sonido -= 15;       
+      estado = STAT_ESPERA;
+      iBoton++;
     }
 
   // STAT_COMPLETA: el usuario completa hasta el final y gana el juego
