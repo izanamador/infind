@@ -16,6 +16,7 @@ int SecuenciaCorrecta[20]; // secuencia de colores cada vez más larga
 #define COLOR_VERDE     1
 #define COLOR_AMARILLO  2
 #define COLOR_AZUL      3
+#define COLOR_NINGUNO   4
   
 
 // Librerías específicas del juego
@@ -124,8 +125,9 @@ void loop()
 
     static int estado = STAT_INICIAL;
     static int boton_pulsado;
+    static int iBoton;
     static int iAciertos;
-    static int duarcion_sonido;
+    static int duracion_sonido;
     static int luminosidad;
 
 
@@ -133,12 +135,17 @@ void loop()
     objInfra.Loop();
     if (!objInfra.GameRunning())
       return;
+      if (estado != STAT_ESPERA)
+      {
+        Serial.println(estado);
+      }
 
   // STAT_INICIAL: Inicialización del juego y melodía de inicio
     if (estado == STAT_INICIAL)
     {
       iAciertos = 0;
-      duarcion_sonido = 500;
+      iBoton = 0;
+      duracion_sonido = 500;
       luminosidad = MIN_LUM_PWM; // empezamos con poca luminosidad y vamos subiendo
       melodia_inicio();
       estado = STAT_SECUENCIA;
@@ -150,7 +157,8 @@ void loop()
       randomSeed(analogRead(8));  // Semilla para que la función Random sea más aleatoria
       SecuenciaCorrecta[iAciertos] = random(4); // valor aleatorio entre 0 y 3 (0,1,2,3)
       for (int i = 0; i <= iAciertos; i++)   
-        mostrar_color(SecuenciaCorrecta[i], duarcion_sonido, luminosidad);
+        mostrar_color(SecuenciaCorrecta[i], duracion_sonido, luminosidad);
+      estado = STAT_ESPERA;
     }
 
   // STAT_ESPERA: Esperar a que el usuario pulse un botón
@@ -175,12 +183,15 @@ void loop()
       char *strBotones[] = {"rojo", "verde", "amarillo","azul"};
       Serial.println(strBotones[boton_pulsado]);
 
-      if (SecuenciaCorrecta[iAciertos] != boton_pulsado)
+      if (SecuenciaCorrecta[iBoton] != boton_pulsado)
         estado = STAT_BOTON_KO;
-      else if (iAciertos+1 == LongitudSecuencia)
+      else if (iBoton + 1 == LongitudSecuencia)
         estado = STAT_COMPLETA;
+      else if (iBoton == iAciertos)
+        estado = STAT_SECUENCIA;
       else
         estado = STAT_BOTON_OK;
+      boton_pulsado = COLOR_NINGUNO;
     }
 
   // STAT_BOTON_KO: el usuario se equivoca de botón, volver a empezar
@@ -190,9 +201,9 @@ void loop()
       delay(500);
       
       // mostrar 3 veces a máxima luminosidad el botón que se debería haber pulsado
-      mostrar_color(SecuenciaCorrecta[iAciertos], duarcion_sonido, MAX_LUM_PWM);
-      mostrar_color(SecuenciaCorrecta[iAciertos], duarcion_sonido, MAX_LUM_PWM);
-      mostrar_color(SecuenciaCorrecta[iAciertos], duarcion_sonido, MAX_LUM_PWM);
+      mostrar_color(SecuenciaCorrecta[iAciertos], duracion_sonido, MAX_LUM_PWM);
+      mostrar_color(SecuenciaCorrecta[iAciertos], duracion_sonido, MAX_LUM_PWM);
+      mostrar_color(SecuenciaCorrecta[iAciertos], duracion_sonido, MAX_LUM_PWM);
       delay(1000);
       objInfra.ReportFailure(NULL);
       estado = STAT_INICIAL;
@@ -202,16 +213,17 @@ void loop()
     else if (estado == STAT_BOTON_OK)
     {
       // TODO CONFIRMAR SI HAY QUE HACER ALGO MÁS
-
+      iBoton++;
+      
       // a medida que se acierta la secuencia la luminosidad de los leds se incrementa      
       //luminosidad = 255-(17+(int)((iAciertos*MIN_LUM_PWM)/(float)LongitudSecuencia)); 
       // HIGH_PWM = round((255/puntuacion_maxima) + ((255*aciertos)/puntuacion_maxima)); // Control PWM de los led
       // TODO REVISAR ESTO PARA VER SI FUNCIONA CORRECTAMENTE
       luminosidad = round((255/LongitudSecuencia) + ((255*iAciertos)/LongitudSecuencia));
-      mostrar_color(boton_pulsado, duarcion_sonido, luminosidad);
+      mostrar_color(boton_pulsado, duracion_sonido, luminosidad);
       
       // a medida que se acierta la secuencia se acorta la duración de los sonidos
-      duarcion_sonido -= 15; 
+      duracion_sonido -= 15; 
       estado = STAT_SECUENCIA;
       iAciertos++;
       if (iAciertos > SecuenciaMasLarga)
@@ -222,7 +234,7 @@ void loop()
   // STAT_COMPLETA: el usuario completa hasta el final y gana el juego
     else if (estado == STAT_COMPLETA)
     {
-      mostrar_color(boton_pulsado, duarcion_sonido, MAX_LUM_PWM);
+      mostrar_color(boton_pulsado, duracion_sonido, MAX_LUM_PWM);
       melodia_felicitacion();
       objInfra.ReportSuccess(NULL);  
     }
@@ -236,6 +248,7 @@ void loop()
 
 void mostrar_color(int color, int luminosidad, int tiempo) 
 {
+  tiempo = 1000;
   switch (color) 
   {
     case COLOR_ROJO:
