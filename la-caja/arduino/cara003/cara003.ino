@@ -208,7 +208,7 @@ void loop()
       }
       else
         estado = STAT_BOTON_OK;
-      boton_pulsado = COLOR_NINGUNO;
+      //boton_pulsado = COLOR_NINGUNO;
     }
 
   // STAT_BOTON_KO: el usuario se equivoca de botón, volver a empezar
@@ -242,7 +242,7 @@ void loop()
       // a medida que se acierta la secuencia se acorta la duración de los sonidos
       duracion_sonido -= 15;       
       estado = STAT_ESPERA;
-      iBoton++;
+        iBoton++;
     }
 
   // STAT_COMPLETA: el usuario completa hasta el final y gana el juego
