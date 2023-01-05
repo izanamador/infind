@@ -8542,7 +8542,7 @@
         "z": "b056b4cf9a298e0d",
         "g": "4cd2d92b6f1e42de",
         "name": "",
-        "func": "var time = global.get(\"time\");\ntime = time - 1;\nglobal.set(\"time\", time);\n\nvar sec_num = time;\nvar hours = Math.floor(sec_num / 3600);\nvar minutes = Math.floor((sec_num - (hours * 3600)) / 60);\nvar seconds = sec_num - (hours * 3600) - (minutes * 60);\n\nif (hours < 10) { hours = \"0\" + hours; }\nif (minutes < 10) { minutes = \"0\" + minutes; }\nif (seconds < 10) { seconds = \"0\" + seconds; }\n\nmsg.payload = hours + ':' + minutes + ':' + seconds;\nreturn msg;",
+        "func": "var time = msg.payload;\n//var time = global.get(\"time\");\n//time = time - 1;\n//global.set(\"time\", time);\n\nvar sec_num = time;\nvar hours = Math.floor(sec_num / 3600);\nvar minutes = Math.floor((sec_num - (hours * 3600)) / 60);\nvar seconds = sec_num - (hours * 3600) - (minutes * 60);\n\nif (hours < 10) { hours = \"0\" + hours; }\nif (minutes < 10) { minutes = \"0\" + minutes; }\nif (seconds < 10) { seconds = \"0\" + seconds; }\n\nmsg.payload = hours + ':' + minutes + ':' + seconds;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -8873,7 +8873,9 @@
         "g": "407e3e089de46a03",
         "name": "link out 18",
         "mode": "link",
-        "links": [],
+        "links": [
+            "a30bf994eae7cd3e"
+        ],
         "x": 755,
         "y": 520,
         "wires": []
@@ -8912,12 +8914,15 @@
             "12cc4231e9594b77",
             "592ea0f1449e87e8",
             "e789e8e1711a246d",
-            "2251ca56c78e191a"
+            "2251ca56c78e191a",
+            "7dc2883e2ed41873"
         ],
         "x": 1065,
         "y": 300,
         "wires": [
-            []
+            [
+                "cfe27898c4972426"
+            ]
         ]
     },
     {
