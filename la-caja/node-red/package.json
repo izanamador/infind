@@ -2,7 +2,11 @@
     "name": "Lacaja",
     "description": "A Node-RED Project",
     "version": "0.0.1",
-    "dependencies": {},
+    "dependencies": {
+        "node-red-contrib-http-multipart": "0.1.5",
+        "node-red-contrib-telegrambot": "14.8.7",
+        "node-red-contrib-controltimer": "0.3.0"
+    },
     "node-red": {
         "settings": {
             "flowFile": "flows.json",
