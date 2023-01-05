@@ -761,8 +761,8 @@
             "1afbd2ca7999e2cb",
             "3ebb0818b8ba2406"
         ],
-        "x": 954,
-        "y": 739,
+        "x": 1034,
+        "y": 699,
         "w": 692,
         "h": 162
     },
@@ -3672,6 +3672,23 @@
         "reg": false,
         "x": 500,
         "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4d229bac0f2f6b4a",
+        "type": "function",
+        "z": "7cbc96056c55979a",
+        "name": "Funcion que debe guardar el tiempo de intento y el intento cuando el estado se failed",
+        "func": "\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1000,
+        "y": 500,
         "wires": [
             []
         ]
@@ -8496,7 +8513,7 @@
         "z": "b056b4cf9a298e0d",
         "g": "4cd2d92b6f1e42de",
         "name": "",
-        "func": "var time_of_game = global.get(\"time of game\");\nvar gametime = Math.round(msg.payload / 1000);\nvar time =  time_of_game - gametime;\n\nvar sec_num = time;\nvar hours = Math.floor(sec_num / 3600);\nvar minutes = Math.floor((sec_num - (hours * 3600)) / 60);\nvar seconds = sec_num - (hours * 3600) - (minutes * 60);\n\nif (hours < 10) { hours = \"0\" + hours; }\nif (minutes < 10) { minutes = \"0\" + minutes; }\nif (seconds < 10) { seconds = \"0\" + seconds; }\n\nmsg.payload = hours + ':' + minutes + ':' + seconds;\nreturn msg;",
+        "func": "var gametime = Math.round(msg.payload / 1000);\nvar time =  3600 - gametime;\n\nvar sec_num = time;\nvar hours = Math.floor(sec_num / 3600);\nvar minutes = Math.floor((sec_num - (hours * 3600)) / 60);\nvar seconds = sec_num - (hours * 3600) - (minutes * 60);\n\nif (hours < 10) { hours = \"0\" + hours; }\nif (minutes < 10) { minutes = \"0\" + minutes; }\nif (seconds < 10) { seconds = \"0\" + seconds; }\n\nmsg.payload = hours + ':' + minutes + ':' + seconds;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -8517,7 +8534,7 @@
         "name": "",
         "properties": [
             {
-                "p": "time of game",
+                "p": "time_of_game",
                 "pt": "global",
                 "to": "3600",
                 "tot": "num"
@@ -9450,8 +9467,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1150,
-        "y": 780,
+        "x": 1230,
+        "y": 740,
         "wires": [
             [
                 "6fec583b8ba2414b"
@@ -9496,8 +9513,8 @@
         "name": "",
         "collection": "historia",
         "operation": "aggregate",
-        "x": 1090,
-        "y": 860,
+        "x": 1170,
+        "y": 820,
         "wires": [
             [
                 "1afbd2ca7999e2cb"
@@ -9516,8 +9533,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1350,
-        "y": 860,
+        "x": 1430,
+        "y": 820,
         "wires": [
             [
                 "3ebb0818b8ba2406"
@@ -9542,8 +9559,8 @@
         "drop": false,
         "allowrate": false,
         "outputs": 1,
-        "x": 1560,
-        "y": 860,
+        "x": 1640,
+        "y": 820,
         "wires": [
             [
                 "da39ff3f3bd01714"
@@ -10894,8 +10911,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 180,
-        "y": 180,
+        "x": 940,
+        "y": 320,
         "wires": [
             [
                 "5f7502ea89ba41c0"
@@ -10914,8 +10931,8 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 340,
-        "y": 180,
+        "x": 1100,
+        "y": 320,
         "wires": []
     },
     {
@@ -10939,8 +10956,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 470,
-        "y": 380,
+        "x": 160,
+        "y": 400,
         "wires": [
             [
                 "02950f3bd412b4b5"
@@ -10959,30 +10976,8 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 680,
-        "y": 400,
-        "wires": []
-    },
-    {
-        "id": "376323a8a9ab5b82",
-        "type": "link in",
-        "z": "522d7990b953f0cf",
-        "name": "",
-        "links": [],
-        "x": 525,
-        "y": 260,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "af43674d9262647e",
-        "type": "link out",
-        "z": "522d7990b953f0cf",
-        "name": "",
-        "links": [],
-        "x": 695,
-        "y": 180,
+        "x": 370,
+        "y": 420,
         "wires": []
     }
 ]
