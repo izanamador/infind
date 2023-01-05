@@ -577,9 +577,7 @@
             "c8ba76d152d7366a"
         ],
         "x": 794,
-        "y": 659,
-        "w": 472,
-        "h": 82
+        "y": 659
     },
     {
         "id": "0f1cf58e08b73cc2",
@@ -603,9 +601,7 @@
             "5baf45c3e6032233"
         ],
         "x": 1324,
-        "y": 179,
-        "w": 342,
-        "h": 242
+        "y": 179
     },
     {
         "id": "4cd2d92b6f1e42de",
@@ -758,7 +754,7 @@
             "1afbd2ca7999e2cb",
             "3ebb0818b8ba2406"
         ],
-        "x": 1174,
+        "x": 1014,
         "y": 699,
         "w": 692,
         "h": 162
@@ -8546,7 +8542,7 @@
         "z": "b056b4cf9a298e0d",
         "g": "4cd2d92b6f1e42de",
         "name": "",
-        "func": "var time = global.get(\"time\");\ntime = time - 1;\nglobal.set(\"time\", time);\n\nvar sec_num = time;\nvar hours = Math.floor(sec_num / 3600);\nvar minutes = Math.floor((sec_num - (hours * 3600)) / 60);\nvar seconds = sec_num - (hours * 3600) - (minutes * 60);\n\nif (hours < 10) { hours = \"0\" + hours; }\nif (minutes < 10) { minutes = \"0\" + minutes; }\nif (seconds < 10) { seconds = \"0\" + seconds; }\n\nmsg.payload = hours + ':' + minutes + ':' + seconds;\nreturn msg;",
+        "func": "var time = msg.payload;\n//var time = global.get(\"time\");\n//time = time - 1;\n//global.set(\"time\", time);\n\nvar sec_num = time;\nvar hours = Math.floor(sec_num / 3600);\nvar minutes = Math.floor((sec_num - (hours * 3600)) / 60);\nvar seconds = sec_num - (hours * 3600) - (minutes * 60);\n\nif (hours < 10) { hours = \"0\" + hours; }\nif (minutes < 10) { minutes = \"0\" + minutes; }\nif (seconds < 10) { seconds = \"0\" + seconds; }\n\nmsg.payload = hours + ':' + minutes + ':' + seconds;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -8877,7 +8873,9 @@
         "g": "407e3e089de46a03",
         "name": "link out 18",
         "mode": "link",
-        "links": [],
+        "links": [
+            "a30bf994eae7cd3e"
+        ],
         "x": 755,
         "y": 520,
         "wires": []
@@ -8916,12 +8914,15 @@
             "12cc4231e9594b77",
             "592ea0f1449e87e8",
             "e789e8e1711a246d",
-            "2251ca56c78e191a"
+            "2251ca56c78e191a",
+            "7dc2883e2ed41873"
         ],
         "x": 1065,
         "y": 300,
         "wires": [
-            []
+            [
+                "cfe27898c4972426"
+            ]
         ]
     },
     {
@@ -9509,7 +9510,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1370,
+        "x": 1210,
         "y": 740,
         "wires": [
             [
@@ -9555,7 +9556,7 @@
         "name": "",
         "collection": "historia",
         "operation": "aggregate",
-        "x": 1310,
+        "x": 1150,
         "y": 820,
         "wires": [
             [
@@ -9575,7 +9576,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1570,
+        "x": 1410,
         "y": 820,
         "wires": [
             [
@@ -9601,7 +9602,7 @@
         "drop": false,
         "allowrate": false,
         "outputs": 1,
-        "x": 1780,
+        "x": 1620,
         "y": 820,
         "wires": [
             [
@@ -9785,7 +9786,8 @@
         "type": "ui_text",
         "z": "b056b4cf9a298e0d",
         "g": "4cd2d92b6f1e42de",
-        "order": 0,
+        "group": "f870df7d6c3cc2e9",
+        "order": 13,
         "width": 0,
         "height": 0,
         "name": "",
@@ -9804,7 +9806,9 @@
         "g": "407e3e089de46a03",
         "name": "link out 56",
         "mode": "link",
-        "links": [],
+        "links": [
+            "97b7c34a01b8e8b1"
+        ],
         "x": 755,
         "y": 560,
         "wires": []
@@ -9815,9 +9819,11 @@
         "z": "b056b4cf9a298e0d",
         "g": "4cd2d92b6f1e42de",
         "name": "link in 38",
-        "links": [],
+        "links": [
+            "7e42775797773e47"
+        ],
         "x": 1065,
-        "y": 380,
+        "y": 360,
         "wires": [
             [
                 "c4abfd79327ad2ff"
