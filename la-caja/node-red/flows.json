@@ -11,40 +11,35 @@
         "type": "tab",
         "label": "Upload intomongo",
         "disabled": false,
-        "info": "",
-        "env": []
+        "info": ""
     },
     {
         "id": "b056b4cf9a298e0d",
         "type": "tab",
         "label": "La caja - Game",
         "disabled": false,
-        "info": "",
-        "env": []
+        "info": ""
     },
     {
         "id": "b23dfd10f01a4521",
         "type": "tab",
         "label": "Pruebas -  Jorge",
         "disabled": false,
-        "info": "",
-        "env": []
+        "info": ""
     },
     {
         "id": "d13323c9cef06b5d",
         "type": "tab",
         "label": "Test",
         "disabled": false,
-        "info": "",
-        "env": []
+        "info": ""
     },
     {
         "id": "522d7990b953f0cf",
         "type": "tab",
         "label": "Izan testin git",
         "disabled": false,
-        "info": "",
-        "env": []
+        "info": ""
     },
     {
         "id": "1736e63b25650818",
@@ -643,9 +638,7 @@
             "97b7c34a01b8e8b1"
         ],
         "x": 1024,
-        "y": 39,
-        "w": 942,
-        "h": 622
+        "y": 39
     },
     {
         "id": "407e3e089de46a03",
@@ -668,9 +661,7 @@
             "7e42775797773e47"
         ],
         "x": 14,
-        "y": 399,
-        "w": 782,
-        "h": 202
+        "y": 399
     },
     {
         "id": "f0bc3c69188895b3",
@@ -693,9 +684,7 @@
             "e789e8e1711a246d"
         ],
         "x": 14,
-        "y": 619,
-        "w": 782,
-        "h": 162
+        "y": 619
     },
     {
         "id": "ef9e0b05387b0f7f",
@@ -718,9 +707,7 @@
             "592ea0f1449e87e8"
         ],
         "x": 14,
-        "y": 979,
-        "w": 782,
-        "h": 162
+        "y": 979
     },
     {
         "id": "cf3c6d5c39d2c130",
@@ -742,9 +729,7 @@
             "2251ca56c78e191a"
         ],
         "x": 14,
-        "y": 799,
-        "w": 782,
-        "h": 162
+        "y": 799
     },
     {
         "id": "aebc254432ed2103",
@@ -763,9 +748,7 @@
             "3ebb0818b8ba2406"
         ],
         "x": 954,
-        "y": 739,
-        "w": 692,
-        "h": 162
+        "y": 739
     },
     {
         "id": "dfefd42be31cab40",
@@ -774,7 +757,6 @@
         "broker": "localhost",
         "port": "1883",
         "clientid": "",
-        "autoConnect": true,
         "usetls": false,
         "protocolVersion": "4",
         "keepalive": "60",
@@ -800,7 +782,6 @@
         "broker": "iot.ac.uma.es",
         "port": "1883",
         "clientid": "",
-        "autoConnect": true,
         "usetls": false,
         "protocolVersion": "4",
         "keepalive": "60",
@@ -817,7 +798,6 @@
         "willQos": "0",
         "willPayload": "",
         "willMsg": {},
-        "userProps": "",
         "sessionExpiry": ""
     },
     {
@@ -1051,7 +1031,6 @@
         "broker": "iot.ac.uma.es",
         "port": "1883",
         "clientid": "",
-        "autoConnect": true,
         "usetls": false,
         "protocolVersion": "4",
         "keepalive": "60",
@@ -1068,7 +1047,6 @@
         "willQos": "0",
         "willPayload": "",
         "willMsg": {},
-        "userProps": "",
         "sessionExpiry": ""
     },
     {
@@ -1078,7 +1056,6 @@
         "broker": "iot.ac.uma.es",
         "port": "1883",
         "clientid": "",
-        "autoConnect": true,
         "usetls": false,
         "protocolVersion": "4",
         "keepalive": "60",
@@ -1095,7 +1072,6 @@
         "willQos": "0",
         "willPayload": "",
         "willMsg": {},
-        "userProps": "",
         "sessionExpiry": ""
     },
     {
@@ -1608,7 +1584,6 @@
         "broker": "iot.ac.uma.es",
         "port": "1883",
         "clientid": "",
-        "autoConnect": true,
         "usetls": false,
         "protocolVersion": "4",
         "keepalive": "60",
@@ -1625,7 +1600,6 @@
         "willQos": "0",
         "willPayload": "",
         "willMsg": {},
-        "userProps": "",
         "sessionExpiry": ""
     },
     {
@@ -1763,7 +1737,6 @@
         "broker": "iot.ac.uma.es",
         "port": "1883",
         "clientid": "",
-        "autoConnect": true,
         "usetls": false,
         "protocolVersion": "4",
         "keepalive": "60",
@@ -1780,7 +1753,6 @@
         "willQos": "0",
         "willPayload": "",
         "willMsg": {},
-        "userProps": "",
         "sessionExpiry": ""
     },
     {
@@ -2280,7 +2252,6 @@
         "broker": "iot.ac.uma.es",
         "port": "1883",
         "clientid": "",
-        "autoConnect": true,
         "usetls": false,
         "protocolVersion": "4",
         "keepalive": "60",
@@ -2297,7 +2268,6 @@
         "willQos": "0",
         "willPayload": "",
         "willMsg": {},
-        "userProps": "",
         "sessionExpiry": ""
     },
     {
@@ -2350,7 +2320,6 @@
         "broker": "iot.ac.uma.es",
         "port": "1883",
         "clientid": "",
-        "autoConnect": true,
         "usetls": false,
         "protocolVersion": "4",
         "keepalive": "60",
@@ -2367,7 +2336,6 @@
         "willQos": "0",
         "willPayload": "",
         "willMsg": {},
-        "userProps": "",
         "sessionExpiry": ""
     },
     {
@@ -2500,7 +2468,6 @@
         "broker": "iot.ac.uma.es",
         "port": "1883",
         "clientid": "",
-        "autoConnect": true,
         "usetls": false,
         "protocolVersion": "4",
         "keepalive": "60",
@@ -2517,7 +2484,6 @@
         "willQos": "0",
         "willPayload": "",
         "willMsg": {},
-        "userProps": "",
         "sessionExpiry": ""
     },
     {
@@ -3143,7 +3109,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 300,
         "y": 180,
         "wires": [
@@ -3164,7 +3129,6 @@
         "nl": false,
         "rap": true,
         "rh": 0,
-        "inputs": 0,
         "x": 110,
         "y": 440,
         "wires": [
@@ -3210,7 +3174,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 1120,
         "y": 300,
         "wires": [
@@ -3224,7 +3187,6 @@
         "type": "link out",
         "z": "7cbc96056c55979a",
         "name": "link out 14",
-        "mode": "link",
         "links": [
             "f467c017da051f39"
         ],
@@ -3257,7 +3219,6 @@
         "type": "link out",
         "z": "7cbc96056c55979a",
         "name": "link out 15",
-        "mode": "link",
         "links": [
             "f467c017da051f39"
         ],
@@ -3270,7 +3231,6 @@
         "type": "link out",
         "z": "7cbc96056c55979a",
         "name": "link out 16",
-        "mode": "link",
         "links": [
             "f467c017da051f39"
         ],
@@ -3362,7 +3322,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 300,
         "y": 240,
         "wires": [
@@ -3376,7 +3335,6 @@
         "type": "link out",
         "z": "7cbc96056c55979a",
         "name": "link out 42",
-        "mode": "link",
         "links": [
             "f467c017da051f39"
         ],
@@ -3448,7 +3406,6 @@
         "type": "link out",
         "z": "7cbc96056c55979a",
         "name": "link out 43",
-        "mode": "link",
         "links": [
             "f467c017da051f39"
         ],
@@ -3472,7 +3429,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 300,
         "y": 120,
         "wires": [
@@ -3525,7 +3481,6 @@
         "type": "link out",
         "z": "7cbc96056c55979a",
         "name": "link out 44",
-        "mode": "link",
         "links": [
             "f467c017da051f39"
         ],
@@ -3568,7 +3523,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 720,
         "y": 980,
         "wires": [
@@ -3582,7 +3536,6 @@
         "type": "link out",
         "z": "7cbc96056c55979a",
         "name": "link out 45",
-        "mode": "link",
         "links": [
             "f467c017da051f39"
         ],
@@ -3734,7 +3687,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 360,
         "y": 180,
         "wires": [
@@ -3873,7 +3825,6 @@
         "nl": false,
         "rap": true,
         "rh": 0,
-        "inputs": 0,
         "x": 240,
         "y": 340,
         "wires": [
@@ -4118,7 +4069,6 @@
         "nl": false,
         "rap": true,
         "rh": 0,
-        "inputs": 0,
         "x": 230,
         "y": 740,
         "wires": [
@@ -4577,7 +4527,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 380,
         "y": 240,
         "wires": [
@@ -4598,7 +4547,6 @@
         "nl": false,
         "rap": true,
         "rh": 0,
-        "inputs": 0,
         "x": 130,
         "y": 400,
         "wires": [
@@ -4625,7 +4573,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 1260,
         "y": 300,
         "wires": [
@@ -4639,7 +4586,6 @@
         "type": "link out",
         "z": "90d9a362f6d9804b",
         "name": "link out 22",
-        "mode": "link",
         "links": [
             "3b61f394285ac503"
         ],
@@ -4668,7 +4614,6 @@
         "type": "link out",
         "z": "90d9a362f6d9804b",
         "name": "link out 23",
-        "mode": "link",
         "links": [
             "3b61f394285ac503"
         ],
@@ -4681,7 +4626,6 @@
         "type": "link out",
         "z": "90d9a362f6d9804b",
         "name": "link out 24",
-        "mode": "link",
         "links": [
             "3b61f394285ac503"
         ],
@@ -4888,7 +4832,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 200,
         "y": 320,
         "wires": [
@@ -4975,7 +4918,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 220,
         "y": 160,
         "wires": [
@@ -5000,7 +4942,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 200,
         "y": 240,
         "wires": [
@@ -5025,7 +4966,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 200,
         "y": 400,
         "wires": [
@@ -5050,7 +4990,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 200,
         "y": 480,
         "wires": [
@@ -5092,7 +5031,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 400,
         "y": 620,
         "wires": [
@@ -5134,7 +5072,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 560,
         "y": 120,
         "wires": [
@@ -5173,7 +5110,6 @@
         "type": "link out",
         "z": "7e2a7678166f609f",
         "name": "link out 30",
-        "mode": "link",
         "links": [
             "53fe3b5f5eab4862"
         ],
@@ -5186,7 +5122,6 @@
         "type": "link out",
         "z": "7e2a7678166f609f",
         "name": "link out 31",
-        "mode": "link",
         "links": [
             "53fe3b5f5eab4862"
         ],
@@ -5229,7 +5164,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 560,
         "y": 200,
         "wires": [
@@ -5243,7 +5177,6 @@
         "type": "link out",
         "z": "7e2a7678166f609f",
         "name": "link out 32",
-        "mode": "link",
         "links": [
             "53fe3b5f5eab4862"
         ],
@@ -5286,7 +5219,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 560,
         "y": 280,
         "wires": [
@@ -5300,7 +5232,6 @@
         "type": "link out",
         "z": "7e2a7678166f609f",
         "name": "link out 33",
-        "mode": "link",
         "links": [
             "53fe3b5f5eab4862"
         ],
@@ -5343,7 +5274,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 560,
         "y": 360,
         "wires": [
@@ -5357,7 +5287,6 @@
         "type": "link out",
         "z": "7e2a7678166f609f",
         "name": "link out 34",
-        "mode": "link",
         "links": [
             "53fe3b5f5eab4862"
         ],
@@ -5400,7 +5329,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 560,
         "y": 440,
         "wires": [
@@ -5414,7 +5342,6 @@
         "type": "link out",
         "z": "7e2a7678166f609f",
         "name": "link out 35",
-        "mode": "link",
         "links": [
             "53fe3b5f5eab4862"
         ],
@@ -5457,7 +5384,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 560,
         "y": 520,
         "wires": [
@@ -5471,7 +5397,6 @@
         "type": "link out",
         "z": "7e2a7678166f609f",
         "name": "link out 36",
-        "mode": "link",
         "links": [
             "53fe3b5f5eab4862"
         ],
@@ -5484,7 +5409,6 @@
         "type": "link out",
         "z": "7e2a7678166f609f",
         "name": "link out 37",
-        "mode": "link",
         "links": [
             "53fe3b5f5eab4862"
         ],
@@ -5497,7 +5421,6 @@
         "type": "link out",
         "z": "7e2a7678166f609f",
         "name": "link out 38",
-        "mode": "link",
         "links": [
             "53fe3b5f5eab4862"
         ],
@@ -5510,7 +5433,6 @@
         "type": "link out",
         "z": "7e2a7678166f609f",
         "name": "link out 39",
-        "mode": "link",
         "links": [
             "53fe3b5f5eab4862"
         ],
@@ -5523,7 +5445,6 @@
         "type": "link out",
         "z": "7e2a7678166f609f",
         "name": "link out 40",
-        "mode": "link",
         "links": [
             "53fe3b5f5eab4862"
         ],
@@ -5536,7 +5457,6 @@
         "type": "link out",
         "z": "7e2a7678166f609f",
         "name": "link out 41",
-        "mode": "link",
         "links": [
             "53fe3b5f5eab4862"
         ],
@@ -5632,7 +5552,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 380,
         "y": 220,
         "wires": [
@@ -5653,7 +5572,6 @@
         "nl": false,
         "rap": true,
         "rh": 0,
-        "inputs": 0,
         "x": 210,
         "y": 480,
         "wires": [
@@ -5686,7 +5604,6 @@
         "type": "link out",
         "z": "178fa897d7510777",
         "name": "link out 46",
-        "mode": "link",
         "links": [
             "0a67632feb36fdf6"
         ],
@@ -5718,7 +5635,6 @@
         "type": "link out",
         "z": "178fa897d7510777",
         "name": "link out 47",
-        "mode": "link",
         "links": [
             "0a67632feb36fdf6"
         ],
@@ -5839,7 +5755,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 380,
         "y": 280,
         "wires": [
@@ -5853,7 +5768,6 @@
         "type": "link out",
         "z": "178fa897d7510777",
         "name": "link out 49",
-        "mode": "link",
         "links": [
             "0a67632feb36fdf6"
         ],
@@ -5925,7 +5839,6 @@
         "type": "link out",
         "z": "178fa897d7510777",
         "name": "link out 50",
-        "mode": "link",
         "links": [
             "0a67632feb36fdf6"
         ],
@@ -5949,7 +5862,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 380,
         "y": 160,
         "wires": [
@@ -6002,7 +5914,6 @@
         "type": "link out",
         "z": "178fa897d7510777",
         "name": "link out 51",
-        "mode": "link",
         "links": [
             "0a67632feb36fdf6"
         ],
@@ -6045,7 +5956,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 940,
         "y": 700,
         "wires": [
@@ -6059,7 +5969,6 @@
         "type": "link out",
         "z": "178fa897d7510777",
         "name": "link out 52",
-        "mode": "link",
         "links": [
             "0a67632feb36fdf6"
         ],
@@ -6495,7 +6404,6 @@
         "z": "a43193f9452562d4",
         "name": "Load Firmware",
         "filename": "filename",
-        "filenameType": "msg",
         "format": "",
         "sendError": false,
         "x": 2586.999786376953,
@@ -7306,7 +7214,6 @@
         "z": "122f65d809b34d8e",
         "name": "Read firmware",
         "filename": "filename",
-        "filenameType": "msg",
         "format": "utf8",
         "encoding": "utf8",
         "allProps": false,
@@ -7859,7 +7766,6 @@
         "type": "link out",
         "z": "122f65d809b34d8e",
         "name": "link out 2",
-        "mode": "link",
         "links": [
             "e8c6e9ffed7b9a38"
         ],
@@ -7890,7 +7796,6 @@
         "type": "link out",
         "z": "122f65d809b34d8e",
         "name": "link out 3",
-        "mode": "link",
         "links": [
             "a2b9b895f1a88888"
         ],
@@ -7937,7 +7842,6 @@
         "type": "link out",
         "z": "122f65d809b34d8e",
         "name": "link out 4",
-        "mode": "link",
         "links": [
             "8d9f6656f8f37055"
         ],
@@ -7950,7 +7854,6 @@
         "type": "link out",
         "z": "122f65d809b34d8e",
         "name": "link out 5",
-        "mode": "link",
         "links": [
             "5baf45c3e6032233"
         ],
@@ -7963,7 +7866,6 @@
         "type": "link out",
         "z": "122f65d809b34d8e",
         "name": "link out 6",
-        "mode": "link",
         "links": [
             "20ec2a5a24d52017"
         ],
@@ -8302,7 +8204,6 @@
         "type": "link out",
         "z": "122f65d809b34d8e",
         "name": "link out 7",
-        "mode": "link",
         "links": [
             "e8c6e9ffed7b9a38"
         ],
@@ -8495,7 +8396,6 @@
         "type": "link out",
         "z": "b056b4cf9a298e0d",
         "name": "link out 8",
-        "mode": "link",
         "links": [
             "880fa11cf1585bf1",
             "d8313757e30311dd"
@@ -8620,7 +8520,6 @@
         "z": "b056b4cf9a298e0d",
         "g": "407e3e089de46a03",
         "name": "link out 10",
-        "mode": "link",
         "links": [
             "d8313757e30311dd"
         ],
@@ -8768,7 +8667,6 @@
         "type": "link out",
         "z": "b056b4cf9a298e0d",
         "name": "link out 13",
-        "mode": "link",
         "links": [
             "d8313757e30311dd"
         ],
@@ -8850,7 +8748,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 220,
         "y": 480,
         "wires": [
@@ -8865,7 +8762,6 @@
         "z": "b056b4cf9a298e0d",
         "g": "407e3e089de46a03",
         "name": "link out 17",
-        "mode": "link",
         "links": [
             "0b1f4c3a444e4988",
             "ef258efaabcdd988"
@@ -8880,7 +8776,6 @@
         "z": "b056b4cf9a298e0d",
         "g": "407e3e089de46a03",
         "name": "link out 18",
-        "mode": "link",
         "links": [
             "a30bf994eae7cd3e"
         ],
@@ -8939,7 +8834,6 @@
         "z": "b056b4cf9a298e0d",
         "g": "f0bc3c69188895b3",
         "name": "link out 19",
-        "mode": "link",
         "links": [
             "56de6b18ecd69a81"
         ],
@@ -8964,7 +8858,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 420,
         "y": 700,
         "wires": [
@@ -9124,7 +9017,6 @@
         "z": "b056b4cf9a298e0d",
         "g": "ef9e0b05387b0f7f",
         "name": "link out 20",
-        "mode": "link",
         "links": [
             "56de6b18ecd69a81"
         ],
@@ -9149,7 +9041,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 420,
         "y": 1060,
         "wires": [
@@ -9221,7 +9112,6 @@
         "z": "b056b4cf9a298e0d",
         "g": "ef9e0b05387b0f7f",
         "name": "link out 25",
-        "mode": "link",
         "links": [
             "adf692ef0a9e9fb2"
         ],
@@ -9235,7 +9125,6 @@
         "z": "b056b4cf9a298e0d",
         "g": "ef9e0b05387b0f7f",
         "name": "link out 26",
-        "mode": "link",
         "links": [
             "a30bf994eae7cd3e"
         ],
@@ -9270,7 +9159,6 @@
         "z": "b056b4cf9a298e0d",
         "g": "f0bc3c69188895b3",
         "name": "link out 27",
-        "mode": "link",
         "links": [
             "5d4807349eb7d70c",
             "0419ec0ef4ea5662",
@@ -9286,7 +9174,6 @@
         "z": "b056b4cf9a298e0d",
         "g": "f0bc3c69188895b3",
         "name": "link out 28",
-        "mode": "link",
         "links": [
             "a30bf994eae7cd3e"
         ],
@@ -9315,7 +9202,6 @@
         "type": "link out",
         "z": "b056b4cf9a298e0d",
         "name": "link out 29",
-        "mode": "link",
         "links": [
             "880fa11cf1585bf1",
             "f43072220deb7eb3"
@@ -9386,7 +9272,6 @@
         "z": "b056b4cf9a298e0d",
         "g": "cf3c6d5c39d2c130",
         "name": "link out 53",
-        "mode": "link",
         "links": [
             "d8313757e30311dd"
         ],
@@ -9431,7 +9316,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 420,
         "y": 880,
         "wires": [
@@ -9463,7 +9347,6 @@
         "z": "b056b4cf9a298e0d",
         "g": "cf3c6d5c39d2c130",
         "name": "link out 54",
-        "mode": "link",
         "links": [
             "eae9519bc6028278"
         ],
@@ -9477,7 +9360,6 @@
         "z": "b056b4cf9a298e0d",
         "g": "cf3c6d5c39d2c130",
         "name": "link out 55",
-        "mode": "link",
         "links": [
             "a30bf994eae7cd3e"
         ],
@@ -9609,7 +9491,6 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
-        "outputs": 1,
         "x": 1560,
         "y": 860,
         "wires": [
@@ -9813,7 +9694,6 @@
         "z": "b056b4cf9a298e0d",
         "g": "407e3e089de46a03",
         "name": "link out 56",
-        "mode": "link",
         "links": [
             "97b7c34a01b8e8b1"
         ],
@@ -9910,10 +9790,7 @@
         "tls": "",
         "persist": false,
         "proxy": "",
-        "insecureHTTPParser": false,
         "authType": "",
-        "senderr": false,
-        "headers": [],
         "x": 540,
         "y": 980,
         "wires": [
@@ -10443,7 +10320,6 @@
         "z": "b23dfd10f01a4521",
         "name": "",
         "filename": "/home/rhyloo/nol/pics/foo.jpeg",
-        "filenameType": "str",
         "format": "",
         "chunk": false,
         "sendError": false,
@@ -10738,7 +10614,6 @@
         "z": "d13323c9cef06b5d",
         "name": "Read audio file",
         "filename": "filename",
-        "filenameType": "msg",
         "format": "utf8",
         "chunk": false,
         "sendError": false,
@@ -10937,7 +10812,6 @@
         "z": "d13323c9cef06b5d",
         "name": "",
         "filename": "~/nol/pics/test.wav",
-        "filenameType": "str",
         "appendNewline": true,
         "createDir": true,
         "overwriteFile": "false",
@@ -10991,6 +10865,51 @@
         "statusType": "auto",
         "x": 340,
         "y": 180,
+        "wires": []
+    },
+    {
+        "id": "6fd331da52211d7e",
+        "type": "inject",
+        "z": "522d7990b953f0cf",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 470,
+        "y": 380,
+        "wires": [
+            [
+                "02950f3bd412b4b5"
+            ]
+        ]
+    },
+    {
+        "id": "02950f3bd412b4b5",
+        "type": "debug",
+        "z": "522d7990b953f0cf",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 680,
+        "y": 400,
         "wires": []
     }
 ]

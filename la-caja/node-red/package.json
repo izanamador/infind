@@ -17,8 +17,8 @@
     },
     "node-red": {
         "settings": {
-            "flowFile": "la-caja/node-red/flows.json",
-            "credentialsFile": "la-caja/node-red/flows_cred.json"
+            "flowFile": "flows.json",
+            "credentialsFile": "flows_cred.json"
         }
     }
 }

@@ -39,6 +39,14 @@
         "env": []
     },
     {
+        "id": "522d7990b953f0cf",
+        "type": "tab",
+        "label": "Izan testin git",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "1736e63b25650818",
         "type": "subflow",
         "name": "Json-Parametros",
@@ -754,8 +762,8 @@
             "1afbd2ca7999e2cb",
             "3ebb0818b8ba2406"
         ],
-        "x": 1014,
-        "y": 699,
+        "x": 954,
+        "y": 739,
         "w": 692,
         "h": 162
     },
@@ -9510,8 +9518,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1210,
-        "y": 740,
+        "x": 1150,
+        "y": 780,
         "wires": [
             [
                 "6fec583b8ba2414b"
@@ -9556,8 +9564,8 @@
         "name": "",
         "collection": "historia",
         "operation": "aggregate",
-        "x": 1150,
-        "y": 820,
+        "x": 1090,
+        "y": 860,
         "wires": [
             [
                 "1afbd2ca7999e2cb"
@@ -9576,8 +9584,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1410,
-        "y": 820,
+        "x": 1350,
+        "y": 860,
         "wires": [
             [
                 "3ebb0818b8ba2406"
@@ -9602,8 +9610,8 @@
         "drop": false,
         "allowrate": false,
         "outputs": 1,
-        "x": 1620,
-        "y": 820,
+        "x": 1560,
+        "y": 860,
         "wires": [
             [
                 "da39ff3f3bd01714"
@@ -10939,5 +10947,50 @@
         "wires": [
             []
         ]
+    },
+    {
+        "id": "e18f203f7270b207",
+        "type": "inject",
+        "z": "522d7990b953f0cf",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 180,
+        "wires": [
+            [
+                "5f7502ea89ba41c0"
+            ]
+        ]
+    },
+    {
+        "id": "5f7502ea89ba41c0",
+        "type": "debug",
+        "z": "522d7990b953f0cf",
+        "name": "debug 48",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 340,
+        "y": 180,
+        "wires": []
     }
 ]
