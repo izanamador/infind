@@ -129,6 +129,8 @@ void loop()
     static int longParcial;
     static int duracion_sonido;
     static int luminosidad;
+    static int ayudasSolicitadas;
+    static int aciertosPorPartida;
 
 
 
@@ -138,8 +140,17 @@ void loop()
       return;
       if (estado != STAT_ESPERA)
       {
-        sprintf(GameInfo, "{Estado: %d, iBoton: %d, longParcial: %d, LongitudSecuencia: %d}",
-          estado, iBoton, longParcial, LongitudSecuencia);
+        ayudasSolicitadas = MAX_SEQ-LongitudSecuencia;
+        if (iBoton + 1 == LongitudSecuencia)
+        {
+          aciertosPorPartida = longParcial;
+        }
+        else
+        {
+          aciertosPorPartida = longParcial - 1;
+        }
+        sprintf(GameInfo, "{Estado: %d, ayudasSolicitadas: %d, aciertosPorPartida: %d, LongitudSecuencia: %d}",
+          estado, ayudasSolicitadas, aciertosPorPartida, LongitudSecuencia);
         Serial.println(GameInfo);
       }
 
@@ -172,16 +183,16 @@ void loop()
       estado = STAT_BOTON;
       if (digitalRead(PIN_BOTON_ROJO) == LOW)
         {boton_pulsado = COLOR_ROJO;
-        delay(500);}
+        delay(50);}
       else if (digitalRead(PIN_BOTON_AZUL) == LOW)
         {boton_pulsado = COLOR_AZUL;
-        delay(500);}
+        delay(50);}
       else if (digitalRead(PIN_BOTON_AMARILLO) == LOW)
         {boton_pulsado = COLOR_AMARILLO;
-        delay(500);}
+        delay(50);}
       else if (digitalRead(PIN_BOTON_VERDE) == LOW)
         {boton_pulsado = COLOR_VERDE;
-        delay(500);}
+        delay(50);}
       else
         estado = STAT_ESPERA;
         //boton_pulsado = COLOR_NINGUNO;
@@ -192,7 +203,12 @@ void loop()
     { 
       char *strBotones[] = {"rojo", "verde", "amarillo","azul"};
       Serial.println(strBotones[boton_pulsado]);
-
+      if((SecuenciaCorrecta[iBoton] == boton_pulsado) && (iBoton + 1 != LongitudSecuencia))
+      {
+        mostrar_color(boton_pulsado, duracion_sonido, luminosidad);
+        Serial.println(luminosidad);
+        delay(300);
+      } 
       if (SecuenciaCorrecta[iBoton] != boton_pulsado)
         estado = STAT_BOTON_KO;
       else if (iBoton + 1 == LongitudSecuencia)
@@ -208,7 +224,6 @@ void loop()
       }
       else
         estado = STAT_BOTON_OK;
-      //boton_pulsado = COLOR_NINGUNO;
     }
 
   // STAT_BOTON_KO: el usuario se equivoca de botón, volver a empezar
@@ -232,17 +247,13 @@ void loop()
     else if (estado == STAT_BOTON_OK)
     {
       
-      // a medida que se acierta la secuencia la luminosidad de los leds se incrementa      
-      //luminosidad = 255-(17+(int)((iSecuencia*MIN_LUM_PWM)/(float)LongitudSecuencia)); 
-      // HIGH_PWM = round((255/puntuacion_maxima) + ((255*aciertos)/puntuacion_maxima)); // Control PWM de los led
-      // TODO REVISAR ESTO PARA VER SI FUNCIONA CORRECTAMENTE
+      // a medida que se acierta la secuencia la luminosidad de los leds se incrementa
       luminosidad = round((255/LongitudSecuencia) + ((255*longParcial)/LongitudSecuencia));
-      mostrar_color(boton_pulsado, duracion_sonido, luminosidad);
       
       // a medida que se acierta la secuencia se acorta la duración de los sonidos
       duracion_sonido -= 15;       
       estado = STAT_ESPERA;
-        iBoton++;
+      iBoton++;
     }
 
   // STAT_COMPLETA: el usuario completa hasta el final y gana el juego
@@ -262,7 +273,7 @@ void loop()
 
 void mostrar_color(int color, int luminosidad, int tiempo) 
 {
-  tiempo = 1000;
+  tiempo = 500;
   switch (color) 
   {
     case COLOR_ROJO:
@@ -351,6 +362,12 @@ void melodia_inicio()
 
 void melodia_felicitacion() 
 {
+  // Encedemos todos los led
+  digitalWrite(PIN_LED_ROJO, HIGH);       
+  digitalWrite(PIN_LED_VERDE, HIGH);
+  digitalWrite(PIN_LED_AMARILLO, HIGH);
+  digitalWrite(PIN_LED_AZUL, HIGH);
+  
   tone(PIN_TONO, 195, 98.2530375);
   delay(109.170041667);
   delay(5.02756770833);
@@ -432,5 +449,12 @@ void melodia_felicitacion()
   tone(PIN_TONO, 659, 294.7591125);
   delay(327.510125);
   noTone(PIN_TONO);
+
+  // Pausa al final de la melodía y apagado de leds
+  delay(600);   
+  digitalWrite(PIN_LED_ROJO, LOW);   
+  digitalWrite(PIN_LED_VERDE, LOW);
+  digitalWrite(PIN_LED_AMARILLO, LOW);
+  digitalWrite(PIN_LED_AZUL, LOW);
 }
  
