@@ -758,7 +758,7 @@
             "1afbd2ca7999e2cb",
             "3ebb0818b8ba2406"
         ],
-        "x": 1174,
+        "x": 1074,
         "y": 699,
         "w": 692,
         "h": 162
@@ -9509,7 +9509,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1370,
+        "x": 1270,
         "y": 740,
         "wires": [
             [
@@ -9555,7 +9555,7 @@
         "name": "",
         "collection": "historia",
         "operation": "aggregate",
-        "x": 1310,
+        "x": 1210,
         "y": 820,
         "wires": [
             [
@@ -9575,7 +9575,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1570,
+        "x": 1470,
         "y": 820,
         "wires": [
             [
@@ -9601,7 +9601,7 @@
         "drop": false,
         "allowrate": false,
         "outputs": 1,
-        "x": 1780,
+        "x": 1680,
         "y": 820,
         "wires": [
             [
