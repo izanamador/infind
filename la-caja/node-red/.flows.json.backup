@@ -3153,7 +3153,8 @@
                 "e2e49d26f6fd4e46",
                 "33612072a9903295",
                 "5c2cf1620e7bb78b",
-                "2eb58ec64814c2b3"
+                "2eb58ec64814c2b3",
+                "9ddd82ff4685fe83"
             ]
         ]
     },
@@ -3669,6 +3670,22 @@
         "wires": [
             []
         ]
+    },
+    {
+        "id": "9ddd82ff4685fe83",
+        "type": "debug",
+        "z": "7cbc96056c55979a",
+        "name": "debug 49",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 380,
+        "y": 680,
+        "wires": []
     },
     {
         "id": "0acde4c796f02db3",
@@ -8467,13 +8484,13 @@
         "z": "b056b4cf9a298e0d",
         "g": "4cd2d92b6f1e42de",
         "name": "",
-        "func": "var time = msg.payload;\n//var time = global.get(\"time\");\n//time = time - 1;\n//global.set(\"time\", time);\n\nvar sec_num = time;\nvar hours = Math.floor(sec_num / 3600);\nvar minutes = Math.floor((sec_num - (hours * 3600)) / 60);\nvar seconds = sec_num - (hours * 3600) - (minutes * 60);\n\nif (hours < 10) { hours = \"0\" + hours; }\nif (minutes < 10) { minutes = \"0\" + minutes; }\nif (seconds < 10) { seconds = \"0\" + seconds; }\n\nmsg.payload = hours + ':' + minutes + ':' + seconds;\nreturn msg;",
+        "func": "var time_of_game = global.get(\"time of game\");\nvar gametime = Math.round(msg.payload / 1000);\nvar time =  time_of_game - gametime;\n\nvar sec_num = time;\nvar hours = Math.floor(sec_num / 3600);\nvar minutes = Math.floor((sec_num - (hours * 3600)) / 60);\nvar seconds = sec_num - (hours * 3600) - (minutes * 60);\n\nif (hours < 10) { hours = \"0\" + hours; }\nif (minutes < 10) { minutes = \"0\" + minutes; }\nif (seconds < 10) { seconds = \"0\" + seconds; }\n\nmsg.payload = hours + ':' + minutes + ':' + seconds;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1640,
+        "x": 1460,
         "y": 300,
         "wires": [
             [
@@ -8488,7 +8505,7 @@
         "name": "",
         "properties": [
             {
-                "p": "time",
+                "p": "time of game",
                 "pt": "global",
                 "to": "3600",
                 "tot": "num"

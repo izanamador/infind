@@ -3125,6 +3125,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 300,
         "y": 180,
         "wires": [
@@ -3145,6 +3146,7 @@
         "nl": false,
         "rap": true,
         "rh": 0,
+        "inputs": 0,
         "x": 110,
         "y": 440,
         "wires": [
@@ -3190,6 +3192,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 1120,
         "y": 300,
         "wires": [
@@ -3338,6 +3341,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 300,
         "y": 240,
         "wires": [
@@ -3445,6 +3449,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 300,
         "y": 120,
         "wires": [
@@ -3539,6 +3544,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 720,
         "y": 980,
         "wires": [
@@ -3703,6 +3709,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 360,
         "y": 180,
         "wires": [
@@ -3841,6 +3848,7 @@
         "nl": false,
         "rap": true,
         "rh": 0,
+        "inputs": 0,
         "x": 240,
         "y": 340,
         "wires": [
@@ -4085,6 +4093,7 @@
         "nl": false,
         "rap": true,
         "rh": 0,
+        "inputs": 0,
         "x": 230,
         "y": 740,
         "wires": [
@@ -4543,6 +4552,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 380,
         "y": 240,
         "wires": [
@@ -4563,6 +4573,7 @@
         "nl": false,
         "rap": true,
         "rh": 0,
+        "inputs": 0,
         "x": 130,
         "y": 400,
         "wires": [
@@ -4589,6 +4600,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 1260,
         "y": 300,
         "wires": [
@@ -4848,6 +4860,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 200,
         "y": 320,
         "wires": [
@@ -4934,6 +4947,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 220,
         "y": 160,
         "wires": [
@@ -4958,6 +4972,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 200,
         "y": 240,
         "wires": [
@@ -4982,6 +4997,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 200,
         "y": 400,
         "wires": [
@@ -5006,6 +5022,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 200,
         "y": 480,
         "wires": [
@@ -5047,6 +5064,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 400,
         "y": 620,
         "wires": [
@@ -5088,6 +5106,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 560,
         "y": 120,
         "wires": [
@@ -5180,6 +5199,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 560,
         "y": 200,
         "wires": [
@@ -5235,6 +5255,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 560,
         "y": 280,
         "wires": [
@@ -5290,6 +5311,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 560,
         "y": 360,
         "wires": [
@@ -5345,6 +5367,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 560,
         "y": 440,
         "wires": [
@@ -5400,6 +5423,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 560,
         "y": 520,
         "wires": [
@@ -5568,6 +5592,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 380,
         "y": 220,
         "wires": [
@@ -5588,6 +5613,7 @@
         "nl": false,
         "rap": true,
         "rh": 0,
+        "inputs": 0,
         "x": 210,
         "y": 480,
         "wires": [
@@ -5771,6 +5797,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 380,
         "y": 280,
         "wires": [
@@ -5878,6 +5905,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 380,
         "y": 160,
         "wires": [
@@ -5972,6 +6000,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 940,
         "y": 700,
         "wires": [
@@ -8467,13 +8496,13 @@
         "z": "b056b4cf9a298e0d",
         "g": "4cd2d92b6f1e42de",
         "name": "",
-        "func": "var time = msg.payload;\n//var time = global.get(\"time\");\n//time = time - 1;\n//global.set(\"time\", time);\n\nvar sec_num = time;\nvar hours = Math.floor(sec_num / 3600);\nvar minutes = Math.floor((sec_num - (hours * 3600)) / 60);\nvar seconds = sec_num - (hours * 3600) - (minutes * 60);\n\nif (hours < 10) { hours = \"0\" + hours; }\nif (minutes < 10) { minutes = \"0\" + minutes; }\nif (seconds < 10) { seconds = \"0\" + seconds; }\n\nmsg.payload = hours + ':' + minutes + ':' + seconds;\nreturn msg;",
+        "func": "var time_of_game = global.get(\"time of game\");\nvar gametime = Math.round(msg.payload / 1000);\nvar time =  time_of_game - gametime;\n\nvar sec_num = time;\nvar hours = Math.floor(sec_num / 3600);\nvar minutes = Math.floor((sec_num - (hours * 3600)) / 60);\nvar seconds = sec_num - (hours * 3600) - (minutes * 60);\n\nif (hours < 10) { hours = \"0\" + hours; }\nif (minutes < 10) { minutes = \"0\" + minutes; }\nif (seconds < 10) { seconds = \"0\" + seconds; }\n\nmsg.payload = hours + ':' + minutes + ':' + seconds;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1640,
+        "x": 1460,
         "y": 300,
         "wires": [
             [
@@ -8488,7 +8517,7 @@
         "name": "",
         "properties": [
             {
-                "p": "time",
+                "p": "time of game",
                 "pt": "global",
                 "to": "3600",
                 "tot": "num"
@@ -8765,6 +8794,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 220,
         "y": 480,
         "wires": [
@@ -8875,6 +8905,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 420,
         "y": 700,
         "wires": [
@@ -9058,6 +9089,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 420,
         "y": 1060,
         "wires": [
@@ -9333,6 +9365,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 420,
         "y": 880,
         "wires": [
@@ -9508,6 +9541,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 1560,
         "y": 860,
         "wires": [
