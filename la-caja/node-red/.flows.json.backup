@@ -3125,6 +3125,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 300,
         "y": 180,
         "wires": [
@@ -3145,6 +3146,7 @@
         "nl": false,
         "rap": true,
         "rh": 0,
+        "inputs": 0,
         "x": 110,
         "y": 440,
         "wires": [
@@ -3153,8 +3155,7 @@
                 "e2e49d26f6fd4e46",
                 "33612072a9903295",
                 "5c2cf1620e7bb78b",
-                "2eb58ec64814c2b3",
-                "9ddd82ff4685fe83"
+                "2eb58ec64814c2b3"
             ]
         ]
     },
@@ -3191,6 +3192,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 1120,
         "y": 300,
         "wires": [
@@ -3339,6 +3341,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 300,
         "y": 240,
         "wires": [
@@ -3446,6 +3449,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 300,
         "y": 120,
         "wires": [
@@ -3540,6 +3544,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 720,
         "y": 980,
         "wires": [
@@ -3672,22 +3677,6 @@
         ]
     },
     {
-        "id": "9ddd82ff4685fe83",
-        "type": "debug",
-        "z": "7cbc96056c55979a",
-        "name": "debug 49",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 380,
-        "y": 680,
-        "wires": []
-    },
-    {
         "id": "0acde4c796f02db3",
         "type": "complete",
         "z": "72ea5fcb0b022fe1",
@@ -3720,6 +3709,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 360,
         "y": 180,
         "wires": [
@@ -3858,6 +3848,7 @@
         "nl": false,
         "rap": true,
         "rh": 0,
+        "inputs": 0,
         "x": 240,
         "y": 340,
         "wires": [
@@ -4102,6 +4093,7 @@
         "nl": false,
         "rap": true,
         "rh": 0,
+        "inputs": 0,
         "x": 230,
         "y": 740,
         "wires": [
@@ -4560,6 +4552,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 380,
         "y": 240,
         "wires": [
@@ -4580,6 +4573,7 @@
         "nl": false,
         "rap": true,
         "rh": 0,
+        "inputs": 0,
         "x": 130,
         "y": 400,
         "wires": [
@@ -4606,6 +4600,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 1260,
         "y": 300,
         "wires": [
@@ -4865,6 +4860,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 200,
         "y": 320,
         "wires": [
@@ -4951,6 +4947,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 220,
         "y": 160,
         "wires": [
@@ -4975,6 +4972,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 200,
         "y": 240,
         "wires": [
@@ -4999,6 +4997,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 200,
         "y": 400,
         "wires": [
@@ -5023,6 +5022,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 200,
         "y": 480,
         "wires": [
@@ -5064,6 +5064,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 400,
         "y": 620,
         "wires": [
@@ -5105,6 +5106,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 560,
         "y": 120,
         "wires": [
@@ -5197,6 +5199,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 560,
         "y": 200,
         "wires": [
@@ -5252,6 +5255,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 560,
         "y": 280,
         "wires": [
@@ -5307,6 +5311,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 560,
         "y": 360,
         "wires": [
@@ -5362,6 +5367,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 560,
         "y": 440,
         "wires": [
@@ -5417,6 +5423,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 560,
         "y": 520,
         "wires": [
@@ -5585,6 +5592,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 380,
         "y": 220,
         "wires": [
@@ -5605,6 +5613,7 @@
         "nl": false,
         "rap": true,
         "rh": 0,
+        "inputs": 0,
         "x": 210,
         "y": 480,
         "wires": [
@@ -5788,6 +5797,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 380,
         "y": 280,
         "wires": [
@@ -5895,6 +5905,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 380,
         "y": 160,
         "wires": [
@@ -5989,6 +6000,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 940,
         "y": 700,
         "wires": [
@@ -8782,6 +8794,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 220,
         "y": 480,
         "wires": [
@@ -8892,6 +8905,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 420,
         "y": 700,
         "wires": [
@@ -9075,6 +9089,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 420,
         "y": 1060,
         "wires": [
@@ -9350,6 +9365,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 420,
         "y": 880,
         "wires": [
@@ -9525,6 +9541,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "allowrate": false,
+        "outputs": 1,
         "x": 1560,
         "y": 860,
         "wires": [
@@ -10964,8 +10981,8 @@
         "z": "522d7990b953f0cf",
         "name": "",
         "links": [],
-        "x": 585,
-        "y": 260,
+        "x": 695,
+        "y": 180,
         "wires": []
     }
 ]
