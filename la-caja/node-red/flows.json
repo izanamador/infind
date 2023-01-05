@@ -28,6 +28,13 @@
         "info": ""
     },
     {
+        "id": "e3938355aa872766",
+        "type": "tab",
+        "label": "Descarga de datos",
+        "disabled": false,
+        "info": ""
+    },
+    {
         "id": "1736e63b25650818",
         "type": "subflow",
         "name": "Json-Parametros",
@@ -9689,6 +9696,491 @@
         "wires": [
             [
                 "13e5a65e6bd44eda"
+            ]
+        ]
+    },
+    {
+        "id": "cb9042472e32ae34",
+        "type": "debug",
+        "z": "e3938355aa872766",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 490,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "6ed942c7662119a2",
+        "type": "json",
+        "z": "e3938355aa872766",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 330,
+        "y": 120,
+        "wires": [
+            [
+                "cb9042472e32ae34",
+                "206ef6a88de18f8a"
+            ]
+        ]
+    },
+    {
+        "id": "206ef6a88de18f8a",
+        "type": "function",
+        "z": "e3938355aa872766",
+        "name": "añade fecha",
+        "func": "msg.payload.date=new Date();\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 120,
+        "wires": [
+            [
+                "08d3749158a9f5b8"
+            ]
+        ]
+    },
+    {
+        "id": "08d3749158a9f5b8",
+        "type": "mongodb out",
+        "z": "e3938355aa872766",
+        "mongodb": "3752afa1.deaf9",
+        "name": "",
+        "collection": "test_descarga",
+        "payonly": true,
+        "upsert": false,
+        "multi": false,
+        "operation": "store",
+        "x": 730,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "052b3978b3a37235",
+        "type": "inject",
+        "z": "e3938355aa872766",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 200,
+        "wires": [
+            [
+                "aaec29dac3f0e699"
+            ]
+        ]
+    },
+    {
+        "id": "aaec29dac3f0e699",
+        "type": "mongodb in",
+        "z": "e3938355aa872766",
+        "mongodb": "3752afa1.deaf9",
+        "name": "",
+        "collection": "test_descarga",
+        "operation": "find",
+        "x": 390,
+        "y": 200,
+        "wires": [
+            [
+                "842517d5b3d810c2"
+            ]
+        ]
+    },
+    {
+        "id": "842517d5b3d810c2",
+        "type": "debug",
+        "z": "e3938355aa872766",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 750,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "a4dcb9d0d9e66e69",
+        "type": "http response",
+        "z": "e3938355aa872766",
+        "name": "",
+        "statusCode": "",
+        "headers": {
+            "Content-Disposition": "attachment; filename=registros.csv"
+        },
+        "x": 1170,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "f8f3cf476857914e",
+        "type": "function",
+        "z": "e3938355aa872766",
+        "name": "Unicode y separador",
+        "func": "//add Unicode BOM character (byte order mark) to make EXCEL knows this is UTF-8\nif(global.get(\"separador_decimal\")==\"punto\")\n{\n    msg.payload='\\ufeff'+msg.payload;\n\n}\nelse\n{\n    msg.payload='\\ufeff'+(msg.payload).replace(/\\./g,\",\");\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 980.0001258850098,
+        "y": 439.9999294281006,
+        "wires": [
+            [
+                "a4dcb9d0d9e66e69"
+            ]
+        ]
+    },
+    {
+        "id": "5323e26ccb613d88",
+        "type": "function",
+        "z": "e3938355aa872766",
+        "name": "consulta",
+        "func": "// fecha por defecto es hoy\nvar ahora = new Date();\n// pillo los globales si los hay, si no la fecha de hoy\nvar desde = new Date(global.get(\"desde\") || ahora);\nvar hasta = new Date(global.get(\"hasta\") || ahora); \n// el día de inicio desde las cero horas\nvar inicio = new Date(desde.getFullYear(),desde.getMonth(),desde.getDate(),0,0,0,0);\n// el día final es hasta final del día\nvar final = new Date(hasta.getFullYear(),hasta.getMonth(),hasta.getDate(),23,59,59,999);\n\nmsg.payload=\n[\n//    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n//    { \"$project\": {\n//        \"_id\": 0,\n//        \"date\": 1,\n//        \"temperatura\": \"$BME280.Temperatura\",\n//        \"humedad\": \"$BME280.Humedad\",\n//        \"presion\": \"$BME280.Presion\"\n//        }\n//    },\n    { \"$sort\": {\"date\": 1} }\n];\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 280,
+        "y": 440,
+        "wires": [
+            [
+                "50fb96904ed630a1"
+            ]
+        ]
+    },
+    {
+        "id": "d839767de85a740f",
+        "type": "http in",
+        "z": "e3938355aa872766",
+        "name": "",
+        "url": "/registros",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 95.00026321411133,
+        "y": 439.9999294281006,
+        "wires": [
+            [
+                "5323e26ccb613d88"
+            ]
+        ]
+    },
+    {
+        "id": "6264c76fa1e75a2b",
+        "type": "ui_template",
+        "z": "e3938355aa872766",
+        "group": "a34ffe7a.04009",
+        "name": "test",
+        "order": 3,
+        "width": "0",
+        "height": "0",
+        "format": "<style>\n.button {\n    text-align: center;\n    font: bold 17px Arial;\n    text-decoration: none;\n    background-color: #339966;\n    color: white;\n    padding: 8px 10px;\n    border: 2px solid #CCCCCC;\n  }\n  \n  .button:hover\n  {\n   background-color: #26734d;\n  }\n\n</style>\n<a href=\"/registros\" class=\"button\">Descarga registros en CSV (EXCEL)</a>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 84.00028610229492,
+        "y": 351.9997625350952,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "50fb96904ed630a1",
+        "type": "mongodb in",
+        "z": "e3938355aa872766",
+        "mongodb": "96e271eba0b52a94",
+        "name": "",
+        "collection": "records_cara003",
+        "operation": "aggregate",
+        "x": 533.0144844055176,
+        "y": 440.00561141967773,
+        "wires": [
+            [
+                "d6090ff92aaaff8c"
+            ]
+        ]
+    },
+    {
+        "id": "d6090ff92aaaff8c",
+        "type": "csv",
+        "z": "e3938355aa872766",
+        "name": "",
+        "sep": ";",
+        "hdrin": "",
+        "hdrout": true,
+        "multi": "one",
+        "ret": "\\r\\n",
+        "temp": "date, temperatura, humedad, presion",
+        "skip": 0,
+        "x": 790,
+        "y": 440,
+        "wires": [
+            [
+                "f8f3cf476857914e"
+            ]
+        ]
+    },
+    {
+        "id": "9083382a96c4d66f",
+        "type": "ui_switch",
+        "z": "e3938355aa872766",
+        "name": "separdor decimal",
+        "label": "{{msg.topic}}",
+        "tooltip": "",
+        "group": "a34ffe7a.04009",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "decouple": "false",
+        "topic": "",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "x": 750,
+        "y": 640,
+        "wires": [
+            [
+                "1eee8306a2b40e35"
+            ]
+        ]
+    },
+    {
+        "id": "faf10ee686b2f8e7",
+        "type": "inject",
+        "z": "e3938355aa872766",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 730.9970664978027,
+        "y": 562.9118814468384,
+        "wires": [
+            [
+                "1eee8306a2b40e35"
+            ]
+        ]
+    },
+    {
+        "id": "1eee8306a2b40e35",
+        "type": "function",
+        "z": "e3938355aa872766",
+        "name": "set global separador_decimal",
+        "func": "if(msg.payload===true)\n{\n    global.set(\"separador_decimal\",\"coma\");\n    msg.topic=\"separador decimal = coma\";\n}\nelse\n{\n    global.set(\"separador_decimal\",\"punto\");\n    msg.topic=\"separador decimal = punto\";\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1059.0084533691406,
+        "y": 563.6192541122437,
+        "wires": [
+            [
+                "9083382a96c4d66f"
+            ]
+        ]
+    },
+    {
+        "id": "f36446197e426a26",
+        "type": "ui_date_picker",
+        "z": "e3938355aa872766",
+        "name": "",
+        "label": "Fecha inicio",
+        "group": "a34ffe7a.04009",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "topic": "",
+        "x": 310,
+        "y": 540,
+        "wires": [
+            [
+                "8f7065f298fe9449"
+            ]
+        ]
+    },
+    {
+        "id": "b2f672e4c50a940d",
+        "type": "ui_date_picker",
+        "z": "e3938355aa872766",
+        "name": "",
+        "label": "Fecha final",
+        "group": "a34ffe7a.04009",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "topic": "",
+        "x": 313.0113525390625,
+        "y": 588.9942374229431,
+        "wires": [
+            [
+                "0d72e49ae8009a57"
+            ]
+        ]
+    },
+    {
+        "id": "8f7065f298fe9449",
+        "type": "change",
+        "z": "e3938355aa872766",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "desde",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 506.00567626953125,
+        "y": 538.6618876457214,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "0d72e49ae8009a57",
+        "type": "change",
+        "z": "e3938355aa872766",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "hasta",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 509.2329559326172,
+        "y": 589.5454421043396,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1413ed146ad4dca9",
+        "type": "inject",
+        "z": "e3938355aa872766",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 112.00849914550781,
+        "y": 564.420440196991,
+        "wires": [
+            [
+                "f36446197e426a26",
+                "b2f672e4c50a940d"
+            ]
+        ]
+    },
+    {
+        "id": "5263d4deef20e59f",
+        "type": "comment",
+        "z": "e3938355aa872766",
+        "name": "Almacenamiento en base de datos",
+        "info": "",
+        "x": 165.7755355834961,
+        "y": 33.08239555358887,
+        "wires": []
+    },
+    {
+        "id": "29d1a6b74f2220b8",
+        "type": "comment",
+        "z": "e3938355aa872766",
+        "name": "Controles para seleccionar fechas",
+        "info": "",
+        "x": 169.00848770141602,
+        "y": 487.8977246284485,
+        "wires": []
+    },
+    {
+        "id": "049e7a16426fcdaa",
+        "type": "comment",
+        "z": "e3938355aa872766",
+        "name": "Botón en HTML para lanzar descarga de fichero",
+        "info": "",
+        "x": 203.79004287719727,
+        "y": 304.0822162628174,
+        "wires": []
+    },
+    {
+        "id": "271ccb2bed5955e7",
+        "type": "comment",
+        "z": "e3938355aa872766",
+        "name": "Flujo para descarga de fichero",
+        "info": "",
+        "x": 146.01446914672852,
+        "y": 402.00558280944824,
+        "wires": []
+    },
+    {
+        "id": "41e74d344845cd7c",
+        "type": "comment",
+        "z": "e3938355aa872766",
+        "name": "Selector de separador decimal",
+        "info": "",
+        "x": 743.01123046875,
+        "y": 502.57400608062744,
+        "wires": []
+    },
+    {
+        "id": "4f25b66cb94d386b",
+        "type": "mqtt in",
+        "z": "e3938355aa872766",
+        "name": "",
+        "topic": "iot/datos/json",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "2b251178.95ad2e",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 147.98578643798828,
+        "y": 119.99432945251465,
+        "wires": [
+            [
+                "6ed942c7662119a2"
             ]
         ]
     }
