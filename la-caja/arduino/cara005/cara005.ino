@@ -10,25 +10,23 @@ This version is only an example with the following problem:
 Secuence: 3 5 7 11 13 
 Correct number: 17
 ********************************************************/
-
-
+/* Librería general de la caja  */
+#include <infra.h>
+#include <ArduinoJson.h>
 
 // Include Libraries
-#include "Arduino.h"
+//#include "Arduino.h"
 #include <Button.h>
 Infra objInfra;
-char *strTopicPub = "II3/ESP002/pub/cara002"; // topic principal para publicar contenido y lastwill
-char *strTopicCfg = "II3/ESP002/cfg/cara002"; // topic para recibir parametros de configuracion
-char *strTopicCmd = "II3/ESP002/cmd/cara002"; // topic para recibir peticiones de comando
+char *strTopicPub = "II3/ESP002/pub/cara005"; // topic principal para publicar contenido y lastwill
+char *strTopicCfg = "II3/ESP002/cfg/cara005"; // topic para recibir parametros de configuracion
+char *strTopicCmd = "II3/ESP002/cmd/cara005"; // topic para recibir peticiones de comando
 // Variables para enviar y recibir datos por MQTT
 #define MESSAGE_SIZE_ 300
 static char message[MESSAGE_SIZE_];
 StaticJsonDocument<MESSAGE_SIZE_> json;
 
 
-/* Librería general de la caja  */
-#include <infra.h>
-#include <ArduinoJson.h>
 
 
 // Pin Definitions
@@ -85,7 +83,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length)
       GameAns = atoi(mensaje);
       objInfra.ReportStart(NULL);
     }
-  Serial.println(game_ans);
+  Serial.println(GameAns);
   free(mensaje);
 }
 
@@ -93,7 +91,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length)
 void loop() 
 {
   static char strSwitches[]="_____";
-  objInfra.Loop(strDigits);
+  objInfra.Loop(strSwitches);
   if (!objInfra.GameRunning())
     return;
 

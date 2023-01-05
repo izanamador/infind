@@ -6,10 +6,19 @@
 #define LDR_PIN A0 // Pin for the LDR sensor
 #define PUSHBUTTON_PIN_2  15
 
+unsigned long buttonPressTime = 0; // Store the time when the button was last pressed
+const long buttonClearTime = 5000; // Threshold time for clearing the message string, in milliseconds
+
+
 Button pushButton(PUSHBUTTON_PIN_2);
 
 String morseCode = ""; // String to store the Morse code message
 String message = ""; // String to store the translated message
+String GameAns = "SOS";
+
+unsigned long previousMillis = 0; // Store the previous time in milliseconds
+long interval = 1000; // Interval between readings in milliseconds
+
 
 void setup() {
   Serial.begin(9600); // Initialize serial communication
@@ -18,17 +27,40 @@ void setup() {
 }
 
 void loop() {
+  
+   // Read the button state
+   
+bool pushButtonVal = pushButton.read(); // Read the button value
+
+// Check if the button has been pressed for a certain amount of time
+if (pushButtonVal == LOW && millis() - buttonPressTime >= buttonClearTime) {
+  message = ""; // Clear the message string
+  buttonPressTime = millis(); // Update the button press time
+}
+
+// Update the button press time when the button is pressed
+if (pushButtonVal == LOW) {
+  buttonPressTime = millis();
+}
+
   int ldrValue = analogRead(LDR_PIN); // Read the value of the LDR sensor
-  bool pushButtonVal = pushButton.read();
+  
   
   Serial.println(ldrValue); // CALIBRATION
+
+   unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;
+    
+    int ldrValue = analogRead(LDR_PIN); // Read the value of the LDR sensor
   
-  if (ldrValue < 100) { // If the LDR value is above a certain threshold, it means the light is on
-    morseCode += "."; // Add a "dot" to the Morse code message
-    delay(1000); // Wait for 100 milliseconds
-  } else {
-    morseCode += "-"; // Add a "dash" to the Morse code message
-    delay(3000); // Wait for 300 milliseconds
+    if (ldrValue < 100) { // If the LDR value is above a certain threshold, it means the light is on
+      morseCode += "."; // Add a "dot" to the Morse code message
+      interval = 3000; // Set the interval to 1 second for the next reading
+    } else {
+      morseCode += "-"; // Add a "dash" to the Morse code message
+      interval = 6000; // Set the interval to 3 seconds for the next reading
+    }
   }
   
   Serial.println(morseCode); // CALIBRATION
@@ -38,12 +70,18 @@ void loop() {
     char c = decodeMorse(morseCode); // Decode the character
     if (c != '\0') { // If the character is valid, add it to the message
       message += c;
+      if (GameAns == message)
+      {
+        Serial.println("YOU WON");
+      }
     }
     morseCode = ""; // Clear the Morse code string for the next character
   }
 
   Serial.println(message); // Print the message to the serial monitor
 }
+
+
 
 
 // Function to decode a Morse code character
