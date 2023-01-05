@@ -15,7 +15,7 @@ Correct number: 17
 #include "Button.h"
 
 // Pin Definitions
-#define PUSHBUTTON_PIN_2  5
+#define PUSHBUTTON_PIN_2  15
 #define TOGGLESWITCH_1_PIN_2  4
 #define TOGGLESWITCH_2_PIN_2  10
 #define TOGGLESWITCH_3_PIN_2  2
@@ -57,17 +57,22 @@ void loop()
     ToggleSwitch_3.read(),
     ToggleSwitch_4.read(),
     ToggleSwitch_5.read()};
-    
+
+   bool pushButtonVal = pushButton.read();
+
   int COMBINACION_ACTUAL = 0;
   
   for (int i = 0; i < 5; i++) {
     COMBINACION_ACTUAL += COMBINACION_ACTUAL_ARRAY[i] << i;
   }
 
-  Serial.println(COMBINACION_ACTUAL);
-  
+
+  if(pushButtonVal == HIGH)
+  {
+      Serial.println(COMBINACION_ACTUAL);
  if(COMBINACION_ACTUAL == COMBINACION_CORRECTA_001)
       { 
       Serial.println(F("¡Ganaste! Felicidades Tienes 150 de IQ"));
       }
+  }
 }

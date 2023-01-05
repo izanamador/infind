@@ -1,4 +1,12 @@
+// Include Libraries
+#include "Arduino.h"
+#include "Button.h"
+
+// Pin Definitions
 #define LDR_PIN A0 // Pin for the LDR sensor
+#define PUSHBUTTON_PIN_2  15
+
+Button pushButton(PUSHBUTTON_PIN_2);
 
 String morseCode = ""; // String to store the Morse code message
 String message = ""; // String to store the translated message
@@ -6,10 +14,12 @@ String message = ""; // String to store the translated message
 void setup() {
   Serial.begin(9600); // Initialize serial communication
   pinMode(LDR_PIN, INPUT); // Set the LDR pin as an input
+  pushButton.init();
 }
 
 void loop() {
   int ldrValue = analogRead(LDR_PIN); // Read the value of the LDR sensor
+  bool pushButtonVal = pushButton.read();
   
   Serial.println(ldrValue); // CALIBRATION
   
@@ -24,7 +34,7 @@ void loop() {
   Serial.println(morseCode); // CALIBRATION
     
   // Check if a complete Morse code character has been received
-  if (morseCode.endsWith(" ")) { // A space indicates the end of a character
+  if (pushButtonVal == HIGH) { // A space indicates the end of a character
     char c = decodeMorse(morseCode); // Decode the character
     if (c != '\0') { // If the character is valid, add it to the message
       message += c;
@@ -34,6 +44,7 @@ void loop() {
 
   Serial.println(message); // Print the message to the serial monitor
 }
+
 
 // Function to decode a Morse code character
 char decodeMorse(String code) {
