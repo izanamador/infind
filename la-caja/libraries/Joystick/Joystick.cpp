@@ -1,136 +1,126 @@
 #include "Joystick.h"
 
-/* Libreria base para usar funciones de arduino */
-#include "Arduino.h"
-
-/* Libreria convertidor A/D ADS1015 */
-#include <Adafruit_ADS1X15.h>
-
-/* Libreria de uso general */
-#include <math.h>
-
-
 /* Constructor */
 Joystick::Joystick(char x_channel, char y_channel){
-  coordenadas.x.channel = x_channel;
-  coordenadas.y.channel = y_channel;
+  coordenada.x.channel = x_channel;
+  coordenada.y.channel = y_channel;
 }
 
 /* Destructor */
-Joystick::~Joystick()
-{
-  ;
+Joystick::~Joystick(){
+  
 }
 
-// String teststr = "rhyloo";
+void Joystick::Direction(){
+  
+  angle =  atan2(coordenada.y.joystickValueFixed,coordenada.x.joystickValueFixed);
+  
+  if(coordenada.x.joystickValueFixed == 0 && coordenada.y.joystickValueFixed == 0){
+    direction = 0;
+  }else if (angle >= 0 ){
+    if (angle <= DEGREES_45) {         
+      direction = DERECHA;
+    }else if (angle >= DEGREES_135){
+      direction = IZQUIERDA;
+    }else{
+      direction = ARRIBA;}
+  }else{
+    if (angle >= -DEGREES_45){
+      direction = DERECHA;
+    }else if (angle <= -DEGREES_135){
+      direction = IZQUIERDA;
+    }else{
+      direction = ABAJO;}
+  }
+}
 
-void Direction(int direction){
-  static int actual_direction = 0;
-  if(direction != actual_direction){
-    actual_direction = direction;
-    switch(direction) {
-    case 0:
-      // teststr = "Centro";
-      Serial.println("Centro");
-      break;
-    case 1:
-      // teststr = "Derecha";
-      Serial.println("Derecha");
-      break;
-    case 2:
-      // teststr = "Arriba";
-      Serial.println("Arriba");
-      break;
-    case 3:
-      // teststr = "Izquierda";
-      Serial.println("Izquierda");
-      break;
-    case 4:
-      // teststr = "Abajo";
-      Serial.println("Abajo");
-      break;
+void Joystick::Calibration(){
+  for (int i = 0; i <= CALIBRATION_VALUE; i++) {
+
+    if(coordenada.x.joystickValue-(coordenada.x.joystickValueOffset+i) == 0){
+      coordenada.x.joystickValueOffset = coordenada.x.joystickValueOffset + i;
+    }else if(coordenada.x.joystickValue-(coordenada.x.joystickValueOffset-i) == 0){
+      coordenada.x.joystickValueOffset = coordenada.x.joystickValueOffset - i;
+    }
+    
+    if(coordenada.y.joystickValue-(coordenada.y.joystickValueOffset+i) == 0){
+      coordenada.y.joystickValueOffset = coordenada.y.joystickValueOffset + i;
+    }else if(coordenada.x.joystickValue-(coordenada.y.joystickValueOffset-i) == 0){
+      coordenada.y.joystickValueOffset = coordenada.y.joystickValueOffset - i;
     }
   }
 }
 
 void Joystick::Setup(){
   begin();
-  coordenadas.x.value = readADC_SingleEnded(coordenadas.x.channel);
-  coordenadas.y.value = readADC_SingleEnded(coordenadas.y.channel);
+  coordenada.x.joystickValue = readADC_SingleEnded(coordenada.x.channel);
+  coordenada.y.joystickValue = readADC_SingleEnded(coordenada.y.channel);
+  startTime = 0;
   this->Calibration();
+  Serial.println("Calibración terminada!");
 }
+
+
+
+
 
 int Joystick::Loop(){
+  // unsigned long lastcalibration = 0;
+  // unsigned long now = millis();
 
-  const float DEG2RAD = PI / 180.0f;
-  const float RAD2DEG = 180.0f / PI;
+  // if (now - lastcalibration >= CALIBRATION_TIME) {
+  //   this->Calibration();
+  //   lastcalibration = now;
+  // }
+	if ( (millis()-startTime) > DEBOUNCE_TIME ) {
+    startTime = millis();
+    
+    // Leo por I2C la posición x e y del Joystick
+    coordenada.x.joystickValue = readADC_SingleEnded(coordenada.x.channel);
+    coordenada.y.joystickValue = readADC_SingleEnded(coordenada.y.channel);
 
-  coordenadas.x.value = readADC_SingleEnded(coordenadas.x.channel);
-  coordenadas.y.value = readADC_SingleEnded(coordenadas.y.channel);
-
-  coordenadas.x.value_fixed = coordenadas.x.value - coordenadas.x.offset;
-  coordenadas.y.value_fixed = coordenadas.y.value - coordenadas.y.offset;
-
-  if(abs(coordenadas.x.value_read-coordenadas.x.value_fixed) > 800){
-    coordenadas.x.value_read = coordenadas.x.value_fixed;
-  }
-
-  if(abs(coordenadas.y.value_read-coordenadas.y.value_fixed) > 800){
-    coordenadas.y.value_read = coordenadas.y.value_fixed;
-  }
-
-  if(abs(coordenadas.x.value_fixed) < DIFFERENCE_ERROR_VALUE){
-    coordenadas.x.value_fixed = 0;
-  }
-
-  if(abs(coordenadas.y.value_fixed) < DIFFERENCE_ERROR_VALUE){
-    coordenadas.y.value_fixed = 0;
-  }
-
-  angle =  atan2(coordenadas.y.value_read,coordenadas.x.value_read);
-
-  if(coordenadas.x.value_fixed == 0 && coordenadas.y.value_fixed == 0){
-    direction = 0;
-  }else if (angle >= 0 ){
-    if (angle <= 45*DEG2RAD) {
-      direction = 1; //derecha
-    } else if (angle >= (90+45)*DEG2RAD){
-      direction = 3; //izquierda
-    }else{
-      direction = 2;} //arriba
-  }else{
-    if (angle >= -45*DEG2RAD){
-      direction = 1; //derecha
-    }else if (angle <= (-90-45)*DEG2RAD){
-      direction = 3; //izquierda
-    }else{
-      direction = 4;} //abajo
-  }
-
-  Direction(direction);
-  return direction;
-}
-
-short Joystick::GetX(){
-  return coordenadas.x.value_read;
-};
-
-short Joystick::GetY(){
-  return coordenadas.y.value_read;
-};
+  
+    // Coloco en el origen el joystick
+    coordenada.x.joystickValueFixed = coordenada.x.joystickValue - coordenada.x.joystickValueOffset;
+    coordenada.y.joystickValueFixed = coordenada.y.joystickValue - coordenada.y.joystickValueOffset;
 
 
-void Joystick::Calibration(){
-  for (int i = 0; i <= CALIBRATION_VALUE; i++) {
-    if(coordenadas.x.value-(coordenadas.x.offset+i) == 0){
-      coordenadas.x.offset = coordenadas.x.offset + i;
-    }else if(coordenadas.x.value-(coordenadas.x.offset-i) == 0){
-      coordenadas.x.offset = coordenadas.x.offset - i;
+  
+    if(abs(coordenada.x.joystickValueFixed - coordenada.x.previousJoystickValue) > DIFFERENCE_ERROR_VALUE){
+      coordenada.x.previousJoystickValue = coordenada.x.joystickValueFixed;
     }
-    if(coordenadas.y.value-(coordenadas.y.offset+i) == 0){
-      coordenadas.y.offset = coordenadas.y.offset + i;
-    }else if(coordenadas.y.value-(coordenadas.y.offset-i) == 0){
-      coordenadas.y.offset = coordenadas.y.offset - i;
+
+    if(abs(coordenada.y.joystickValueFixed - coordenada.y.previousJoystickValue) > DIFFERENCE_ERROR_VALUE){
+      coordenada.y.previousJoystickValue = coordenada.y.joystickValueFixed;
+    }
+
+    if(abs(coordenada.x.joystickValueFixed) < DIFFERENCE_ERROR_VALUE){
+      coordenada.x.joystickValueFixed = 0;
+      coordenada.x.previousJoystickValue = coordenada.x.joystickValueFixed;
+      // Serial.println("x = 0");
+    }
+
+    if(abs(coordenada.y.joystickValueFixed) < DIFFERENCE_ERROR_VALUE){
+      coordenada.y.joystickValueFixed = 0;
+      coordenada.y.previousJoystickValue = 0;
+      coordenada.y.previousJoystickValue = coordenada.y.joystickValueFixed;
+      // Serial.println("y = 0");
+    }
+
+    // Serial.printf("joystick x value: %d \n", coordenada.x.joystickValueFixed);
+    // Serial.printf("joystick y value: %d \n", coordenada.y.joystickValueFixed);
+
+    this->Direction();
+  
+    if(lastdirection == direction){
+      return -1;    
+    }else{
+      lastdirection = direction;
+      return direction;
     }
   }
+
 }
+
+
+

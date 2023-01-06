@@ -14,42 +14,56 @@
 /*********************************************************************************************************/
 
 #include <Adafruit_ADS1X15.h>
+#include "Arduino.h"
+#include <math.h>
 
 #ifndef Joystick_
 #define Joystick_
+
 #define CALIBRATION_VALUE 1000
-#define DIFFERENCE_ERROR_VALUE 800
+#define DIFFERENCE_ERROR_VALUE 750
+#define DEBOUNCE_TIME 300
+
+#define DEGREES_45 0.785398
+#define DEGREES_135 2.35619
+// #define CALIBRATION_TIME 600000
+
+#define DERECHA 1
+#define ARRIBA 2
+#define IZQUIERDA 3
+#define ABAJO 4
 
 class Joystick: public Adafruit_ADS1015{
 private:
 
   struct datos{
     char channel = 0;
-    short value = 0;
-    int value_read = 0;
-    int value_fixed = 0;
-    int  offset = 0;
+
+    short joystickValue;
+    short previousJoystickValue = 0;
+    int joystickValueRead = 0;
+    int joystickValueFixed = 0;
+    int joystickValueOffset = 0;
   };
 
   struct coords{
     datos x;
     datos y;
-  } coordenadas;
+  } coordenada;
 
   float angle;
-  char direction = 0;
+  char direction;
+  char lastdirection;
+  unsigned long startTime;
+
 
 public:
   Joystick(char x_channel, char y_channel);
   void Setup();
   void Calibration();
+  void Direction();
   int Loop();
-  short GetX();
-  short GetY();
   ~Joystick();
-
-
-
 };
 
 #endif
