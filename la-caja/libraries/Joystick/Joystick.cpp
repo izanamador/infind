@@ -86,21 +86,21 @@ int Joystick::Loop(){
 
 
   
-    if(abs(coordenada.x.joystickValueFixed - coordenada.x.previousJoystickValue) > DIFFERENCE_ERROR_VALUE){
+    if(abs(coordenada.x.joystickValueFixed - coordenada.x.previousJoystickValue) > DIFFERENCE_ERROR_VALUE_MAX){
       coordenada.x.previousJoystickValue = coordenada.x.joystickValueFixed;
     }
 
-    if(abs(coordenada.y.joystickValueFixed - coordenada.y.previousJoystickValue) > DIFFERENCE_ERROR_VALUE){
+    if(abs(coordenada.y.joystickValueFixed - coordenada.y.previousJoystickValue) > DIFFERENCE_ERROR_VALUE_MAX){
       coordenada.y.previousJoystickValue = coordenada.y.joystickValueFixed;
     }
 
-    if(abs(coordenada.x.joystickValueFixed) < DIFFERENCE_ERROR_VALUE){
+    if(abs(coordenada.x.joystickValueFixed) < DIFFERENCE_ERROR_VALUE_MIN){
       coordenada.x.joystickValueFixed = 0;
       coordenada.x.previousJoystickValue = coordenada.x.joystickValueFixed;
       // Serial.println("x = 0");
     }
 
-    if(abs(coordenada.y.joystickValueFixed) < DIFFERENCE_ERROR_VALUE){
+    if(abs(coordenada.y.joystickValueFixed) < DIFFERENCE_ERROR_VALUE_MIN){
       coordenada.y.joystickValueFixed = 0;
       coordenada.y.previousJoystickValue = 0;
       coordenada.y.previousJoystickValue = coordenada.y.joystickValueFixed;
