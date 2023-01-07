@@ -35,7 +35,7 @@ https://github.com/users/izanamador/projects/1/views/1
   - la-caja/pruebas/izan
   - la caja/pruebas/ricardo
 - la-caja/arduino: fuentes de Arduino
-  - la-caja/arduino/libraries: librerías de Arduino (cara.h/cpp)
+  - la-caja/arduino/libraries: librerías de Arduino (infra.h/cpp) 
   - la-caja/arduino/cara001: fuentes de dispositivos comunes (altavoz)/crono (si se hace)
   - la-caja/arduino/cara002: fuentes de acertijo
   - la-caja/arduino/cara003: fuentes de simon
@@ -44,7 +44,9 @@ https://github.com/users/izanamador/projects/1/views/1
   - la-caja/arduino/cara006: fuentes del 
 - la-caja/base_de_datos: contiene toda la información que será rescatada o almacenada, cada carpeta es una colleción de la base de datos II3.
   - la-caja/base_de_datos/recursos_de_las_pruebas: Información necesaria para el funcionamiento de las pruebas
-- la-caja/nodered: exports de flujos 
+- la-caja/kicad: Esquemáticos del proyecto
+  - la-caja/kicad/librerías: Recursos necesarios para realizar los esquemáticos
+- la-caja/nodered: Flujo del proyecto
 - la-caja/doc: documentación en Markdown
   - la-caja/doc/hardware: esquemáticos, sensores, actuadores, BOM...
   - la-caja/doc/software: documentación técnica de desarrollo (hardware, base de datos, arquitectura, topics ...)
