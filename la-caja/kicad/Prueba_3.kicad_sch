@@ -524,7 +524,7 @@
   (symbol (lib_id "ESP8266:NodeMCU1.0(ESP-12E)") (at 81.28 137.16 0) (unit 1)
     (in_bom yes) (on_board yes)
     (uuid d3d5ac86-c364-42d3-b107-2f6fb5119784)
-    (property "Reference" "Cara003" (id 0) (at 81.28 109.22 0)
+    (property "Reference" "Cara3" (id 0) (at 81.28 109.22 0)
       (effects (font (size 1.524 1.524)))
     )
     (property "Value" "NodeMCU1.0(ESP-12E)" (id 1) (at 81.28 113.03 0)
