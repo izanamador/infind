@@ -11,11 +11,6 @@
 #include <cstring>
 
 
-/* Variables para enviar y recibir datos por MQTT */
-#define MESSAGE_SIZE_ 300
-static char message[MESSAGE_SIZE_];
-StaticJsonDocument<MESSAGE_SIZE_> json;
-
 /* TODO Estandarizar los nombres de topics en la infrasestructura */
 /* Ejemplo de topic que cumple: #define TOPIC_PUB_ "II3/ESP14440037/resultados_juego2" */
 Infra objInfra;
