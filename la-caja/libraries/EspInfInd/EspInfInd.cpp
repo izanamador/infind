@@ -1,3 +1,4 @@
+#include "Arduino.h"
 #include "EspInfInd.hpp"
 
 
@@ -50,15 +51,6 @@ EspInfInd::EspInfInd()
   
 }
 
-EspInfInd::~EspInfInd()
-{
-  ;
-}
-
-void MqttCallback(char* topic, byte* payload, unsigned int length)
-{
-
-}
 
 
 
@@ -80,6 +72,7 @@ int EspInfInd::Setup()
     Serial.printf("\nWiFi connected, IP address: %s\n", 
       objWifi.localIP().toString().c_str());
 
+delay(1000);
 /*
   //---------------------------------------------- OTA Setup
     Serial.println( "--------------------------");  
@@ -143,6 +136,20 @@ int EspInfInd::Setup()
   return 0;
 }
 
+int EspInfInd::Loop()
+{
+   ptrMqtt->loop(); // para que la librería recupere el control
+} 
+
+EspInfInd::~EspInfInd()
+{
+  ;
+}
+
+void MqttCallback(char* topic, byte* payload, unsigned int length)
+{
+
+}
 
 void EspInfInd::MqttConnect()
 {
@@ -179,10 +186,6 @@ void EspInfInd::MqttConnect()
 }
     
 
-int EspInfInd::Loop()
-{
-   ptrMqtt->loop();
-} 
 /*
 void Esp8266::MqttPublish(char* topic, char *message)
 {
