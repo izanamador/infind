@@ -25,7 +25,8 @@
 #define TOPIC_SUB_FOTA            "II3/%s/FOTA"
 
 //----- REQ.MQ28 entre II3 y ESP se crea un subcampo para comodines en NodeRED
-#define TOPIC_PUB_FMT_CONEXION    "II3/CON/%s/conexion"
+//#define TOPIC_PUB_FMT_CONEXION    "II3/CON/%s/conexion"
+#define TOPIC_PUB_FMT_CONEXION    "II3/%s/conexion"
 #define TOPIC_PUB_FMT_DATOS       "II3/DAT/%s/datos"
 #define TOPIC_PUB_LED_STATUS      "II3/LED/%s/led/status"
 #define TOPIC_PUB_SWITCH_STATUS   "II3/SWI/%s/switch/status"
@@ -180,7 +181,7 @@ void EspInfInd::MqttConnect()
 
 int EspInfInd::Loop()
 {
-
+   ptrMqtt->loop();
 } 
 /*
 void Esp8266::MqttPublish(char* topic, char *message)
