@@ -50,13 +50,14 @@ class EspInfInd
       WiFiClient    objWifi;
 
     // mqtt object
-      PubSubClient  *ptrMqtt;;
+      PubSubClient  *ptrMqtt;
       void          MqttSetup();
       void          MqttConnect();
       void          MqttPublish(char *message);
 
   private:
     char strTopicPubConex_[100];
+    char strTopicSubConf_ [100];
       
 };
 
