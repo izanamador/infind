@@ -45,12 +45,26 @@ EspInfInd::EspInfInd()
   // hardcodes relacionados con la placa
     sprintf(espId, "ESP_%d", ESP.getChipId());
     sprintf(strTopicPubConex_,TOPIC_PUB_FMT_CONEXION,espId);
+    sprintf(strTopicSubConf_ ,TOPIC_SUB_FMT_CONFIG, espId);
 
 
     ptrMqtt = new PubSubClient(objWifi);
   
 }
 
+
+
+void MqttCallback(char* topic, byte* payload, unsigned int length)
+{
+  /* Procesa los mensajes enviados por Node-red */
+  char *mensaje = (char *)malloc(length+1);
+  strncpy(mensaje, (char*)payload, length);
+  mensaje[length]='\0';
+  if (strcmp(topic, strTopicCmd)==0){
+    ans = atoi(mensaje);
+    objInfra.ReportStart(NULL);}
+  free(mensaje);
+}
 
 
 
@@ -106,8 +120,6 @@ delay(1000);
     ptrMqtt->setBufferSize(MQTT_BUFFER_SIZE); 
     ptrMqtt->setCallback(MqttCallback);
     MqttConnect();
-    Serial.printf("\nWiFi connected, IP address: %s\n", 
-      objWifi.localIP().toString().c_str());
 
     /*
   //---------------------------------------------- Setup summary
@@ -139,6 +151,7 @@ delay(1000);
 int EspInfInd::Loop()
 {
    ptrMqtt->loop(); // para que la librería recupere el control
+   return 0;
 } 
 
 EspInfInd::~EspInfInd()
@@ -146,10 +159,8 @@ EspInfInd::~EspInfInd()
   ;
 }
 
-void MqttCallback(char* topic, byte* payload, unsigned int length)
-{
 
-}
+
 
 void EspInfInd::MqttConnect()
 {
@@ -168,6 +179,7 @@ void EspInfInd::MqttConnect()
           strTopicPubConex_, 1, true, MQTT_LASTWILL)) 
       {
         Serial.printf(" conectado a broker: %s\n", MQTT_SERVER);
+        ptrMqtt->subscribe(strTopicSubConf_);
         //for (int i=0; i<TOPIC_NUM_MAX; i++) 
         //{
         //  if (mqttTopicsSub[i]!=NULL)
