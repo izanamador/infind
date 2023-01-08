@@ -1,0 +1,276 @@
+[
+    {
+        "id": "d5499d6e16ad24e9",
+        "type": "tab",
+        "label": "#23 Conexión",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "d2391dd645cccdd6",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "1d42a39e53b6600e",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "819581010d48bfd0",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "f605fa69.8f5008",
+        "type": "mongodb",
+        "hostname": "iot.ac.uma.es:27017",
+        "connectOptions": "",
+        "port": "27017",
+        "db": "ejemplo",
+        "name": ""
+    },
+    {
+        "id": "54b81aef6119075b",
+        "type": "mqtt in",
+        "z": "d5499d6e16ad24e9",
+        "name": "",
+        "topic": "II3/CON/#",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "1d42a39e53b6600e",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "x": 150,
+        "y": 80,
+        "wires": [
+            [
+                "105d6722833a56a1",
+                "5c195b15.881824"
+            ]
+        ]
+    },
+    {
+        "id": "105d6722833a56a1",
+        "type": "debug",
+        "z": "d5499d6e16ad24e9",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 870,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "5c195b15.881824",
+        "type": "json",
+        "z": "d5499d6e16ad24e9",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 330,
+        "y": 160,
+        "wires": [
+            [
+                "385048ee.10d878",
+                "bb03f139.45523"
+            ]
+        ]
+    },
+    {
+        "id": "385048ee.10d878",
+        "type": "debug",
+        "z": "d5499d6e16ad24e9",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 773.8333740234375,
+        "y": 206.99999046325684,
+        "wires": []
+    },
+    {
+        "id": "a73e9b37.4c68d8",
+        "type": "mongodb out",
+        "z": "d5499d6e16ad24e9",
+        "mongodb": "f605fa69.8f5008",
+        "name": "",
+        "collection": "II3_conexiones",
+        "payonly": true,
+        "upsert": false,
+        "multi": false,
+        "operation": "insert",
+        "x": 1200,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "bb03f139.45523",
+        "type": "function",
+        "z": "d5499d6e16ad24e9",
+        "name": "+ts",
+        "func": "msg.payload.timestamp = new Date();\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 550,
+        "y": 260,
+        "wires": [
+            [
+                "9629bce4d711867b"
+            ]
+        ]
+    },
+    {
+        "id": "9629bce4d711867b",
+        "type": "debug",
+        "z": "d5499d6e16ad24e9",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 730,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "ab2c893b8297e7c6",
+        "type": "mongodb in",
+        "z": "d5499d6e16ad24e9",
+        "mongodb": "f605fa69.8f5008",
+        "name": "",
+        "collection": "II3_conexiones",
+        "operation": "find",
+        "x": 630,
+        "y": 520,
+        "wires": [
+            [
+                "3d9393ae6d5cbb70"
+            ]
+        ]
+    },
+    {
+        "id": "721bd912190e4fd4",
+        "type": "inject",
+        "z": "d5499d6e16ad24e9",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 280,
+        "y": 520,
+        "wires": [
+            [
+                "ab2c893b8297e7c6"
+            ]
+        ]
+    },
+    {
+        "id": "3d9393ae6d5cbb70",
+        "type": "debug",
+        "z": "d5499d6e16ad24e9",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1060,
+        "y": 520,
+        "wires": []
+    }
+]
