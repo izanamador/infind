@@ -19,16 +19,16 @@
 #define MQTT_CONNECT_MSG      "{\"online\":true}"
 
 //----- REQ.MQ1 
-#define TOPIC_SUB_FMT_CONFIG      "II3/ESP%s/config"
-#define TOPIC_SUB_LED_CMD         "II3/ESP%s/led/cmd"
-#define TOPIC_SUB_SWITCH_CMD      "II3/ESP%s/switch/cmd"
-#define TOPIC_SUB_FOTA            "II3/ESP%s/FOTA"
+#define TOPIC_SUB_FMT_CONFIG      "II3/%s/config"
+#define TOPIC_SUB_LED_CMD         "II3/%s/led/cmd"
+#define TOPIC_SUB_SWITCH_CMD      "II3/%s/switch/cmd"
+#define TOPIC_SUB_FOTA            "II3/%s/FOTA"
 
 //----- REQ.MQ28 entre II3 y ESP se crea un subcampo para comodines en NodeRED
-#define TOPIC_PUB_FMT_CONEXION    "II3/CON/ESP%s/conexion"
-#define TOPIC_PUB_FMT_DATOS       "II3/DAT/ESP%s/datos"
-#define TOPIC_PUB_LED_STATUS      "II3/LED/ESP%s/led/status"
-#define TOPIC_PUB_SWITCH_STATUS   "II3/SWI/ESP%s/switch/status"
+#define TOPIC_PUB_FMT_CONEXION    "II3/CON/%s/conexion"
+#define TOPIC_PUB_FMT_DATOS       "II3/DAT/%s/datos"
+#define TOPIC_PUB_LED_STATUS      "II3/LED/%s/led/status"
+#define TOPIC_PUB_SWITCH_STATUS   "II3/SWI/%s/switch/status"
 
 //----- REQ.MQ29 orden grupal a todos los dispositivos
 #define TOPIC_SUB_ALL_FMT_CONFIG  "II3/all/config"
@@ -166,8 +166,8 @@ void EspInfInd::MqttConnect()
         //    ptrMqtt->subscribe(mqttTopicsSub[i]);
         //}
 
-		//---- REQ.BD4 conexión 
-			ptrMqtt->publish(strTopicPubConex_, MQTT_CONNECT_MSG, true);
+    		//---- REQ.BD4 conexión 
+    			ptrMqtt->publish(strTopicPubConex_, MQTT_CONNECT_MSG, true);
       } 
       else 
       {
@@ -177,7 +177,11 @@ void EspInfInd::MqttConnect()
     } // while
 }
     
- 
+
+int EspInfInd::Loop()
+{
+
+} 
 /*
 void Esp8266::MqttPublish(char* topic, char *message)
 {
