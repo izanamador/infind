@@ -40,7 +40,7 @@ class EspInfInd
   public:
     EspInfInd();
     int Setup();
-    int Loop();
+    void Loop();
     ~EspInfInd();
     
     // REQ.MQ1 

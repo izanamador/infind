@@ -1,5 +1,5 @@
 #include "Arduino.h"
-#include "EspInfInd.hpp"
+#include "EspInfInd.h"
 
 
 //--------------------------------------------- MQTT
@@ -52,6 +52,10 @@ EspInfInd::EspInfInd()
 }
 
 
+void MqttCallback(char* topic, byte* payload, unsigned int length)
+{
+
+}
 
 
 int EspInfInd::Setup() 
@@ -136,7 +140,7 @@ delay(1000);
   return 0;
 }
 
-int EspInfInd::Loop()
+void EspInfInd::Loop()
 {
    ptrMqtt->loop(); // para que la librería recupere el control
 } 
@@ -146,10 +150,6 @@ EspInfInd::~EspInfInd()
   ;
 }
 
-void MqttCallback(char* topic, byte* payload, unsigned int length)
-{
-
-}
 
 void EspInfInd::MqttConnect()
 {
