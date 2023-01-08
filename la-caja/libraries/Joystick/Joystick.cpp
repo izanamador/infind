@@ -65,7 +65,7 @@ void Joystick::Setup(){
 
 
 int Joystick::Loop(){
-  int value;
+  /* int value; */
   // unsigned long lastcalibration = 0;
   // unsigned long now = millis();
 
@@ -114,15 +114,15 @@ int Joystick::Loop(){
     this->Direction();
   
     if(lastdirection == direction){
-      value = -1;
-      // return -1;    
+      /* value = -1; */
+      return -1;    
     }else{
       lastdirection = direction;
-      // return direction;
-      value = direction;
+      return direction;
+      /* value = direction; */
     }
   }
-  return value;
+  /* return value; */
 }
 
 
