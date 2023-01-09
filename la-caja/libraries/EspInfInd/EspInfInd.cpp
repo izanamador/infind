@@ -42,62 +42,17 @@
 #define TOPIC_ALL_JUEGOS          "II3/ALL/juegos"
 
 
-//---- Topics de publicación
-static char strTopicPubConex_[100];
-static char strTopicPubDatos_[100];
-static char strTopicPubStLed_[100];
-static char strTopicPubStSwi_[100];
- //--- Topics de suscripción individual
-static char strTopicSubConfig_[100];
-static char strTopicSubCmdLed_[100];
-static char strTopicSubCmdSwi_[100];
-static char strTopicSubCmdOta_[100];
- //--- Topics de suscripción grupal
-static char strTopicAllConfig_[100];
-static char strTopicAllCmdLed_[100];
-static char strTopicAllCmdSwi_[100];
-static char strTopicAllCmdOta_[100];
- //--- Topics de suscripción grupal
-static char strTopicPubJuegos_[100];
-static char strTopicAllJuegos_[100];
-
-static long stSwitch=HIGH;
-//bool bEstandar_; // si la configuración de pines se ajusta a la especificación
 
 
 
-void MqttCallback(char* strTopicMsg, byte* payload, unsigned int length)
-{
-  //----- Prepara la memoria para copiar el mensaje
-    char *strMsg = (char *)malloc(length+1);
-    strncpy(strMsg, (char*)payload, length);
-    strMsg[length]='\0';
-
-  //----- Ver qué llegó
-    Serial.printf("Topic:%s, Mensaje=%s\n", strTopicMsg, strMsg);
-
-  //----- Procesamiento del mensaje en función del topic
-  if ((strcmp(strTopicMsg, strTopicSubCmdSwi_)==0 ||
-       strcmp(strTopicMsg, strTopicAllCmdSwi_)==0) 
-      && bEstandar_)
-  {
-    char strOut[100];
-    stSwitch = !stSwitch; // statSwi==LOW ? HIGH: LOW
-    digitalWrite(PIN_COMUN_SWITCH, stSwitch);  // write to led pin
-    sprintf(strOut,"{\"CHIPID\":\"%s\",\"SWITCH\":%d,\"origen\":\"mqtt\",\"id\":\"%s\"}","pte");
-    ptrMqtt->publish(strTopicPubStSwi_, strOut);
-  }
-
-  //----- Liberación de la memoria reservada
-  free(strMsg);
-}
 
 
-EspInfInd::EspInfInd()
-{
+EspInfInd::EspInfInd(bool bStandard) {
   // hardcodes relacionados con la placa
+    stSwitch_  = 0;
+    bStandard_ = bStandard;
     sprintf(espId, "ESP_%d", ESP.getChipId());
-//    bEstandar_ = bEstandar;
+
 
   //------ Creación de nombres de topics
     sprintf(strTopicSubConfig_, TOPIC_SUB_CONFIG,espId);
@@ -120,19 +75,18 @@ EspInfInd::EspInfInd()
 }
 
 
-
-void EspInfInd::setup() 
-{
+void EspInfInd::Setup(void (*MqttCallback)(char*, byte*, unsigned int)) {
+  
   //---------------------------------------------- ESP Setup
     Serial.begin(ESP_BAUD_RATE);
     Serial.println();
     Serial.printf("Empieza setup en %lu ms...", millis());
 
   //-------------------------------- Configurar los pines comunes
-    //if (bEstandar_) {
+    if (bStandard_) {
       pinMode(PIN_COMUN_LED,        OUTPUT);      
       pinMode(PIN_COMUN_SWITCH,     OUTPUT); 
-    //}
+    }
 
 
   //---------------------------------------------- WIFI Setup
@@ -156,16 +110,77 @@ void EspInfInd::setup()
     MqttConnect();
 }
 
-void EspInfInd::loop()
+void EspInfInd::Loop()
 {
    ptrMqtt->loop(); // para que la librería recupere el control
 
 } 
 
+
+//void EspInfInd::callback(char* topic, byte* payload, unsigned int length)
+//{
+//  /* Procesa los mensajes enviados por Node-red */
+//  char *mensaje = (char *)malloc(length+1);
+//  strncpy(mensaje, (char*)payload, length);
+//  mensaje[length]='\0';
+//  //if (strcmp(topic, strTopicCmd)==0){
+//  //  ans = atoi(mensaje);
+//  //  objInfra.ReportStart(NULL);}
+//  free(mensaje);  
+//}
+
+void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
+{
+
+  //----- Prepara la memoria para copiar el mensaje
+    char *strMsg = (char *)malloc(length+1);
+    strncpy(strMsg, (char*)payload, length);
+    strMsg[length]='\0';
+    deserializeJson(jsonSub,strMsg);
+    Serial.printf("Test1: %s", (const char *)jsonSub["Test1"]);
+    //Serial.print(jsonSub["Test1"].c_str());
+
+  //----- Ver qué llegó
+    Serial.printf("Topic:%s, Mensaje=%s\n", strTopic, strMsg);
+
+  //----- Procesamiento del mensaje en función del topic
+  if ((strcmp(strTopic, strTopicSubCmdSwi_)==0 ||
+       strcmp(strTopic, strTopicAllCmdSwi_)==0) 
+      && bStandard_)
+  {
+//    char strOut[100];
+    stSwitch_ =  stSwitch_==LOW ? HIGH: LOW;
+    digitalWrite(PIN_COMUN_SWITCH, stSwitch_);  // write to led pin
+//    sprintf(strOut,"{\"CHIPID\":\"%s\",\"SWITCH\":%d,\"origen\":\"mqtt\",\"id\":\"%s\"}",
+//      espId, stSwitch_, "pte");
+//    ptrMqtt->publish(strTopicPubStSwi_, strOut);
+    MqttSend(strTopicPubStSwi_, NULL);
+  }
+
+  //----- Liberación de la memoria reservada
+  free(strMsg);
+}
+
+void EspInfInd::MqttSend(char* strTopic, char* strGameStatus) {
+  static char strSerialized[JSON_MESSAGE_SIZE];
+
+  jsonPub["ChipId"] = espId;
+  jsonPub["Online"] = 1; // true;
+  jsonPub["Switch"] = stSwitch_;
+  jsonPub["Origin"] = "mqtt";
+  jsonPub["MqttId"] = "PTE";
+  jsonPub["UpTime"] = millis();
+
+  serializeJson(jsonPub,strSerialized);
+  ptrMqtt->publish(strTopic, strSerialized);
+}
+
+
 EspInfInd::~EspInfInd()
 {
   ; 
 }
+
 
 void EspInfInd::MqttConnect()
 {
