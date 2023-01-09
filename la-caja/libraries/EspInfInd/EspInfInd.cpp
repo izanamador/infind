@@ -11,159 +11,157 @@
 #define MQTT_PASSWORD         "qW30SImD"
 #define MQTT_RETRY_DELAY      5000
 
-//----- Topics específicos de juegos
-#define TOPIC_SUBGAME_CMD        "II3/CMD/%s/ESP%s"
-#define TOPIC_SUB_GAME_EST        "II3/EST/%s/ESP%s"
 
 //----- REQ.MQ3 LastWill
 #define MQTT_LASTWILL         "{\"online\":false}"
 #define MQTT_CONNECT_MSG      "{\"online\":true}"
 
+
+
+
 //----- REQ.MQ1 
-#define TOPIC_SUB_FMT_CONFIG      "II3/%s/config"
-#define TOPIC_SUB_LED_CMD         "II3/%s/led/cmd"
-#define TOPIC_SUB_SWITCH_CMD      "II3/%s/switch/cmd"
-#define TOPIC_SUB_FOTA            "II3/%s/FOTA"
+#define TOPIC_SUB_CONFIG          "II3/%s/config"
+#define TOPIC_SUB_CMDLED          "II3/%s/led/cmd"
+#define TOPIC_SUB_CMDSWI          "II3/%s/switch/cmd"
+#define TOPIC_SUB_CMDOTA          "II3/%s/FOTA"
 
 //----- REQ.MQ28 entre II3 y ESP se crea un subcampo para comodines en NodeRED
-//#define TOPIC_PUB_FMT_CONEXION    "II3/CON/%s/conexion"
-#define TOPIC_PUB_FMT_CONEXION    "II3/%s/conexion"
-#define TOPIC_PUB_FMT_DATOS       "II3/DAT/%s/datos"
-#define TOPIC_PUB_LED_STATUS      "II3/LED/%s/led/status"
-#define TOPIC_PUB_SWITCH_STATUS   "II3/SWI/%s/switch/status"
+#define TOPIC_PUB_CONEX           "II3/CONEX/%s/conexion"
+#define TOPIC_PUB_DATOS           "II3/DATOS/%s/datos"
+#define TOPIC_PUB_STLED           "II3/STLED/%s/led/status"
+#define TOPIC_PUB_STSWI           "II3/STSWI/%s/switch/status"
 
 //----- REQ.MQ29 orden grupal a todos los dispositivos
-#define TOPIC_SUB_ALL_FMT_CONFIG  "II3/all/config"
-#define TOPIC_SUB_ALL_LED_CMD     "II3/all/led/cmd"
-#define TOPIC_SUB_ALL_SWITCH_CMD  "II3/all/switch/cmd"
-#define TOPIC_SUB_ALL_FOTA        "II3/all/FOTA"
+#define TOPIC_ALL_CONFIG          "II3/ALL/config"
+#define TOPIC_ALL_CMDLED          "II3/ALL/led/cmd"
+#define TOPIC_ALL_CMDSWI          "II3/ALL/switch/cmd"
+#define TOPIC_ALL_CMDOTA          "II3/ALL/FOTA"
 
+//----- Topics genéricos para los juegos
+#define TOPIC_PUB_JUEGOS          "II3/JUEGO/%s/status"
+#define TOPIC_ALL_JUEGOS          "II3/ALL/juegos"
+
+
+//---- Topics de publicación
+static char strTopicPubConex_[100];
+static char strTopicPubDatos_[100];
+static char strTopicPubStLed_[100];
+static char strTopicPubStSwi_[100];
+ //--- Topics de suscripción individual
+static char strTopicSubConfig_[100];
+static char strTopicSubCmdLed_[100];
+static char strTopicSubCmdSwi_[100];
+static char strTopicSubCmdOta_[100];
+ //--- Topics de suscripción grupal
+static char strTopicAllConfig_[100];
+static char strTopicAllCmdLed_[100];
+static char strTopicAllCmdSwi_[100];
+static char strTopicAllCmdOta_[100];
+ //--- Topics de suscripción grupal
+static char strTopicPubJuegos_[100];
+static char strTopicAllJuegos_[100];
+
+static long stSwitch=HIGH;
+//bool bEstandar_; // si la configuración de pines se ajusta a la especificación
+
+
+
+void MqttCallback(char* strTopicMsg, byte* payload, unsigned int length)
+{
+  //----- Prepara la memoria para copiar el mensaje
+    char *strMsg = (char *)malloc(length+1);
+    strncpy(strMsg, (char*)payload, length);
+    strMsg[length]='\0';
+
+  //----- Ver qué llegó
+    Serial.printf("Topic:%s, Mensaje=%s\n", strTopicMsg, strMsg);
+
+  //----- Procesamiento del mensaje en función del topic
+  if ((strcmp(strTopicMsg, strTopicSubCmdSwi_)==0 ||
+       strcmp(strTopicMsg, strTopicAllCmdSwi_)==0) 
+     )// && bEstandar_)
+  {
+    stSwitch = !stSwitch; // statSwi==LOW ? HIGH: LOW
+    digitalWrite(PIN_COMUN_SWITCH, stSwitch);  // write to led pin
+  }
+
+  //----- Liberación de la memoria reservada
+  free(strMsg);
+}
 
 
 EspInfInd::EspInfInd()
 {
   // hardcodes relacionados con la placa
     sprintf(espId, "ESP_%d", ESP.getChipId());
-    sprintf(strTopicPubConex_,TOPIC_PUB_FMT_CONEXION,espId);
-    sprintf(strTopicSubConf_ ,TOPIC_SUB_FMT_CONFIG, espId);
+//    bEstandar_ = bEstandar;
 
+  //------ Creación de nombres de topics
+    sprintf(strTopicSubConfig_, TOPIC_SUB_CONFIG,espId);
+    sprintf(strTopicSubCmdLed_, TOPIC_SUB_CMDLED,espId);
+    sprintf(strTopicSubCmdSwi_, TOPIC_SUB_CMDSWI,espId);
+    sprintf(strTopicSubCmdOta_, TOPIC_SUB_CMDOTA,espId);
+    sprintf(strTopicPubConex_ , TOPIC_PUB_CONEX, espId);
+    sprintf(strTopicPubDatos_ , TOPIC_PUB_DATOS, espId);
+    sprintf(strTopicPubStLed_ , TOPIC_PUB_STLED, espId);
+    sprintf(strTopicPubStSwi_ , TOPIC_PUB_STSWI, espId);
+    sprintf(strTopicAllConfig_, TOPIC_ALL_CONFIG,espId);
+    sprintf(strTopicAllCmdLed_, TOPIC_ALL_CMDLED,espId);
+    sprintf(strTopicAllCmdSwi_, TOPIC_ALL_CMDSWI,espId);
+    sprintf(strTopicAllCmdOta_, TOPIC_ALL_CMDOTA,espId);
+    sprintf(strTopicPubJuegos_, TOPIC_PUB_JUEGOS,espId);
+    sprintf(strTopicAllJuegos_, TOPIC_ALL_JUEGOS,espId);
 
-    ptrMqtt = new PubSubClient(objWifi);
-  
-}
-
-
-void MqttCallback(char* topic, byte* payload, unsigned int length)
-{
-
-}
-
-void MqttCallback(char* topic, byte* payload, unsigned int length)
-{
-  /* Procesa los mensajes enviados por Node-red */
-  char *mensaje = (char *)malloc(length+1);
-  strncpy(mensaje, (char*)payload, length);
-  mensaje[length]='\0';
-  if (strcmp(topic, strTopicCmd)==0){
-    ans = atoi(mensaje);
-    objInfra.ReportStart(NULL);}
-  free(mensaje);
+  //------- Inicialización de objetos
+    ptrMqtt = new PubSubClient(objWifi); 
 }
 
 
 
-int EspInfInd::Setup() 
+void EspInfInd::setup() 
 {
   //---------------------------------------------- ESP Setup
     Serial.begin(ESP_BAUD_RATE);
     Serial.println();
     Serial.printf("Empieza setup en %lu ms...", millis());
 
+  //-------------------------------- Configurar los pines comunes
+    //if (bEstandar_) {
+      pinMode(PIN_COMUN_LED,        OUTPUT);      
+      pinMode(PIN_COMUN_SWITCH,     OUTPUT); 
+    //}
+
+
   //---------------------------------------------- WIFI Setup
     Serial.printf("\nConnecting to %s:\n", WIFI_SSID);
     WiFi.mode(WIFI_STA);
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-    while (WiFi.status() != WL_CONNECTED) {
+    while (WiFi.status() != WL_CONNECTED) 
+    {
       delay(WIFI_RETRY_DELAY);
       Serial.print(".");
     }
     Serial.printf("\nWiFi connected, IP address: %s\n", 
       objWifi.localIP().toString().c_str());
 
-delay(1000);
-/*
-  //---------------------------------------------- OTA Setup
-    Serial.println( "--------------------------");  
-    Serial.println( "Comprobando actualización:");
-    Serial.print(OTA_HTTP_ADDRESS);
-    Serial.print(":");
-    Serial.print(OTA_HTTP_PORT);
-    Serial.println(OTA_HTTP_PATH);
-    Serial.println("--------------------------");  
-    ESPhttpUpdate.setLedPin(ESP_LED_OTA, LOW);
-    ESPhttpUpdate.onStart(OTA_CB_Start);
-    ESPhttpUpdate.onError(OTA_CB_Error);
-    ESPhttpUpdate.onProgress(OTA_CB_Progress);
-    ESPhttpUpdate.onEnd(OTA_CB_End);
-    switch(ESPhttpUpdate.update(objWifi, OTA_HTTP_ADDRESS, OTA_HTTP_PORT, OTA_HTTP_PATH, OTA_HTTP_VERSION)) {
-    case HTTP_UPDATE_FAILED:
-      Serial.printf(" HTTP update failed: Error (%d): %s\n", 
-          ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
-      break;
-    case HTTP_UPDATE_NO_UPDATES:
-      Serial.println(F(" El dispositivo ya está actualizado"));
-      break;
-    case HTTP_UPDATE_OK:
-      Serial.println(F(" OK"));
-      break;
-    }
-*/
+  // delay(1000);
     
   //---------------------------------------------- MQTT Setup
     ptrMqtt->setServer(MQTT_SERVER, MQTT_PORT);
     ptrMqtt->setBufferSize(MQTT_BUFFER_SIZE); 
     ptrMqtt->setCallback(MqttCallback);
     MqttConnect();
-
-    /*
-  //---------------------------------------------- Setup summary
-    Serial.printf("Identificador placa: %s\n", espId);
-    for (int i=0; i<TOPIC_NUM_MAX; i++) 
-    {
-      if (mqttTopicsPub[i] != NULL)
-        Serial.printf("TopicPub[%d]: %s\n", i, mqttTopicsPub[i]);
-      if (mqttTopicsSub[i] != NULL)
-        Serial.printf("TopicSub[%d]: %s\n", i, mqttTopicsSub[i]);
-    }
-    Serial.printf("Termina setup en %lu ms\n\n",millis());
-    PrintConfig();
-*/
-
-  //---------------------------------------------- Status of the game
-    /*
-    numTries_ = 0;
-    milLsRep_ = 0;
-    milStart_ = 0;
-    milTries_ = 0;
-    currStat_ = STAT_SETUP;
-    ReportStatus(NULL);  
-    currStat_ = STAT_WAIT;
-*/
-  return 0;
 }
 
-void EspInfInd::Loop()
+void EspInfInd::loop()
 {
    ptrMqtt->loop(); // para que la librería recupere el control
-   return 0;
 } 
 
 EspInfInd::~EspInfInd()
 {
-  ;
+  ; 
 }
-
-/*
 
 void EspInfInd::MqttConnect()
 {
@@ -182,15 +180,12 @@ void EspInfInd::MqttConnect()
           strTopicPubConex_, 1, true, MQTT_LASTWILL)) 
       {
         Serial.printf(" conectado a broker: %s\n", MQTT_SERVER);
-        ptrMqtt->subscribe(strTopicSubConf_);
-        //for (int i=0; i<TOPIC_NUM_MAX; i++) 
-        //{
-        //  if (mqttTopicsSub[i]!=NULL)
-        //    ptrMqtt->subscribe(mqttTopicsSub[i]);
-        //}
-
-    		//---- REQ.BD4 conexión 
-    			ptrMqtt->publish(strTopicPubConex_, MQTT_CONNECT_MSG, true);
+        ptrMqtt->subscribe(strTopicSubCmdSwi_);
+        ptrMqtt->subscribe(strTopicAllCmdSwi_);
+        
+        
+        //---- REQ.BD4 conexión 
+          ptrMqtt->publish(strTopicPubConex_, MQTT_CONNECT_MSG, true);
       } 
       else 
       {
@@ -199,20 +194,3 @@ void EspInfInd::MqttConnect()
       }
     } // while
 }
-    */
-
-/*
-void Esp8266::MqttPublish(char* topic, char *message)
-{
-  if (!ptrMqtt->connected())
-    MqttConnect();
-
-  if (strlen(message) < MQTT_MAX_MESSAGE)
-  {
-	  Serial.print("MqttPublish: ");
-  	Serial.print(message);
-  	Serial.print("\n");    
-  	ptrMqtt->publish(strTopic, strMessage);
-  }
-}
-*/
