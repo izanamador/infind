@@ -79,10 +79,13 @@ void MqttCallback(char* strTopicMsg, byte* payload, unsigned int length)
   //----- Procesamiento del mensaje en función del topic
   if ((strcmp(strTopicMsg, strTopicSubCmdSwi_)==0 ||
        strcmp(strTopicMsg, strTopicAllCmdSwi_)==0) 
-     )// && bEstandar_)
+      && bEstandar_)
   {
+    char strOut[100];
     stSwitch = !stSwitch; // statSwi==LOW ? HIGH: LOW
     digitalWrite(PIN_COMUN_SWITCH, stSwitch);  // write to led pin
+    sprintf(strOut,"{\"CHIPID\":\"%s\",\"SWITCH\":%d,\"origen\":\"mqtt\",\"id\":\"%s\"}","pte");
+    ptrMqtt->publish(strTopicPubStSwi_, strOut);
   }
 
   //----- Liberación de la memoria reservada
@@ -156,6 +159,7 @@ void EspInfInd::setup()
 void EspInfInd::loop()
 {
    ptrMqtt->loop(); // para que la librería recupere el control
+
 } 
 
 EspInfInd::~EspInfInd()

@@ -15,7 +15,7 @@ void setup() {
 void loop() {
   static unsigned int msLast=0;
   objEsp.loop();
-  if (msLast+5000>millis()) {
+  if (msLast+60000<millis()) {
     Serial.printf("Sigo vivo");
     msLast=millis();
   }
