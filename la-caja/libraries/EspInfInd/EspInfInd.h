@@ -35,7 +35,7 @@ class EspInfInd
     void Loop();
     void MqttReceived(char* strTopic, byte* payload, unsigned int length);
     void MqttSend(char* strTopic, char* strGameStatus, const char *strSrc=STR_ORG_BOARD);
-    void UpdateSwitch(int iUpdateType, long newLevel, long newConfig);
+    void UpdateSwitch(int iUpdateType, int newLevel, int newConfig);
     ~EspInfInd();
     
     // REQ.MQ1 

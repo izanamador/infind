@@ -17,19 +17,19 @@
 
 //----- REQ.MQ1 
 #define TOPIC_SUB_CONFIG          "II3/%s/%s/config"
-#define TOPIC_SUB_CMDLED          "II3/%s/%s/led/cmd"
 #define TOPIC_SUB_CMDSWI          "II3/%s/SETSWITCH/%s/switch/cmd"
+#define TOPIC_SUB_CMDLED          "II3/%s/SETLED/%s/led/cmd"
 #define TOPIC_SUB_CMDOTA          "II3/%s/%s/FOTA"
 
 //----- REQ.MQ28 entre II3 y ESP se crea un subcampo para comodines en NodeRED
 #define TOPIC_PUB_CONEX           "II3/CONEXION/%s/%s/conexion"
 #define TOPIC_PUB_DATOS           "II3/DATOS/%s/%s/datos"
-#define TOPIC_PUB_STLED           "II3/STLED/%s/%s/led/status"
 #define TOPIC_PUB_STSWI           "II3/STASWITCH/%s/%s/switch/status"
+#define TOPIC_PUB_STLED           "II3/STALED/%s/%s/led/status"
 
 //----- REQ.MQ29 orden grupal a todos los dispositivos
 #define TOPIC_ALL_CONFIG          "II3/ALL/config"
-#define TOPIC_ALL_CMDLED          "II3/ALL/led/cmd"
+#define TOPIC_ALL_CMDLED          "II3/ALL/SETLED/sed/cmd"
 #define TOPIC_ALL_CMDSWI          "II3/ALL/SETSWITCH/switch/cmd"
 #define TOPIC_ALL_CMDOTA          "II3/ALL/FOTA"
 
@@ -51,17 +51,18 @@ EspInfInd::EspInfInd(const char *strBoardName, bool bStandard) {
 
 
   //------ Creación de nombres de topics
-    sprintf(strTopicSubCmdSwi_, TOPIC_SUB_CMDSWI,strBoardName, espId);
-    sprintf(strTopicPubStSwi_ , TOPIC_PUB_STSWI, strBoardName, espId);
-
     sprintf(strTopicSubConfig_, TOPIC_SUB_CONFIG,strBoardName, espId);
     sprintf(strTopicAllConfig_, TOPIC_ALL_CONFIG,strBoardName, espId);
 
+    sprintf(strTopicSubCmdSwi_, TOPIC_SUB_CMDSWI,strBoardName, espId);
+    sprintf(strTopicPubStSwi_ , TOPIC_PUB_STSWI, strBoardName, espId);
+
     sprintf(strTopicSubCmdLed_, TOPIC_SUB_CMDLED,strBoardName, espId);
+    sprintf(strTopicPubStLed_ , TOPIC_PUB_STLED, strBoardName, espId);
+
     sprintf(strTopicSubCmdOta_, TOPIC_SUB_CMDOTA,strBoardName, espId);
     sprintf(strTopicPubConex_ , TOPIC_PUB_CONEX, strBoardName, espId);
     sprintf(strTopicPubDatos_ , TOPIC_PUB_DATOS, strBoardName, espId);
-    sprintf(strTopicPubStLed_ , TOPIC_PUB_STLED, strBoardName, espId);
     sprintf(strTopicAllCmdLed_, TOPIC_ALL_CMDLED,strBoardName, espId);
     sprintf(strTopicAllCmdSwi_, TOPIC_ALL_CMDSWI,strBoardName, espId);
     sprintf(strTopicAllCmdOta_, TOPIC_ALL_CMDOTA,strBoardName, espId);
@@ -72,6 +73,57 @@ EspInfInd::EspInfInd(const char *strBoardName, bool bStandard) {
     ptrMqtt = new PubSubClient(objWifi); 
 }
 
+
+void EspInfInd::MqttConnect()
+{
+
+  const char* mqtt_user = "II3";
+  const char* mqtt_pass = "qW30SImD";
+
+  
+  // Loop until we're reconnected
+    while (!ptrMqtt->connected()) 
+    {
+      Serial.print("Attempting MQTT connection...");
+
+      //---- REQ.MQ3 LastWill
+      char strLastWill[100];
+      sprintf(strLastWill, "{\"ChipId\": \"%s\", \"BoardName\": \"%s\", \"Online\": 0, \"Source\": \"%s\"}", 
+          espId, strBoardName_, STR_ORG_BOARD);
+      Serial.printf("LastWill: %s", strLastWill);
+
+      if (ptrMqtt->connect(espId, MQTT_USER, MQTT_PASSWORD, 
+          strTopicPubConex_, 1, true, strLastWill)) 
+      {
+        Serial.printf(" conectado a broker: %s\n", MQTT_SERVER);
+
+        Serial.printf("Suscribiendo a %s\n", strTopicAllConfig_);
+        ptrMqtt->subscribe(strTopicAllConfig_);        
+        Serial.printf("Suscribiendo a %s\n", strTopicSubConfig_);
+        ptrMqtt->subscribe(strTopicSubConfig_);
+
+        Serial.printf("Suscribiendo a %s\n", strTopicAllCmdSwi_);
+        ptrMqtt->subscribe(strTopicAllCmdSwi_);
+        Serial.printf("Suscribiendo a %s\n", strTopicSubCmdSwi_);
+        ptrMqtt->subscribe(strTopicSubCmdSwi_);
+
+        Serial.printf("Suscribiendo a %s\n", strTopicAllCmdLed_);
+        ptrMqtt->subscribe(strTopicAllCmdLed_);
+        Serial.printf("Suscribiendo a %s\n", strTopicSubCmdLed_);
+        ptrMqtt->subscribe(strTopicSubCmdLed_);
+
+         
+        //---- REQ.BD4 conexión
+          delay(10000); // dar tiempo a que llegue el mensaje de last will
+          MqttSend(strTopicPubConex_, (char *)"Connected", STR_ORG_BOARD);
+      } 
+      else 
+      {
+        Serial.printf("failed, rc=%d  try again in 5s\n", ptrMqtt->state());
+        delay(MQTT_RETRY_DELAY); // Wait 5 seconds before retrying
+      }
+    } // while
+}
 
 void EspInfInd::Setup(void (*MqttCallback)(char*, byte*, unsigned int)) {
   
@@ -125,35 +177,17 @@ void EspInfInd::Loop()
 #define SWITCH_CMD_MSG 1
 #define SWITCH_CFG_MSG 2
 #define SWITCH_BOTON   3
-#define LED_CMD_MSG 1
-#define LED_CFG_MSG 2
+#define LED_CMD_MSG 4
+#define LED_CFG_MSG 5
 
 
-void EspInfInd::UpdateSwitch(int iUpdateType, long newLevel, long newConfig) {
+void EspInfInd::UpdateSwitch(int iUpdateType, int newLevel, int newConfig) {
   char strStatus[100];
   long highLow;
-
-
-  // Actualización de switch por comando MQTT
-    if (iUpdateType == SWITCH_CMD_MSG) { 
-      if (newLevel != 0 && newLevel != 1){
-        // TODO tratamiento errores
-        Serial.printf("Error 1 iUpdate=%d, newLevel=%d, newConfig=%d\n", iUpdateType, newLevel, newConfig);
-
-      } else if (newLevel == stSwLevel_) {
-        Serial.printf("Switch permanece en %d\n", stSwLevel_);
-
-      } else {
-        sprintf(strStatus, "Cambiando valor de switch de %d a %d\n", stSwLevel_, newLevel);
-        stSwLevel_ = newLevel;
-        highLow = (stSwLevel_==0 && cfSwLight_==0)||(stSwLevel_==1 && cfSwLight_==1)?LOW:HIGH;
-        digitalWrite(PIN_COMUN_SWITCH, highLow);  // write to led pin
-        MqttSend(strTopicPubStSwi_, strStatus, STR_ORG_MQTT);
-      }  // comando MQTT
-    }
+  long pct2val;
 
   // Actualización de configuración de switch
-    else if (iUpdateType == SWITCH_CFG_MSG) {
+    if (iUpdateType == SWITCH_CFG_MSG) {
       if (newConfig == 2) {
         Serial.printf("New switch config LIGHT=%d remains\n", cfSwLight_);
 
@@ -173,15 +207,14 @@ void EspInfInd::UpdateSwitch(int iUpdateType, long newLevel, long newConfig) {
     else if (iUpdateType == LED_CFG_MSG) {
       if (newConfig == 2) {
         Serial.printf("New led config LIGHT=%d remains\n", cfSwLight_);
-      }
+      } // no cambia
       
       else if (newConfig != 0 && newConfig != 1) {
         Serial.printf("Error 2 iUpdate=%d, newLevel=%d, newConfig=%d\n", iUpdateType, newLevel, newConfig);
         ; // TODO tratamiento errores
-      } 
+      } // error
 
       else {
-        long pct2val;
         sprintf(strStatus, "Config led updated to LIGHT=%d from LIGHT=%d\n", newConfig, cfLdLight_);
         cfLdLight_ = newConfig;
         highLow = (stLdLevel_==0 && cfLdLight_==0)||(stLdLevel_==1 && cfLdLight_==1)?LOW:HIGH;
@@ -191,14 +224,58 @@ void EspInfInd::UpdateSwitch(int iUpdateType, long newLevel, long newConfig) {
           pct2val = 255;
         analogWrite(PIN_COMUN_LED, pct2val);
         MqttSend(strTopicPubStLed_, strStatus, STR_ORG_MQTT);
-      }
+      } // cambia la configuración
     } // configuración MQTT
+  
+
+  // Actualización de switch por comando MQTT
+    else if (iUpdateType == SWITCH_CMD_MSG) { 
+      if (newLevel != 0 && newLevel != 1){
+        // TODO tratamiento errores
+        Serial.printf("Error 1 iUpdate=%d, newLevel=%d, newConfig=%d\n", iUpdateType, newLevel, newConfig);
+
+      } else if (newLevel == stSwLevel_) {
+        Serial.printf("Switch permanece en %d\n", stSwLevel_);
+
+      } else {
+        sprintf(strStatus, "Cambiando valor de switch de %d a %d\n", stSwLevel_, newLevel);
+        stSwLevel_ = newLevel;
+        highLow = (stSwLevel_==0 && cfSwLight_==0)||(stSwLevel_==1 && cfSwLight_==1)?LOW:HIGH;
+        digitalWrite(PIN_COMUN_SWITCH, highLow);  // write to led pin
+        MqttSend(strTopicPubStSwi_, strStatus, STR_ORG_MQTT);
+      }  // comando MQTT
+    }
+
+  // Actualización de led por comando MQTT
+    else if (iUpdateType == LED_CMD_MSG) { 
+      if (newLevel != 0 && newLevel != 1){
+        // TODO tratamiento errores
+        Serial.printf("Error 1 iUpdate=%d, newLevel=%d, newConfig=%d\n", iUpdateType, newLevel, newConfig);
+
+      } else if (newLevel == stLdLevel_) {
+        Serial.printf("Led permanece en %d\n", stSwLevel_);
+
+      } else {
+        sprintf(strStatus, "Cambiando valor de Led de %d a %d\n", stLdLevel_, newLevel);
+        stLdLevel_ = newLevel;
+        highLow = (stLdLevel_==0 && cfLdLight_==0)||(stLdLevel_==1 && cfLdLight_==1)?LOW:HIGH;
+        if (highLow==LOW) // encender led según brillo requerido
+          pct2val = 255-(int)(cfLedBrig_ * 255);
+        else
+          pct2val = 255;
+        analogWrite(PIN_COMUN_LED, pct2val);
+        MqttSend(strTopicPubStLed_, strStatus, STR_ORG_MQTT);
+      }  // comando MQTT
+    }
+  
+
 }
 
 
 
 void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
 {
+  char strStatus[100];
 
   //----- Mensaje recibido
     char *strMsg = (char *)malloc(length+1);
@@ -211,23 +288,16 @@ void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
     serializeJsonPretty(jsonSub, output);
     Serial.println(output);
 
-  //----- Procesamiento de mensajes hacia el Switch
-    char strStatus[100];
-
-    if ((strcmp(strTopic, strTopicSubCmdSwi_)==0 ||
-         strcmp(strTopic, strTopicAllCmdSwi_)==0) 
-        && bStandard_)
-    {
-      long lev =jsonSub["level"];
-      UpdateSwitch(SWITCH_CMD_MSG, lev, -1);
-    }
-
   //----- Procesamiento de mensajes de configuración
-    else if ((strcmp(strTopic, strTopicSubConfig_)==0 ||
+    if ((strcmp(strTopic, strTopicSubConfig_)==0 ||
               strcmp(strTopic, strTopicAllConfig_)==0)  )
     {
         Serial.printf("cfPerStat=%d -> ",cfPerStat_);
         cfPerStat_ = jsonSub["cfPerStat"].as<int>();
+        if (cfPerStat_ < 1000) {
+          Serial.printf("Error en configuración de periodo de status=%d\n", cfPerStat_);
+          cfPerStat_ = 1000;
+        }
 
         Serial.printf("cfPerStat=%d -----------------> %d",cfPerStat_);
         cfPerFota_ = jsonSub["cfPerFota"].as<int>();;
@@ -263,6 +333,27 @@ void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
       long cfLdLight_ =0;    // ídem pero para el led
       
     }
+
+  //----- Procesamiento de mensajes hacia el Switch
+
+    else if ((strcmp(strTopic, strTopicSubCmdSwi_)==0 ||
+         strcmp(strTopic, strTopicAllCmdSwi_)==0) 
+        && bStandard_)
+    {
+      int lev =jsonSub["stSwLevel"];
+      UpdateSwitch(SWITCH_CMD_MSG, lev, -1);
+    }
+
+  //----- Procesamiento de mensajes hacia el Led
+
+    else if ((strcmp(strTopic, strTopicSubCmdLed_)==0 ||
+         strcmp(strTopic, strTopicAllCmdLed_)==0) 
+        && bStandard_)
+    {
+      int lev =jsonSub["stLdLevel"];
+      UpdateSwitch(LED_CMD_MSG, lev, -1);
+    }
+
 
   //----- Mensaje no esperado
     else {
@@ -314,43 +405,3 @@ EspInfInd::~EspInfInd()
 
 
 
-void EspInfInd::MqttConnect()
-{
-
-  const char* mqtt_user = "II3";
-  const char* mqtt_pass = "qW30SImD";
-
-  
-  // Loop until we're reconnected
-    while (!ptrMqtt->connected()) 
-    {
-      Serial.print("Attempting MQTT connection...");
-
-      //---- REQ.MQ3 LastWill
-      char strLastWill[100];
-      sprintf(strLastWill, "{\"ChipId\": \"%s\", \"BoardName\": \"%s\", \"Online\": 0, \"Source\": \"%s\"}", 
-          espId, strBoardName_, STR_ORG_BOARD);
-      Serial.printf("LastWill: %s", strLastWill);
-
-      if (ptrMqtt->connect(espId, MQTT_USER, MQTT_PASSWORD, 
-          strTopicPubConex_, 1, true, strLastWill)) 
-      {
-        Serial.printf(" conectado a broker: %s\n", MQTT_SERVER);
-        ptrMqtt->subscribe(strTopicSubCmdSwi_);
-        ptrMqtt->subscribe(strTopicAllCmdSwi_);
-        ptrMqtt->subscribe(strTopicSubConfig_);
-        //Serial.printf("Suscribiendo a %s\n", strTopicAllConfig_);
-        ptrMqtt->subscribe(strTopicAllConfig_);
-        
-         
-        //---- REQ.BD4 conexión
-          delay(10000); // dar tiempo a que llegue el mensaje de last will
-          MqttSend(strTopicPubConex_, (char *)"Connected", STR_ORG_BOARD);
-      } 
-      else 
-      {
-        Serial.printf("failed, rc=%d  try again in 5s\n", ptrMqtt->state());
-        delay(MQTT_RETRY_DELAY); // Wait 5 seconds before retrying
-      }
-    } // while
-}
