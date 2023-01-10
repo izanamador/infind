@@ -18,7 +18,7 @@ void loop() {
   static unsigned int msLast=0;
   oEspInfInd.Loop();
   if (msLast+60000<millis()) {
-    Serial.printf("Sigo vivo");
+    Serial.printf("Sigo vivo\n");
     msLast=millis();
   }
 }

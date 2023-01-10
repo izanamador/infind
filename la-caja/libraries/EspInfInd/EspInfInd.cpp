@@ -18,19 +18,19 @@
 //----- REQ.MQ1 
 #define TOPIC_SUB_CONFIG          "II3/%s/%s/config"
 #define TOPIC_SUB_CMDLED          "II3/%s/%s/led/cmd"
-#define TOPIC_SUB_CMDSWI          "II3/%s/%s/switch/cmd"
+#define TOPIC_SUB_CMDSWI          "II3/%s/SETSWITCH/%s/switch/cmd"
 #define TOPIC_SUB_CMDOTA          "II3/%s/%s/FOTA"
 
 //----- REQ.MQ28 entre II3 y ESP se crea un subcampo para comodines en NodeRED
 #define TOPIC_PUB_CONEX           "II3/CONEXION/%s/%s/conexion"
 #define TOPIC_PUB_DATOS           "II3/DATOS/%s/%s/datos"
 #define TOPIC_PUB_STLED           "II3/STLED/%s/%s/led/status"
-#define TOPIC_PUB_STSWI           "II3/STSWI/%s/%s/switch/status"
+#define TOPIC_PUB_STSWI           "II3/STASWITCH/%s/%s/switch/status"
 
 //----- REQ.MQ29 orden grupal a todos los dispositivos
 #define TOPIC_ALL_CONFIG          "II3/ALL/config"
 #define TOPIC_ALL_CMDLED          "II3/ALL/led/cmd"
-#define TOPIC_ALL_CMDSWI          "II3/ALL/switch/cmd"
+#define TOPIC_ALL_CMDSWI          "II3/ALL/SETSWITCH/switch/cmd"
 #define TOPIC_ALL_CMDOTA          "II3/ALL/FOTA"
 
 //----- Topics genéricos para los juegos
@@ -45,22 +45,25 @@
 
 EspInfInd::EspInfInd(const char *strBoardName, bool bStandard) {
   // hardcodes relacionados con la placa
-    stSwitch_  = 0;
+    cfSwitchOn_  = 0;  // configuración por defecto del switch: 0=encendido
+    stSwitchLev_ = 0;  // valor inicial del switch (apagado)
     strcpy(strBoardName_, strBoardName);
     bStandard_ = bStandard;
     sprintf(espId, "ESP_%d", ESP.getChipId());
 
 
   //------ Creación de nombres de topics
-    sprintf(strTopicSubConfig_, TOPIC_SUB_CONFIG,strBoardName, espId);
-    sprintf(strTopicSubCmdLed_, TOPIC_SUB_CMDLED,strBoardName, espId);
     sprintf(strTopicSubCmdSwi_, TOPIC_SUB_CMDSWI,strBoardName, espId);
+    sprintf(strTopicPubStSwi_ , TOPIC_PUB_STSWI, strBoardName, espId);
+
+    sprintf(strTopicSubConfig_, TOPIC_SUB_CONFIG,strBoardName, espId);
+    sprintf(strTopicAllConfig_, TOPIC_ALL_CONFIG,strBoardName, espId);
+
+    sprintf(strTopicSubCmdLed_, TOPIC_SUB_CMDLED,strBoardName, espId);
     sprintf(strTopicSubCmdOta_, TOPIC_SUB_CMDOTA,strBoardName, espId);
     sprintf(strTopicPubConex_ , TOPIC_PUB_CONEX, strBoardName, espId);
     sprintf(strTopicPubDatos_ , TOPIC_PUB_DATOS, strBoardName, espId);
     sprintf(strTopicPubStLed_ , TOPIC_PUB_STLED, strBoardName, espId);
-    sprintf(strTopicPubStSwi_ , TOPIC_PUB_STSWI, strBoardName, espId);
-    sprintf(strTopicAllConfig_, TOPIC_ALL_CONFIG,strBoardName, espId);
     sprintf(strTopicAllCmdLed_, TOPIC_ALL_CMDLED,strBoardName, espId);
     sprintf(strTopicAllCmdSwi_, TOPIC_ALL_CMDSWI,strBoardName, espId);
     sprintf(strTopicAllCmdOta_, TOPIC_ALL_CMDOTA,strBoardName, espId);
@@ -113,37 +116,97 @@ void EspInfInd::Loop()
 
 } 
 
+#define SWITCH_CMD_MSG 1
+#define SWITCH_CFG_MSG 2
+#define SWITCH_BOTON   3
+
+void EspInfInd::UpdateSwitch(int iUpdateType, long newLevel, long newConfig) {
+  char strStatus[100];
+  long highLow;
+
+
+  // Actualización de switch por comando MQTT
+    if (iUpdateType == SWITCH_CMD_MSG) { 
+      if (newLevel != 0 && newLevel != 1){
+        // TODO tratamiento errores
+        Serial.printf("Error1 iUpdate=%d, newLevel=%d, newConfig=%d\n", iUpdateType, newLevel, newConfig);
+
+      } else if (newLevel == stSwitchLev_) {
+        Serial.printf("Switch permanece en %d\n", stSwitchLev_);
+
+      } else {
+        sprintf(strStatus, "Cambiando valor de switch de %d a %d\n", stSwitchLev_, newLevel);
+        stSwitchLev_ = newLevel;
+        highLow = (stSwitchLev_==0 && cfSwitchOn_==0)||(stSwitchLev_==1 && cfSwitchOn_==1)?LOW:HIGH;
+        digitalWrite(PIN_COMUN_SWITCH, highLow);  // write to led pin
+        MqttSend(strTopicPubStSwi_, strStatus, STR_ORG_MQTT);
+      }  // comando MQTT
+  }
+
+  // Actualización de configuración de switch
+    else if (iUpdateType == SWITCH_CFG_MSG) {
+      if (newConfig == cfSwitchOn_) {
+        Serial.printf("New switch config LIGHT=%d remains LIGHT=%d\n", newConfig, cfSwitchOn_);
+
+      } if (newConfig != 0 && newConfig != 1) {
+        Serial.printf("Error1 iUpdate=%d, newLevel=%d, newConfig=%d\n", iUpdateType, newLevel, newConfig);
+        ; // TODO tratamiento errores
+      } else {
+        sprintf(strStatus, "Config switch updated to LIGHT=%d from LIGHT=%d\n", newConfig, cfSwitchOn_);
+        cfSwitchOn_ = newConfig;
+        highLow = (stSwitchLev_==0 && cfSwitchOn_==0)||(stSwitchLev_==1 && cfSwitchOn_==1)?LOW:HIGH;
+        digitalWrite(PIN_COMUN_SWITCH, highLow);  // write to led pin
+        MqttSend(strTopicPubStSwi_, strStatus, STR_ORG_MQTT);
+      }
+  } // configuración MQTT
+
+}
+
 
 void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
 {
 
-  //----- Prepara la memoria para copiar el mensaje
+  //----- Mensaje recibido
     char *strMsg = (char *)malloc(length+1);
     strncpy(strMsg, (char*)payload, length);
     strMsg[length]='\0';
+    Serial.printf("\n\n\nRecibido por Topic:%s\n%s\n----------------\n", strTopic, strMsg);
     deserializeJson(jsonSub,strMsg);
-    Serial.printf("Test1: %s", (const char *)jsonSub["Test1"]);
-    //Serial.print(jsonSub["Test1"].c_str());
+    free(strMsg);
 
-  //----- Ver qué llegó
-    Serial.printf("Topic:%s, Mensaje=%s\n", strTopic, strMsg);
+  //----- Procesamiento de mensajes hacia el Switch
+    char strStatus[100];
 
-  //----- Procesamiento del mensaje en función del topic
-  if ((strcmp(strTopic, strTopicSubCmdSwi_)==0 ||
-       strcmp(strTopic, strTopicAllCmdSwi_)==0) 
-      && bStandard_)
-  {
-//    char strOut[100];
-    stSwitch_ =  stSwitch_==LOW ? HIGH: LOW;
-    digitalWrite(PIN_COMUN_SWITCH, stSwitch_);  // write to led pin
-//    sprintf(strOut,"{\"CHIPID\":\"%s\",\"SWITCH\":%d,\"origen\":\"mqtt\",\"id\":\"%s\"}",
-//      espId, stSwitch_, "pte");
-//    ptrMqtt->publish(strTopicPubStSwi_, strOut);
-    MqttSend(strTopicPubStSwi_, NULL);
-  }
+    if ((strcmp(strTopic, strTopicSubCmdSwi_)==0 ||
+         strcmp(strTopic, strTopicAllCmdSwi_)==0) 
+        && bStandard_)
+    {
+      long lev =jsonSub["level"];
+      UpdateSwitch(SWITCH_CMD_MSG, lev, -1);
+    }
 
-  //----- Liberación de la memoria reservada
-  free(strMsg);
+  //----- Procesamiento de mensajes de configuración
+    else if ((strcmp(strTopic, strTopicSubConfig_)==0 ||
+              strcmp(strTopic, strTopicAllConfig_)==0)  )
+    {
+      if (jsonSub["SWITCH"]=="ON=0") {
+        UpdateSwitch(SWITCH_CFG_MSG, -1, 0);
+      }
+      else if (jsonSub["SWITCH"]=="ON=1"){
+        UpdateSwitch(SWITCH_CFG_MSG, -1, 1);
+      }
+      else if (jsonSub["SWITCH"]!="null")
+        UpdateSwitch(SWITCH_CFG_MSG, -1, 2);
+      else {
+        Serial.printf("Configuration remains LIGHT=%d\n", cfSwitchOn_);
+      }
+    }
+
+  //----- Mensaje no esperado
+    else {
+      // TODO tratamiento de error
+      Serial.printf("Topic no reconocido\n");
+    }
 }
 
 void EspInfInd::MqttSend(char* strTopic, char* strGameStatus, const char *strSrc) {
@@ -152,7 +215,10 @@ void EspInfInd::MqttSend(char* strTopic, char* strGameStatus, const char *strSrc
   jsonPub["ChipId"] = espId;
   jsonPub["BoardName"] = strBoardName_;
   jsonPub["Online"] = 1; // true;
-  jsonPub["Switch"] = stSwitch_;
+  jsonPub["SwitchLevel"] = stSwitchLev_;
+  jsonPub["SwitchCfgOn"] = cfSwitchOn_;
+  jsonPub["SwitchLight"] = (stSwitchLev_== cfSwitchOn_)?1:0;
+
   jsonPub["Origin"] = strSrc;
   jsonPub["MqttId"] = "PTE";
   jsonPub["UpTime"] = millis();
@@ -173,6 +239,8 @@ EspInfInd::~EspInfInd()
 //----- REQ.MQ3 LastWill
 //#define MQTT_LASTWILL         "{\"online\":false}"
 //#define MQTT_LASTWILL         "{\"online\": 0}"
+
+
 
 void EspInfInd::MqttConnect()
 {
@@ -198,8 +266,11 @@ void EspInfInd::MqttConnect()
         Serial.printf(" conectado a broker: %s\n", MQTT_SERVER);
         ptrMqtt->subscribe(strTopicSubCmdSwi_);
         ptrMqtt->subscribe(strTopicAllCmdSwi_);
+        ptrMqtt->subscribe(strTopicSubConfig_);
+        //Serial.printf("Suscribiendo a %s\n", strTopicAllConfig_);
+        ptrMqtt->subscribe(strTopicAllConfig_);
         
-        
+         
         //---- REQ.BD4 conexión
           delay(10000); // dar tiempo a que llegue el mensaje de last will
           MqttSend(strTopicPubConex_, (char *)"Connected", STR_ORG_BOARD);
