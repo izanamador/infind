@@ -45,8 +45,6 @@
 
 EspInfInd::EspInfInd(const char *strBoardName, bool bStandard) {
   // hardcodes relacionados con la placa
-    cfSwitchOn_  = 0;  // configuración por defecto del switch: 0=encendido
-    stSwitchLev_ = 0;  // valor inicial del switch (apagado)
     strcpy(strBoardName_, strBoardName);
     bStandard_ = bStandard;
     sprintf(espId, "ESP_%d", ESP.getChipId());
@@ -112,13 +110,24 @@ void EspInfInd::Setup(void (*MqttCallback)(char*, byte*, unsigned int)) {
 
 void EspInfInd::Loop()
 {
+  char strStatus[100];
    ptrMqtt->loop(); // para que la librería recupere el control
 
+   // Reenvío periódico del estado
+     if (millis() > stPerStat_ + (cfPerStat_ * 1000)) {
+        sprintf(strStatus, "Periodic update every %d seconds\n", cfPerStat_);
+        //Serial.printf("Millis %d, stPer=%d, cfPer=%d\n", millis(),stPerStat_, cfPerStat_);
+        MqttSend(strTopicPubDatos_, strStatus, STR_ORG_BOARD);
+        //stPerStat_ =millis()+10000;
+     }
 } 
 
 #define SWITCH_CMD_MSG 1
 #define SWITCH_CFG_MSG 2
 #define SWITCH_BOTON   3
+#define LED_CMD_MSG 1
+#define LED_CFG_MSG 2
+
 
 void EspInfInd::UpdateSwitch(int iUpdateType, long newLevel, long newConfig) {
   char strStatus[100];
@@ -129,38 +138,63 @@ void EspInfInd::UpdateSwitch(int iUpdateType, long newLevel, long newConfig) {
     if (iUpdateType == SWITCH_CMD_MSG) { 
       if (newLevel != 0 && newLevel != 1){
         // TODO tratamiento errores
-        Serial.printf("Error1 iUpdate=%d, newLevel=%d, newConfig=%d\n", iUpdateType, newLevel, newConfig);
+        Serial.printf("Error 1 iUpdate=%d, newLevel=%d, newConfig=%d\n", iUpdateType, newLevel, newConfig);
 
-      } else if (newLevel == stSwitchLev_) {
-        Serial.printf("Switch permanece en %d\n", stSwitchLev_);
+      } else if (newLevel == stSwLevel_) {
+        Serial.printf("Switch permanece en %d\n", stSwLevel_);
 
       } else {
-        sprintf(strStatus, "Cambiando valor de switch de %d a %d\n", stSwitchLev_, newLevel);
-        stSwitchLev_ = newLevel;
-        highLow = (stSwitchLev_==0 && cfSwitchOn_==0)||(stSwitchLev_==1 && cfSwitchOn_==1)?LOW:HIGH;
+        sprintf(strStatus, "Cambiando valor de switch de %d a %d\n", stSwLevel_, newLevel);
+        stSwLevel_ = newLevel;
+        highLow = (stSwLevel_==0 && cfSwLight_==0)||(stSwLevel_==1 && cfSwLight_==1)?LOW:HIGH;
         digitalWrite(PIN_COMUN_SWITCH, highLow);  // write to led pin
         MqttSend(strTopicPubStSwi_, strStatus, STR_ORG_MQTT);
       }  // comando MQTT
-  }
+    }
 
   // Actualización de configuración de switch
     else if (iUpdateType == SWITCH_CFG_MSG) {
-      if (newConfig == cfSwitchOn_) {
-        Serial.printf("New switch config LIGHT=%d remains LIGHT=%d\n", newConfig, cfSwitchOn_);
+      if (newConfig == 2) {
+        Serial.printf("New switch config LIGHT=%d remains\n", cfSwLight_);
 
-      } if (newConfig != 0 && newConfig != 1) {
-        Serial.printf("Error1 iUpdate=%d, newLevel=%d, newConfig=%d\n", iUpdateType, newLevel, newConfig);
+      } else if (newConfig != 0 && newConfig != 1) {
+        Serial.printf("Error 2 iUpdate=%d, newLevel=%d, newConfig=%d\n", iUpdateType, newLevel, newConfig);
         ; // TODO tratamiento errores
       } else {
-        sprintf(strStatus, "Config switch updated to LIGHT=%d from LIGHT=%d\n", newConfig, cfSwitchOn_);
-        cfSwitchOn_ = newConfig;
-        highLow = (stSwitchLev_==0 && cfSwitchOn_==0)||(stSwitchLev_==1 && cfSwitchOn_==1)?LOW:HIGH;
+        sprintf(strStatus, "Config switch updated to LIGHT=%d from LIGHT=%d\n", newConfig, cfSwLight_);
+        cfSwLight_ = newConfig;
+        highLow = (stSwLevel_==0 && cfSwLight_==0)||(stSwLevel_==1 && cfSwLight_==1)?LOW:HIGH;
         digitalWrite(PIN_COMUN_SWITCH, highLow);  // write to led pin
         MqttSend(strTopicPubStSwi_, strStatus, STR_ORG_MQTT);
       }
-  } // configuración MQTT
+    } // configuración switch
 
+  // Actualización de configuración de led
+    else if (iUpdateType == LED_CFG_MSG) {
+      if (newConfig == 2) {
+        Serial.printf("New led config LIGHT=%d remains\n", cfSwLight_);
+      }
+      
+      else if (newConfig != 0 && newConfig != 1) {
+        Serial.printf("Error 2 iUpdate=%d, newLevel=%d, newConfig=%d\n", iUpdateType, newLevel, newConfig);
+        ; // TODO tratamiento errores
+      } 
+
+      else {
+        long pct2val;
+        sprintf(strStatus, "Config led updated to LIGHT=%d from LIGHT=%d\n", newConfig, cfLdLight_);
+        cfLdLight_ = newConfig;
+        highLow = (stLdLevel_==0 && cfLdLight_==0)||(stLdLevel_==1 && cfLdLight_==1)?LOW:HIGH;
+        if (highLow==LOW) // encender led según brillo requerido
+          pct2val = 255-(int)(cfLedBrig_ * 255);
+        else
+          pct2val = 255;
+        analogWrite(PIN_COMUN_LED, pct2val);
+        MqttSend(strTopicPubStLed_, strStatus, STR_ORG_MQTT);
+      }
+    } // configuración MQTT
 }
+
 
 
 void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
@@ -173,6 +207,9 @@ void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
     Serial.printf("\n\n\nRecibido por Topic:%s\n%s\n----------------\n", strTopic, strMsg);
     deserializeJson(jsonSub,strMsg);
     free(strMsg);
+    char output[1000];
+    serializeJsonPretty(jsonSub, output);
+    Serial.println(output);
 
   //----- Procesamiento de mensajes hacia el Switch
     char strStatus[100];
@@ -189,17 +226,42 @@ void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
     else if ((strcmp(strTopic, strTopicSubConfig_)==0 ||
               strcmp(strTopic, strTopicAllConfig_)==0)  )
     {
-      if (jsonSub["SWITCH"]=="ON=0") {
-        UpdateSwitch(SWITCH_CFG_MSG, -1, 0);
+        Serial.printf("cfPerStat=%d -> ",cfPerStat_);
+        cfPerStat_ = jsonSub["cfPerStat"].as<int>();
+
+        Serial.printf("cfPerStat=%d -----------------> %d",cfPerStat_);
+        cfPerFota_ = jsonSub["cfPerFota"].as<int>();;
+        cfLedBrig_ = jsonSub["cfLedBrig"].as<int>();;
+        cfLedVelo_ = jsonSub["cfLedVelo"].as<int>();;
+
+      //--------- Actualizar configuración del Switch
+        if (jsonSub["cfSwLight"]=="ON=0") {
+          UpdateSwitch(SWITCH_CFG_MSG, -1, 0);
+        }
+        else if (jsonSub["cfSwLight"]=="ON=1"){
+          UpdateSwitch(SWITCH_CFG_MSG, -1, 1);
+        }
+        else if (jsonSub["cfSwLight"]!="null")
+          UpdateSwitch(SWITCH_CFG_MSG, -1, 2);
+        else {
+        Serial.printf("Switch config remains LIGHT=%d\n", cfSwLight_);
       }
-      else if (jsonSub["SWITCH"]=="ON=1"){
-        UpdateSwitch(SWITCH_CFG_MSG, -1, 1);
+
+      //--------- Actualizar configuración del led
+        if (jsonSub["cfLdLight"]=="ON=0") {
+          UpdateSwitch(LED_CFG_MSG, -1, 0);
+        }
+        else if (jsonSub["cfLdLight"]=="ON=1"){
+          UpdateSwitch(LED_CFG_MSG, -1, 1);
+        }
+        else if (jsonSub["cfLdLight"]!="null")
+          UpdateSwitch(LED_CFG_MSG, -1, 2);
+        else {
+        Serial.printf("Led config remains LIGHT=%d\n", cfSwLight_);
       }
-      else if (jsonSub["SWITCH"]!="null")
-        UpdateSwitch(SWITCH_CFG_MSG, -1, 2);
-      else {
-        Serial.printf("Configuration remains LIGHT=%d\n", cfSwitchOn_);
-      }
+
+      long cfLdLight_ =0;    // ídem pero para el led
+      
     }
 
   //----- Mensaje no esperado
@@ -215,9 +277,18 @@ void EspInfInd::MqttSend(char* strTopic, char* strGameStatus, const char *strSrc
   jsonPub["ChipId"] = espId;
   jsonPub["BoardName"] = strBoardName_;
   jsonPub["Online"] = 1; // true;
-  jsonPub["SwitchLevel"] = stSwitchLev_;
-  jsonPub["SwitchCfgOn"] = cfSwitchOn_;
-  jsonPub["SwitchLight"] = (stSwitchLev_== cfSwitchOn_)?1:0;
+  jsonPub["cfPerStat"] = cfPerStat_;
+  jsonPub["cfPerFota"] = cfPerFota_;
+
+  jsonPub["cfSwLight"] = cfSwLight_;
+  jsonPub["stSwLevel"] = stSwLevel_;
+  jsonPub["uiSwLevel"] = (stSwLevel_== cfSwLight_) ? 1 : 0;
+  
+  jsonPub["cfLdLight"] = cfLdLight_;
+  jsonPub["stLdLevel"] = stLdLevel_;
+  jsonPub["uiLdLevel"] = (stLdLevel_== cfLdLight_) ? 1 : 0;
+  jsonPub["cfLedBrig"] = cfLedBrig_;
+  jsonPub["cfLedVelo"] = cfLedVelo_;
 
   jsonPub["Origin"] = strSrc;
   jsonPub["MqttId"] = "PTE";
@@ -228,6 +299,7 @@ void EspInfInd::MqttSend(char* strTopic, char* strGameStatus, const char *strSrc
   Serial.printf("Enviando: %s a %s\n---\n%s\n---\n", strGameStatus, strTopic, strSerialized);
 
   ptrMqtt->publish(strTopic, strSerialized);
+  stPerStat_ = millis(); // reset del tiempo desde último envío de configuración
 }
 
 

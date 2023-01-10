@@ -76,12 +76,25 @@ private:
       char strTopicPubJuegos_[100];
       char strTopicAllJuegos_[100];
 
-      long stSwitchLev_;
-      long cfSwitchOn_;
+      
       bool bStandard_; // si la configuración de pines se ajusta a la especificación
-
-
       char strBoardName_[20]; // nombre simbólico de la placa
+
+      //-- Estados del chip
+      long stSwLevel_ = 0;    // Nivel inicial del switch = 0 encendido
+      long stLdLevel_ = 0;    // Nivel inicial del led = 0 encendido
+      unsigned int stLedBrig_ = 0;    // milisegundos desde orden de encender led
+      unsigned int stPerStat_ = 0;    // milisegundos desde último estado = 0
+      unsigned int stPerFota_ = 0;    // milisegundos desde última actualización fota
+
+      //--------------------- configuración
+      int cfPerStat_ = 30;   // frecuencia de envío de mensajes de estado (segundos)
+      int cfPerFota_ = 0;    // periodo de actualizaciones FOTA (minutos)
+      int cfSwLight_ = 0;    // configuración de qué valor representa luz encendida 0 o 1
+      int cfLdLight_ = 0;    //  "  pero para el led
+      int cfLedBrig_ = 50;   // brillo hasta el que tiene que llegar cuando se enciende (50%)
+      int cfLedVelo_ = 1;    // velocidad de cambio del brillo (1% cada 10 ms)
+
 
 };
 
