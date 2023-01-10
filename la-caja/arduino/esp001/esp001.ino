@@ -1,7 +1,7 @@
 #include "EspInfInd.h"
 
 bool bStandard = true;
-EspInfInd oEspInfInd(bStandard);
+EspInfInd oEspInfInd("esp001", bStandard);
 
 void mqttCallback(char* topic, byte* payload, unsigned int length){
   oEspInfInd.MqttReceived(topic, payload, length);

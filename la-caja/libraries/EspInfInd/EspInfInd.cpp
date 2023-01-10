@@ -12,24 +12,20 @@
 #define MQTT_RETRY_DELAY      5000
 
 
-//----- REQ.MQ3 LastWill
-#define MQTT_LASTWILL         "{\"online\":false}"
-#define MQTT_CONNECT_MSG      "{\"online\":true}"
-
 
 
 
 //----- REQ.MQ1 
-#define TOPIC_SUB_CONFIG          "II3/%s/config"
-#define TOPIC_SUB_CMDLED          "II3/%s/led/cmd"
-#define TOPIC_SUB_CMDSWI          "II3/%s/switch/cmd"
-#define TOPIC_SUB_CMDOTA          "II3/%s/FOTA"
+#define TOPIC_SUB_CONFIG          "II3/%s/%s/config"
+#define TOPIC_SUB_CMDLED          "II3/%s/%s/led/cmd"
+#define TOPIC_SUB_CMDSWI          "II3/%s/%s/switch/cmd"
+#define TOPIC_SUB_CMDOTA          "II3/%s/%s/FOTA"
 
 //----- REQ.MQ28 entre II3 y ESP se crea un subcampo para comodines en NodeRED
-#define TOPIC_PUB_CONEX           "II3/CONEX/%s/conexion"
-#define TOPIC_PUB_DATOS           "II3/DATOS/%s/datos"
-#define TOPIC_PUB_STLED           "II3/STLED/%s/led/status"
-#define TOPIC_PUB_STSWI           "II3/STSWI/%s/switch/status"
+#define TOPIC_PUB_CONEX           "II3/CONEXION/%s/%s/conexion"
+#define TOPIC_PUB_DATOS           "II3/DATOS/%s/%s/datos"
+#define TOPIC_PUB_STLED           "II3/STLED/%s/%s/led/status"
+#define TOPIC_PUB_STSWI           "II3/STSWI/%s/%s/switch/status"
 
 //----- REQ.MQ29 orden grupal a todos los dispositivos
 #define TOPIC_ALL_CONFIG          "II3/ALL/config"
@@ -38,7 +34,7 @@
 #define TOPIC_ALL_CMDOTA          "II3/ALL/FOTA"
 
 //----- Topics genéricos para los juegos
-#define TOPIC_PUB_JUEGOS          "II3/JUEGO/%s/status"
+#define TOPIC_PUB_JUEGOS          "II3/JUEGO/%s/%s/status"
 #define TOPIC_ALL_JUEGOS          "II3/ALL/juegos"
 
 
@@ -47,28 +43,29 @@
 
 
 
-EspInfInd::EspInfInd(bool bStandard) {
+EspInfInd::EspInfInd(const char *strBoardName, bool bStandard) {
   // hardcodes relacionados con la placa
     stSwitch_  = 0;
+    strcpy(strBoardName_, strBoardName);
     bStandard_ = bStandard;
     sprintf(espId, "ESP_%d", ESP.getChipId());
 
 
   //------ Creación de nombres de topics
-    sprintf(strTopicSubConfig_, TOPIC_SUB_CONFIG,espId);
-    sprintf(strTopicSubCmdLed_, TOPIC_SUB_CMDLED,espId);
-    sprintf(strTopicSubCmdSwi_, TOPIC_SUB_CMDSWI,espId);
-    sprintf(strTopicSubCmdOta_, TOPIC_SUB_CMDOTA,espId);
-    sprintf(strTopicPubConex_ , TOPIC_PUB_CONEX, espId);
-    sprintf(strTopicPubDatos_ , TOPIC_PUB_DATOS, espId);
-    sprintf(strTopicPubStLed_ , TOPIC_PUB_STLED, espId);
-    sprintf(strTopicPubStSwi_ , TOPIC_PUB_STSWI, espId);
-    sprintf(strTopicAllConfig_, TOPIC_ALL_CONFIG,espId);
-    sprintf(strTopicAllCmdLed_, TOPIC_ALL_CMDLED,espId);
-    sprintf(strTopicAllCmdSwi_, TOPIC_ALL_CMDSWI,espId);
-    sprintf(strTopicAllCmdOta_, TOPIC_ALL_CMDOTA,espId);
-    sprintf(strTopicPubJuegos_, TOPIC_PUB_JUEGOS,espId);
-    sprintf(strTopicAllJuegos_, TOPIC_ALL_JUEGOS,espId);
+    sprintf(strTopicSubConfig_, TOPIC_SUB_CONFIG,strBoardName, espId);
+    sprintf(strTopicSubCmdLed_, TOPIC_SUB_CMDLED,strBoardName, espId);
+    sprintf(strTopicSubCmdSwi_, TOPIC_SUB_CMDSWI,strBoardName, espId);
+    sprintf(strTopicSubCmdOta_, TOPIC_SUB_CMDOTA,strBoardName, espId);
+    sprintf(strTopicPubConex_ , TOPIC_PUB_CONEX, strBoardName, espId);
+    sprintf(strTopicPubDatos_ , TOPIC_PUB_DATOS, strBoardName, espId);
+    sprintf(strTopicPubStLed_ , TOPIC_PUB_STLED, strBoardName, espId);
+    sprintf(strTopicPubStSwi_ , TOPIC_PUB_STSWI, strBoardName, espId);
+    sprintf(strTopicAllConfig_, TOPIC_ALL_CONFIG,strBoardName, espId);
+    sprintf(strTopicAllCmdLed_, TOPIC_ALL_CMDLED,strBoardName, espId);
+    sprintf(strTopicAllCmdSwi_, TOPIC_ALL_CMDSWI,strBoardName, espId);
+    sprintf(strTopicAllCmdOta_, TOPIC_ALL_CMDOTA,strBoardName, espId);
+    sprintf(strTopicPubJuegos_, TOPIC_PUB_JUEGOS,strBoardName, espId);
+    sprintf(strTopicAllJuegos_, TOPIC_ALL_JUEGOS,strBoardName, espId);
 
   //------- Inicialización de objetos
     ptrMqtt = new PubSubClient(objWifi); 
@@ -117,18 +114,6 @@ void EspInfInd::Loop()
 } 
 
 
-//void EspInfInd::callback(char* topic, byte* payload, unsigned int length)
-//{
-//  /* Procesa los mensajes enviados por Node-red */
-//  char *mensaje = (char *)malloc(length+1);
-//  strncpy(mensaje, (char*)payload, length);
-//  mensaje[length]='\0';
-//  //if (strcmp(topic, strTopicCmd)==0){
-//  //  ans = atoi(mensaje);
-//  //  objInfra.ReportStart(NULL);}
-//  free(mensaje);  
-//}
-
 void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
 {
 
@@ -161,17 +146,21 @@ void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
   free(strMsg);
 }
 
-void EspInfInd::MqttSend(char* strTopic, char* strGameStatus) {
+void EspInfInd::MqttSend(char* strTopic, char* strGameStatus, const char *strSrc) {
   static char strSerialized[JSON_MESSAGE_SIZE];
 
   jsonPub["ChipId"] = espId;
+  jsonPub["BoardName"] = strBoardName_;
   jsonPub["Online"] = 1; // true;
   jsonPub["Switch"] = stSwitch_;
-  jsonPub["Origin"] = "mqtt";
+  jsonPub["Origin"] = strSrc;
   jsonPub["MqttId"] = "PTE";
   jsonPub["UpTime"] = millis();
+  jsonPub["Info"] = strGameStatus;
 
   serializeJson(jsonPub,strSerialized);
+  Serial.printf("Enviando: %s a %s\n---\n%s\n---\n", strGameStatus, strTopic, strSerialized);
+
   ptrMqtt->publish(strTopic, strSerialized);
 }
 
@@ -181,6 +170,9 @@ EspInfInd::~EspInfInd()
   ; 
 }
 
+//----- REQ.MQ3 LastWill
+//#define MQTT_LASTWILL         "{\"online\":false}"
+//#define MQTT_LASTWILL         "{\"online\": 0}"
 
 void EspInfInd::MqttConnect()
 {
@@ -195,16 +187,22 @@ void EspInfInd::MqttConnect()
       Serial.print("Attempting MQTT connection...");
 
       //---- REQ.MQ3 LastWill
+      char strLastWill[100];
+      sprintf(strLastWill, "{\"ChipId\": \"%s\", \"BoardName\": \"%s\", \"Online\": 0, \"Source\": \"%s\"}", 
+          espId, strBoardName_, STR_ORG_BOARD);
+      Serial.printf("LastWill: %s", strLastWill);
+
       if (ptrMqtt->connect(espId, MQTT_USER, MQTT_PASSWORD, 
-          strTopicPubConex_, 1, true, MQTT_LASTWILL)) 
+          strTopicPubConex_, 1, true, strLastWill)) 
       {
         Serial.printf(" conectado a broker: %s\n", MQTT_SERVER);
         ptrMqtt->subscribe(strTopicSubCmdSwi_);
         ptrMqtt->subscribe(strTopicAllCmdSwi_);
         
         
-        //---- REQ.BD4 conexión 
-          ptrMqtt->publish(strTopicPubConex_, MQTT_CONNECT_MSG, true);
+        //---- REQ.BD4 conexión
+          delay(10000); // dar tiempo a que llegue el mensaje de last will
+          MqttSend(strTopicPubConex_, (char *)"Connected", STR_ORG_BOARD);
       } 
       else 
       {

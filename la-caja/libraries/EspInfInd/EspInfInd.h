@@ -23,15 +23,18 @@
 #define PIN_COMUN_LED      2    // REQ.IT3
 #define PIN_COMUN_SWITCH   16   // REQ.IT4
 
+//------ Orígenes de mensajes desde ESP a NodeRED
+#define STR_ORG_BOARD  "board"
+#define STR_ORG_MQTT   "mqtt"
 
 class EspInfInd
 { 
   public:
-    EspInfInd(bool bStandard);    
+    EspInfInd(const char *strBoardName, bool bStandard);
     void Setup(void (*mqttCallback)(char*, byte*, unsigned int));
     void Loop();
     void MqttReceived(char* strTopic, byte* payload, unsigned int length);
-    void MqttSend(char* strTopic, char* strGameStatus);
+    void MqttSend(char* strTopic, char* strGameStatus, const char *strSrc=STR_ORG_BOARD);
     ~EspInfInd();
     
     // REQ.MQ1 
@@ -74,6 +77,8 @@ private:
 
       long stSwitch_;
       bool bStandard_; // si la configuración de pines se ajusta a la especificación
+
+      char strBoardName_[20]; // nombre simbólico de la placa
 
 };
 
