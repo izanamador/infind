@@ -24,6 +24,7 @@ JuegoInfInd oPrueba("Prueba", 7, &oEspInfInd);
 #define NUMPAD_NUM_ROWS 4  /* Tamaño del numpad (4 x 4)    */
 #define NUMPAD_NUM_COLS 4
 
+char strAux[300];
 
 //------------------------------------------ Funciones del juego Numpad
 void fNumpad() {
@@ -41,7 +42,6 @@ void fNumpad() {
   // string con el número que se está componiendo hasta pulsar send
   static char strDigits[NUMPAD_MAX_DIGITS];
   static int  iDigit = 0;
-
   //objInfra.Loop(strDigits);
   char key = myKeypad.getKey(); // TODO CONFIRMAR SI ES BLOQUEANTE
   
@@ -49,15 +49,20 @@ void fNumpad() {
     strDigits[iDigit] = '\0'; // nulo al final del string
     if (iDigit > 0 && (strcmp(strDigits,oNumpad.GameParm)==0))
     {
-      // won ha acertado
+      sprintf(strAux, "Numero %s correcto", strDigits);
+      oNumpad.ReportSuccess(strAux);
+
     } else {
+      sprintf(strAux, "Numero %s erroneo", strDigits);
+      oNumpad.ReportFail(strAux);
       iDigit = 0;
-      // fail número erróneo
     }
   }
 
   else if (iDigit == NUMPAD_MAX_DIGITS) {
-    // fail demasiado largo el número
+      sprintf(strAux, "Numero demasiado largo %s", strDigits);
+    
+      oNumpad.ReportFail(strAux);
     iDigit = 0;
 
   }
