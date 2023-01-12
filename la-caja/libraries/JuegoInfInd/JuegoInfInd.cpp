@@ -159,7 +159,7 @@ bool JuegoInfInd::GameRunning() {
 			    GameStat = STAT_LOST;
 				ReportStatus((char *)"Timeout, has perdido");
 			} else { // TODO INDICAR EL TIEMPO QUE QUEDA
-				ReportStatus((char *)"Queda un segundo menos");
+				//ReportStatus((char *)"Queda un segundo menos");
 			}
 		}
 	}

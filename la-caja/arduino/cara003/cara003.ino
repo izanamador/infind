@@ -135,7 +135,7 @@ void loop()
 
 
   // Invocación a la infraestructura y salida si el juego no está activo
-    objInfra.Loop();
+    objInfra.Loop("");
     if (!objInfra.GameRunning())
       return;
       if (estado != STAT_ESPERA)

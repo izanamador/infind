@@ -29,6 +29,20 @@ void mqttCallback(char* topic, byte* payload, unsigned int length){
 #define PIN_BOTON_AMARILLO 10      // SSD3-GPIO10
 #define PIN_BOTON_VERDE    0       // D3-GPIO0   // ojo, SSD2-9 no lee bien
 
+#define STAT_INICIAL    0 // estado inicial
+#define STAT_SECUENCIA  1 // alargar y reproducir la secuencia
+#define STAT_ESPERA     2 // esperar que el usuario pulse un botón
+#define STAT_BOTON      3 // el usuario ha pulsado un botón
+#define STAT_BOTON_OK   4 // el usuario pulsó el botón correcto
+#define STAT_BOTON_KO   5 // el usuario pulsó el botón erróneo
+#define STAT_COMPLETA   6 // el usuario completó la secuencia con éxito
+#define MILIS_BOTON_KO  500 // TODO CONFIRMAR QUE EL TIEMPO ES ADECUADO
+#define MAX_LUM_PWM     0  // TODO, LA LUMINOSIDAD ESTÁ AL REVES, AL SUBIR EL NÚMERO BAJA LA LUZ
+#define MIN_LUM_PWM     200 // TODO, CONFIRMAR QUE CON ESTE VALOR EL LED SE PUEDE VER
+
+int estado = STAT_INICIAL;
+//int estado = STAT_SECUENCIA;
+
 void setup() {
     delay(1000);
     pinMode(LED_BUILTIN, OUTPUT);
@@ -45,6 +59,9 @@ void setup() {
       pinMode(PIN_BOTON_AZUL,     INPUT);
       pinMode(PIN_BOTON_AMARILLO, INPUT);
       pinMode(PIN_BOTON_VERDE,    INPUT);
+
+    // 
+    //estado = STAT_SECUENCIA;
     delay(2000);
 }
 
@@ -107,22 +124,12 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length)
 */
 
 
-#define STAT_INICIAL    0 // estado inicial
-#define STAT_SECUENCIA  1 // alargar y reproducir la secuencia
-#define STAT_ESPERA     2 // esperar que el usuario pulse un botón
-#define STAT_BOTON      3 // el usuario ha pulsado un botón
-#define STAT_BOTON_OK   4 // el usuario pulsó el botón correcto
-#define STAT_BOTON_KO   5 // el usuario pulsó el botón erróneo
-#define STAT_COMPLETA   6 // el usuario completó la secuencia con éxito
-#define MILIS_BOTON_KO  500 // TODO CONFIRMAR QUE EL TIEMPO ES ADECUADO
-#define MAX_LUM_PWM     0  // TODO, LA LUMINOSIDAD ESTÁ AL REVES, AL SUBIR EL NÚMERO BAJA LA LUZ
-#define MIN_LUM_PWM     200 // TODO, CONFIRMAR QUE CON ESTE VALOR EL LED SE PUEDE VER
 void fSimon()
 {
   // Declaración de variables
     char GameInfo[200]; // TODO REPORTAR EL NUMERO DE AYUDAS Y LONGITUD DE SECUENCIA
 
-    static int estado = STAT_INICIAL;
+    
     static int boton_pulsado;
     static int iBoton;
     static int longParcial;
@@ -173,6 +180,8 @@ void fSimon()
       iBoton = 0;
       for (int i = 0; i < longParcial; i++)   
         mostrar_color(SecuenciaCorrecta[i], duracion_sonido, luminosidad);
+     Serial.println("de secuencia a espera");
+
       estado = STAT_ESPERA;
     }
 
@@ -223,6 +232,9 @@ void fSimon()
       }
       else
         estado = STAT_BOTON_OK;
+
+      Serial.printf("de boton a %d\n", estado);
+
     }
 
   // STAT_BOTON_KO: el usuario se equivoca de botón, volver a empezar
@@ -238,7 +250,7 @@ void fSimon()
       mostrar_color(SecuenciaCorrecta[iBoton], duracion_sonido, MAX_LUM_PWM);
       
       delay(1000);
-      oSimon.ReportFailure(GameInfo);
+      oSimon.ReportFail(GameInfo);
       estado = STAT_INICIAL;
     }
 
@@ -252,6 +264,8 @@ void fSimon()
       // a medida que se acierta la secuencia se acorta la duración de los sonidos
       duracion_sonido -= 15;       
       estado = STAT_ESPERA;
+      Serial.println("de boton ok a espera");
+
       iBoton++;
     }
 
