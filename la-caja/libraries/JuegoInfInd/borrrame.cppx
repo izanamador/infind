@@ -1,0 +1,37 @@
+
+void setup() {
+  const int buttonPin = 0;    // the number of the pushbutton pin
+  const int ledPin = 2;       // the number of the LED pin
+
+  pinMode(buttonPin, INPUT);
+  pinMode(ledPin, OUTPUT);
+}
+
+void loop() {
+  static int numPresses;
+
+  static int statButton = LOW; 
+  static int statLed = HIGH;        // the current state of the output pin
+  const  unsigned long msShortPress = 50; 
+  const  unsigned long msLongPress = 500; 
+  static unsigned long lastChange = 0;
+  static unsigned long msPressTime = 0;
+
+
+  int reading = digitalRead(buttonPin);
+  if (reading != statButton) {
+    lastChange = millis();
+    msPressTime = (reading == HIGH) ? lastChange : 0;
+  }  
+  statButton = reading;
+
+  if ((millis() - lastChange) > msShortPress)
+    if ((reading != buttonState) && (buttonState == HIGH) {
+        statLed = !statLed;
+    }
+    buttonState = reading;
+  }
+
+  // set the LED:
+  digitalWrite(ledPin, statLed);
+}

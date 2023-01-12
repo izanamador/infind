@@ -34,11 +34,8 @@
 #define TOPIC_ALL_CMDOTA          "II3/ALL/FOTA"
 
 //----- Topics genéricos para los juegos
-#define TOPIC_PUB_JUEGOS          "II3/JUEGO/%s/%s/status"
-#define TOPIC_ALL_JUEGOS          "II3/ALL/juegos"
-
-
-
+#define TOPIC_GAME_COMMAND_ALL    "II3/GAME/COMMAND/ALL"
+#define TOPIC_GAME_STATUS         "II3/GAME/STATUS/%s/%s"
 
 
 
@@ -66,16 +63,16 @@ EspInfInd::EspInfInd(const char *strBoardName, bool bStandard) {
     sprintf(strTopicAllCmdLed_, TOPIC_ALL_CMDLED,strBoardName, espId);
     sprintf(strTopicAllCmdSwi_, TOPIC_ALL_CMDSWI,strBoardName, espId);
     sprintf(strTopicAllCmdOta_, TOPIC_ALL_CMDOTA,strBoardName, espId);
-    sprintf(strTopicPubJuegos_, TOPIC_PUB_JUEGOS,strBoardName, espId);
-    sprintf(strTopicAllJuegos_, TOPIC_ALL_JUEGOS,strBoardName, espId);
+    
+    sprintf(strTopicGameCommand, TOPIC_GAME_COMMAND_ALL,strBoardName, espId);
+    sprintf(strTopicGameStatus,  TOPIC_GAME_STATUS,strBoardName, espId);
 
   //------- Inicialización de objetos
     ptrMqtt = new PubSubClient(objWifi); 
 }
 
 
-void EspInfInd::MqttConnect()
-{
+void EspInfInd::MqttConnect() {
 
   const char* mqtt_user = "II3";
   const char* mqtt_pass = "qW30SImD";
@@ -112,6 +109,8 @@ void EspInfInd::MqttConnect()
         Serial.printf("Suscribiendo a %s\n", strTopicSubCmdLed_);
         ptrMqtt->subscribe(strTopicSubCmdLed_);
 
+        Serial.printf("Suscribiendo a %s\n", strTopicGameCommand);
+        ptrMqtt->subscribe(strTopicGameCommand);
          
         //---- REQ.BD4 conexión
           delay(10000); // dar tiempo a que llegue el mensaje de last will
@@ -124,6 +123,7 @@ void EspInfInd::MqttConnect()
       }
     } // while
 }
+
 
 void EspInfInd::Setup(void (*MqttCallback)(char*, byte*, unsigned int)) {
   
@@ -288,9 +288,21 @@ void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
     serializeJsonPretty(jsonSub, output);
     Serial.println(output);
 
+  //----- Procesamiento de mensajes de juego
+    if (strcmp(strTopic, strTopicGameCommand)==0) {
+      int newGame = jsonSub["FaceNumb"].as<int>();
+      LastGameTime = jsonSub["GameTime"].as<int>();
+      LastFailTime = jsonSub["FailTime"].as<int>();
+      LastNumTries = jsonSub["NumTries"].as<int>();
+      strcpy(LastGameParm, (const char *)jsonSub["GameParm"]);
+      Serial.printf("Pasando de juego %d a %d\n",ActiveFace, newGame);
+      ActiveFace = newGame;
+    }
+
+  
   //----- Procesamiento de mensajes de configuración
-    if ((strcmp(strTopic, strTopicSubConfig_)==0 ||
-              strcmp(strTopic, strTopicAllConfig_)==0)  )
+    else if ((strcmp(strTopic, strTopicSubConfig_)==0 ||
+         strcmp(strTopic, strTopicAllConfig_)==0)  )
     {
         Serial.printf("cfPerStat=%d -> ",cfPerStat_);
         cfPerStat_ = jsonSub["cfPerStat"].as<int>();

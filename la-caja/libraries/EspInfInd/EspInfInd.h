@@ -1,5 +1,5 @@
-#ifndef ESPINFIND
-#define ESPINFIND
+#ifndef ESPINFIND_
+#define ESPINFIND_
 
 
 //------ Librerías utilizadas
@@ -10,6 +10,7 @@
 
 //--------------------------------------------- ESP
 #define ESP_BAUD_RATE         115200
+#define TOPIC_NAME_MAX        100
 
 //--------------------------------------------- WIFI
 #define WIFI_SSID             "infind"
@@ -53,28 +54,38 @@ class EspInfInd
       void          MqttSetup();
       void          MqttConnect();
 
+
+    //-------------------- multi dispositivo
+      int ActiveFace;        // cada juego en unca cara, 1=> está activa
+      char strTopicGameCommand[TOPIC_NAME_MAX];
+      char strTopicGameStatus[TOPIC_NAME_MAX];
+
+      int             LastGameTime;     // Tiempo máximo de juego
+      int             LastFailTime;     // Tiempo máximo hasta fallar
+      int             LastNumTries;     // Número máximo de reintentos
+      char            LastGameParm[30]; // solución del juego o parámetros de entrada
+    
+
+
     //------ REQ.IT29 Interfaz común JSON
       // StaticJsonDocument<JSON_MESSAGE_SIZE> msgPub;
 private:
     //------ Nomenclatura de topics
       //---- Topics de publicación
-      char strTopicPubConex_[100];
-      char strTopicPubDatos_[100];
-      char strTopicPubStLed_[100];
-      char strTopicPubStSwi_[100];
+      char strTopicPubConex_[TOPIC_NAME_MAX];
+      char strTopicPubDatos_[TOPIC_NAME_MAX];
+      char strTopicPubStLed_[TOPIC_NAME_MAX];
+      char strTopicPubStSwi_[TOPIC_NAME_MAX];
        //--- Topics de suscripción individual
-      char strTopicSubConfig_[100];
-      char strTopicSubCmdLed_[100];
-      char strTopicSubCmdSwi_[100];
-      char strTopicSubCmdOta_[100];
+      char strTopicSubConfig_[TOPIC_NAME_MAX];
+      char strTopicSubCmdLed_[TOPIC_NAME_MAX];
+      char strTopicSubCmdSwi_[TOPIC_NAME_MAX];
+      char strTopicSubCmdOta_[TOPIC_NAME_MAX];
        //--- Topics de suscripción grupal
-      char strTopicAllConfig_[100];
-      char strTopicAllCmdLed_[100];
-      char strTopicAllCmdSwi_[100];
-      char strTopicAllCmdOta_[100];
-       //--- Topics de suscripción grupal
-      char strTopicPubJuegos_[100];
-      char strTopicAllJuegos_[100];
+      char strTopicAllConfig_[TOPIC_NAME_MAX];
+      char strTopicAllCmdLed_[TOPIC_NAME_MAX];
+      char strTopicAllCmdSwi_[TOPIC_NAME_MAX];
+      char strTopicAllCmdOta_[TOPIC_NAME_MAX];
 
       
       bool bStandard_; // si la configuración de pines se ajusta a la especificación
@@ -88,13 +99,12 @@ private:
       unsigned int stPerFota_ = 0;    // milisegundos desde última actualización fota
 
       //--------------------- configuración
-      int cfPerStat_ = 30;   // frecuencia de envío de mensajes de estado (segundos)
+      int cfPerStat_ = 300;  // frecuencia de envío de mensajes de estado (segundos)
       int cfPerFota_ = 0;    // periodo de actualizaciones FOTA (minutos)
       int cfSwLight_ = 0;    // configuración de qué valor representa luz encendida 0 o 1
       int cfLdLight_ = 0;    //  "  pero para el led
       int cfLedBrig_ = 50;   // brillo hasta el que tiene que llegar cuando se enciende (50%)
       int cfLedVelo_ = 1;    // velocidad de cambio del brillo (1% cada 10 ms)
-
 
 };
 
