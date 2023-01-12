@@ -58,8 +58,7 @@ void JuegoInfInd::ReportStatus (char *strGameInfo) {
 
   pEsp_->jsonPub["Origin"] = STR_ORG_BOARD;
   pEsp_->jsonPub["MqttId"] = "";
-  pEsp_->jsonPub["x-------"] = "-----------";
-  pEsp_->jsonPub["Time2End"] = Time2End;
+  pEsp_->jsonPub["Time2End"] = (String)Time2End;
   pEsp_->jsonPub["========"] = "========---";
   pEsp_->jsonPub["UpTime"] = millis();
 

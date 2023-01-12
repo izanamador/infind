@@ -18,7 +18,7 @@
 #define WIFI_RETRY_DELAY      200
 
 //--------------------------------------------- JSON
-#define JSON_MESSAGE_SIZE    512
+#define JSON_MESSAGE_SIZE    1024
 
 //----- Pines comunes o estándar
 #define PIN_COMUN_LED      2    // REQ.IT3
