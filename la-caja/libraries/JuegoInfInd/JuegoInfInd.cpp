@@ -94,9 +94,10 @@ void JuegoInfInd::ReportStatus (char *strGameInfo) {
 bool JuegoInfInd::GameRunning() {
 	char strAux[100];
 	bool bJugando = false;
+	static unsigned int msReport = 0;
 
 
-	// Inicio de partida
+	// Cambio de estar jugando a inicio de partida (termino la anterior)
 	if ((GameStat != STAT_NOMATCH) && (pEsp_->ActiveFace==0)) {
 		sprintf(strAux, "Pasando de estado %d a nueva partida", GameStat);
 		ReportStatus(strAux);
@@ -139,9 +140,18 @@ bool JuegoInfInd::GameRunning() {
 		//------ Cambiar estado y reportarlo
 	    GameStat = STAT_PLAYING;
 		ReportStatus((char *)"Wait completado -> play");
+		msReport = millis();
 		return true;
 	}
 	// {"bugRaro":"abcd","FaceNumb":2,"GameParm":"34","GameTime":300,"FailTime":90,"NumTries":10}
+
+	// Estoy jugando así que reporto cada segundo
+	else if  ((GameStat == STAT_PLAYING) && (FaceNumb == pEsp_->ActiveFace)) {
+		if (millis() > msReport + 1000) {
+			msReport = millis();
+			ReportStatus((char *)"Queda un segundo menos");
+		}
+	}
 
 	// La cara activa ha dejado de ser la del juego => interrumpimos
 	else if  ((GameStat == STAT_PLAYING) && (FaceNumb != pEsp_->ActiveFace)) {
