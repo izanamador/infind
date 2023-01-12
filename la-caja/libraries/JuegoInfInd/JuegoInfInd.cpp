@@ -97,7 +97,7 @@ bool JuegoInfInd::GameRunning() {
 
 
 	// Inicio de partida
-	if (pEsp_->ActiveFace==0) {
+	if ((GameStat != STAT_NOMATCH) && (pEsp_->ActiveFace==0)) {
 		sprintf(strAux, "Pasando de estado %d a nueva partida", GameStat);
 		ReportStatus(strAux);
 		GameStat = STAT_NOMATCH;
