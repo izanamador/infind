@@ -12,6 +12,7 @@ class JuegoInfInd
 
     bool            GameRunning();
     void            ReportStatus (char* strGameInfo);
+    void            ReportSuccess(char* strGameInfo);
 //    void            ReportStart(char* GameInfo);
 //    void            ReportStatus(char* GameInfo);
     void            ReportFail(char* strGameInfo);

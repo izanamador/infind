@@ -8,7 +8,7 @@
 #define STAT_ONHOLD     	3 // ROJO
 #define STAT_LOST     		4 // NEGRO
 #define STAT_WON      		5 // VIOLETA
-
+char strGameInfoOut[100];
 //#define STAT_TIMEOUT  6
 //#define STAT_END      7
 
@@ -16,6 +16,7 @@
 JuegoInfInd::JuegoInfInd(const char *gameName, int faceNumb, EspInfInd *pEspInfInd) {
     //---  parametros del juego
 	strcpy(GameName, gameName);
+	sprintf(strGameInfoOut, "Game name: %s", GameName);
 	FaceNumb = faceNumb;
 	pEsp_ = pEspInfInd;
 
@@ -38,16 +39,24 @@ void JuegoInfInd::Setup() {
 
 void JuegoInfInd::ReportFail(char* strGameInfo){
     NumFails++;
+    strcpy(strGameInfoOut, strGameInfo);
 	TmLstTry = millis()-msTries_-msTryHolded_;
-	ReportStatus(strGameInfo);
+	ReportStatus(strGameInfoOut);
 
     msTries_ = millis();
     msTryHolded_ = 0;
     GameStat = STAT_PLAYING;
 }
 
+void JuegoInfInd::ReportSuccess(char* strGameInfo){
+	sprintf(strGameInfoOut, "Has gandado %s.\n%s", GameName,strGameInfo);
+	GameStat = STAT_WON;
+	ReportStatus(strGameInfoOut);
+}
+
 
 void JuegoInfInd::ReportStatus (char *strGameInfo) {
+  strcpy(strGameInfoOut, strGameInfo);
   char strSerialized[JSON_MESSAGE_SIZE];
 
 
@@ -58,8 +67,6 @@ void JuegoInfInd::ReportStatus (char *strGameInfo) {
 
   pEsp_->jsonPub["Origin"] = STR_ORG_BOARD;
   pEsp_->jsonPub["MqttId"] = "";
-  pEsp_->jsonPub["Time2End"] = (String)Time2End;
-  pEsp_->jsonPub["========"] = "========---";
   pEsp_->jsonPub["UpTime"] = millis();
 
   //------------ Datos specíficos del estado del juego
@@ -79,9 +86,9 @@ void JuegoInfInd::ReportStatus (char *strGameInfo) {
   pEsp_->jsonPub["TmActive"] = TmActive;
   pEsp_->jsonPub["TmOnHold"] = TmOnHold;
   pEsp_->jsonPub["TmLstTry"] = TmLstTry;
-  pEsp_->jsonPub["GameInfo"] = strGameInfo;
-
-
+  pEsp_->jsonPub["========"] = "========---";
+  pEsp_->jsonPub["GameInfo"] = strGameInfoOut;
+  pEsp_->jsonPub["Time2End"] = (String)Time2End;
 
   serializeJson(pEsp_->jsonPub,strSerialized);
   Serial.printf("Enviando: %s a %s\n-----\n%s\n-----\n", strGameInfo, pEsp_->strTopicGameStatus, strSerialized);
@@ -144,11 +151,16 @@ bool JuegoInfInd::GameRunning() {
 	}
 	// {"bugRaro":"abcd","FaceNumb":2,"GameParm":"34","GameTime":300,"FailTime":90,"NumTries":10}
 
-	// Estoy jugando así que reporto cada segundo
+	// Estoy jugando así que reporto compruebo timeout y cada segundo
 	else if  ((GameStat == STAT_PLAYING) && (FaceNumb == pEsp_->ActiveFace)) {
 		if (millis() > msReport + 1000) {
 			msReport = millis();
-			ReportStatus((char *)"Queda un segundo menos");
+			if (millis() > 300000) { // TODO PONER LA CONDICION DE TIMEOUT y en otro sitio la del NUMERO MAXIMO DE INTENTOS
+			    GameStat = STAT_LOST;
+				ReportStatus((char *)"Timeout, has perdido");
+			} else { // TODO INDICAR EL TIEMPO QUE QUEDA
+				ReportStatus((char *)"Queda un segundo menos");
+			}
 		}
 	}
 
