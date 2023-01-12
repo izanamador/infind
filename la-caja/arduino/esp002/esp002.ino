@@ -15,6 +15,20 @@ void mqttCallback(char* topic, byte* payload, unsigned int length){
   oEspInfInd.MqttReceived(topic, payload, length);
 }
 
+// Pines de salida 
+#define PIN_LED_ROJO      5       // D1(serigrafiado)-GPIO5      
+#define PIN_LED_AZUL      4       // D2-GPIO4 
+#define PIN_LED_AMARILLO  2       // D4-GPIO2
+#define PIN_LED_VERDE     14      // D5-GPIO14
+#define PIN_TONO          12      // D6-GPIO12
+ 
+
+// Pines de entrada para los botones
+#define PIN_BOTON_ROJO     13      // D7-GPIO13
+#define PIN_BOTON_AZUL     16      // D0-GPIO16  // ojo, el 15 no va
+#define PIN_BOTON_AMARILLO 10      // SSD3-GPIO10
+#define PIN_BOTON_VERDE    0       // D3-GPIO0   // ojo, SSD2-9 no lee bien
+
 void setup() {
     delay(1000);
     pinMode(LED_BUILTIN, OUTPUT);
@@ -55,19 +69,7 @@ int SecuenciaCorrecta[20]; // secuencia de colores cada vez más larga
 #define COLOR_NINGUNO   4
   
 
-// Pines de salida 
-#define PIN_LED_ROJO      5       // D1(serigrafiado)-GPIO5      
-#define PIN_LED_AZUL      4       // D2-GPIO4 
-#define PIN_LED_AMARILLO  2       // D4-GPIO2
-#define PIN_LED_VERDE     14      // D5-GPIO14
-#define PIN_TONO          12      // D6-GPIO12
- 
 
-// Pines de entrada para los botones
-#define PIN_BOTON_ROJO     13      // D7-GPIO13
-#define PIN_BOTON_AZUL     16      // D0-GPIO16  // ojo, el 15 no va
-#define PIN_BOTON_AMARILLO 10      // SSD3-GPIO10
-#define PIN_BOTON_VERDE    0       // D3-GPIO0   // ojo, SSD2-9 no lee bien
 
 
 
@@ -93,7 +95,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length)
 
       // inicializamos contadores con el primer mensaje recibido
       if (reducir_secuencia==0)
-        objInfra.ReportStart(NULL); 
+        oSimon.ReportStart(NULL); 
 
       // nos piden ayuda y reducimos la longitud de la secuencia
       else
@@ -132,9 +134,9 @@ void fSimon()
 
 
   // Invocación a la infraestructura y salida si el juego no está activo
-    objInfra.Loop();
-    if (!objInfra.GameRunning())
-      return;
+    //objInfra.Loop();
+    //if (!objInfra.GameRunning())
+      //return;
       if (estado != STAT_ESPERA)
       {
         ayudasSolicitadas = MAX_SEQ-LongitudSecuencia;
@@ -236,7 +238,7 @@ void fSimon()
       mostrar_color(SecuenciaCorrecta[iBoton], duracion_sonido, MAX_LUM_PWM);
       
       delay(1000);
-      objInfra.ReportFailure(GameInfo);
+      oSimon.ReportFailure(GameInfo);
       estado = STAT_INICIAL;
     }
 
@@ -258,7 +260,7 @@ void fSimon()
     {
       mostrar_color(boton_pulsado, duracion_sonido, MAX_LUM_PWM);
       melodia_felicitacion();
-      objInfra.ReportSuccess(GameInfo);  
+      oSimon.ReportSuccess(GameInfo);  
     }
 
 } // setup
@@ -455,5 +457,3 @@ void melodia_felicitacion()
   digitalWrite(PIN_LED_AZUL, LOW);
 }
  
-
-
