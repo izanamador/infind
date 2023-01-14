@@ -1,16 +1,18 @@
+
+/* Librería general de la caja  */
+//#include <infra.h>
+//#include <ArduinoJson.h>
+
 #include "EspInfInd.h"
 #include "JuegoInfInd.h"
-
-//--------- 
-bool bStandard = true;
+//bool bStandard = true;
+bool bStandard = false;
 EspInfInd     oEspInfInd("esp001", bStandard);
 
-//--------- Juegos en el esp001
-JuegoInfInd oNumpad("Numpad", 2, &oEspInfInd);
-JuegoInfInd oPrueba("Prueba", 7, &oEspInfInd); 
+//--------- Juegos en el esp003
+JuegoInfInd oNumpad("Numpad", 2, &oEspInfInd); 
 
 
-//------------------------------------------------------------------- NUMPAD
 
 /* Librerías de uso generales*/
 #include <array>
@@ -19,107 +21,103 @@ JuegoInfInd oPrueba("Prueba", 7, &oEspInfInd);
 #include <math.h>
 #include <cstring>
 
+
+/* TODO Estandarizar los nombres de topics en la infrasestructura */
+/* Ejemplo de topic que cumple: #define TOPIC_PUB_ "II3/ESP14440037/resultados_juego2" */
+//Infra objInfra;
+//char *strTopicPub = "II3/ESP002/pub/cara002"; /* topic principal para publicar contenido y lastwill */
+//char *strTopicCfg = "II3/ESP002/cfg/cara002"; /* topic para recibir parametros de configuracion */
+//char *strTopicCmd = "II3/ESP002/cmd/cara002"; /* topic para recibir peticiones de comando */
+
+
 #include <Keypad.h> /* Libreria para usar el numpad */
-#define NUMPAD_MAX_DIGITS 10
-#define NUMPAD_NUM_ROWS 4  /* Tamaño del numpad (4 x 4)    */
-#define NUMPAD_NUM_COLS 4
+#define NUM_ROWS 4  /* Tamaño del numpad (4 x 4)    */
+#define NUM_COLS 4
+char keys[NUM_ROWS][NUM_COLS] = {
+  /* Layout */
+  {'1','2','3','A'},
+  {'4','5','6','B'},
+  {'7','8','9','C'},
+  {'*','0','#','D'}
+};
+byte rowPins[NUM_ROWS] = {D0, D1, D2, D3}; /* Configuración de pines del numpad */
+byte colPins[NUM_COLS] = {D4, D5, D6, D7}; /* Configuración de pines del numpad */
+Keypad myKeypad = Keypad( makeKeymap(keys), rowPins, colPins, NUM_ROWS, NUM_COLS); /* Instancia de la clase keypad */
 
-char strAux[300];
 
-//------------------------------------------ Funciones del juego Numpad
-void fNumpad() {
-  static char keys[NUMPAD_NUM_ROWS][NUMPAD_NUM_COLS] = {
-    /* Layout */
-    {'1','2','3','A'},
-    {'4','5','6','B'},
-    {'7','8','9','C'},
-    {'*','0','#','D'}
-  };
-  static byte rowPins[NUMPAD_NUM_ROWS] = {D0, D1, D2, D3}; /* Configuración de pines del numpad */
-  static byte colPins[NUMPAD_NUM_COLS] = {D4, D5, D6, D7}; /* Configuración de pines del numpad */
-  static Keypad myKeypad = Keypad( makeKeymap(keys), rowPins, colPins, NUMPAD_NUM_ROWS, NUMPAD_NUM_COLS); /* Instancia de la clase keypad */
+void setup(){
+    Serial.printf("setup  ");
 
-  // string con el número que se está componiendo hasta pulsar send
-  static char strDigits[NUMPAD_MAX_DIGITS];
-  static int  iDigit = 0;
-  //objInfra.Loop(strDigits);
-  char key = myKeypad.getKey(); // TODO CONFIRMAR SI ES BLOQUEANTE
-  
-  if (key == '#') { // tecla # es la de envío, comprobar si la respuesta es correcta
-    strDigits[iDigit] = '\0'; // nulo al final del string
-    if (iDigit > 0 && (strcmp(strDigits,oNumpad.GameParm)==0))
-    {
-      sprintf(strAux, "Numero %s correcto", strDigits);
-      oNumpad.ReportSuccess(strAux);
-
-    } else {
-      sprintf(strAux, "Numero %s erroneo", strDigits);
-      oNumpad.ReportFail(strAux);
-      iDigit = 0;
-    }
-  }
-
-  else if (iDigit == NUMPAD_MAX_DIGITS) {
-      sprintf(strAux, "Numero demasiado largo %s", strDigits);
-    
-      oNumpad.ReportFail(strAux);
-    iDigit = 0;
-
-  }
-
-  else if (key >= '0' && key <= '0') {
-    strDigits[iDigit++] = key; // actualiza el string y la posición
-    strDigits[iDigit] = '\0'; // nulo al final del string
-    oNumpad.ReportStatus(strDigits);
-
-  }
+     delay(1000);
+//     pinMode(LED_BUILTIN, OUTPUT);
+     oEspInfInd.Setup(mqttCallback);
+     delay(2000);
+    Serial.printf("setup!\n");
 }
 
-//------------------------------------------------------------------- ESP
+int ans = NULL; /* Resupuesta del acertijo */
 
 void mqttCallback(char* topic, byte* payload, unsigned int length){
+  Serial.printf("-mqttCallback ");
   oEspInfInd.MqttReceived(topic, payload, length);
+  Serial.printf("callback!\n");
+
 }
 
-void setup() {
-    delay(1000);
-    pinMode(LED_BUILTIN, OUTPUT);
-    oEspInfInd.Setup(mqttCallback);
-    delay(2000);
+static char strReport[50];
+
+
+int countDigit(int number){
+  /* Calcula el número de dígitos que tiene un número cualquiera */
+  return int(log10(number) + 1);
 }
 
-void loop() {
+
+#define CHAR_0 '0'
+#define CHAR_9 '9'
+#define CHAR_SEND '#'
+#define MAX_DIGITS 9
+
+
+void loop(){
+  /* variables */
+  static int number = 0;
+  static char strDigits[10]= "";
+  static int iDigit = 0;
+
+  // objInfra.Loop(strDigits);
   oEspInfInd.Loop();
-  if (oNumpad.GameRunning()) {
-    fNumpad();
+
+  //if (!objInfra.GameRunning())
+  //  return;
+  if (!oNumpad.GameRunning()) return;
+
+  char key = myKeypad.getKey(); /* Recibo una tecla del numpad */
+
+sprintf(strReport, " k= %c\n", key);
+
+  if ((key == CHAR_SEND) && (ans == number)){
+    /* si se pulsa enviar y la respuesta es correcta */
+    //objInfra.ReportSuccess(" "); /* Actualiza el estado a: "You won" */    
+    oNumpad.ReportSuccess(strReport);
+  }
+  else if ((key == CHAR_SEND) && (ans != number)){
+    /* si se pulsa enviar y la respuesta es incorrecta */
+    //objInfra.ReportFailure(" "); /* Actualiza el estado a: "Failure" y suma un intento */
+    oNumpad.ReportFail(strReport);
+    strcpy(strDigits,"");        /* Limpio el string en Node-Red */
+    number = 0; /* Reinicio el número */
+  }
+  else if (key >= CHAR_0 && key <= CHAR_9){
+    /* Envía el número a Node-Red */
+    if(countDigit(number) < MAX_DIGITS){
+      /* Evita el overflow */
+      number = 10*number + (key-48); /* Concateno dígito a digíto para formar un número */
+    }
+    String str = String(number);
+    str.toCharArray(strDigits, 10);
+    //objInfra.ReportStatus(strDigits);
+    sprintf(strReport, " Digits=%s", strDigits);
+    oNumpad.ReportStatus(strReport);
   }
 }
-
-/*
-//------------------------------------------------------------------- Prueba
-#include "Button.h"
-#define PIN_FLASH 0
-Button pbFlash(PIN_FLASH); // Object inicialization
-
-
-// Millis timing
-unsigned long buttonPressTime = 0; // Store the time when the button was last pressed
-unsigned long previousMillis = 0; // Store the previous time in milliseconds
-const long buttonClearTime = 5000; // Threshold time for clearing the message string, in milliseconds
-long interval = 1000; // Interval between readings in milliseconds
-pinMode(PIN_FLASH, INPUT); // Set the FLASH pin as an input
-  pbFlash.init();
-
-bool pushButtonVal = pushButton.read(); // Read the button value
-
-// Clears the message after a long time
-if (pushButtonVal == LOW && millis() - buttonPressTime >= buttonClearTime) {
-  message = ""; // Clear the message string
-  buttonPressTime = millis(); // Update the button press time
-}
-
-// Update the button press time when the button is pressed
-if (pushButtonVal == LOW) {
-  buttonPressTime = millis();
-}
-*/

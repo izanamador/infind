@@ -113,7 +113,7 @@ void EspInfInd::MqttConnect() {
         ptrMqtt->subscribe(strTopicGameCommand);
          
         //---- REQ.BD4 conexión
-          delay(10000); // dar tiempo a que llegue el mensaje de last will
+          delay(1000); // dar tiempo a que llegue el mensaje de last will
           MqttSend(strTopicPubConex_, (char *)"Connected", STR_ORG_BOARD);
       } 
       else 
@@ -271,6 +271,9 @@ void EspInfInd::UpdateSwitch(int iUpdateType, int newLevel, int newConfig) {
 
 }
 
+void Debug(int i, char* msg){
+  Serial.printf("Debug %d: %s\n", i, msg);
+}
 
 
 void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
@@ -278,6 +281,7 @@ void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
   char strStatus[100];
 
   //----- Mensaje recibido
+    Debug(1, "");
     char *strMsg = (char *)malloc(length+1);
     strncpy(strMsg, (char*)payload, length);
     strMsg[length]='\0';
@@ -290,6 +294,7 @@ void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
 
   //----- Procesamiento de mensajes de juego
     if (strcmp(strTopic, strTopicGameCommand)==0) {
+      Debug(2, "");
       int newGame = jsonSub["FaceNumb"].as<int>();
       LastGameTime = jsonSub["GameTime"].as<int>();
       LastFailTime = jsonSub["FailTime"].as<int>();
@@ -304,6 +309,7 @@ void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
     else if ((strcmp(strTopic, strTopicSubConfig_)==0 ||
          strcmp(strTopic, strTopicAllConfig_)==0)  )
     {
+        Debug(3, "");
         Serial.printf("cfPerStat=%d -> ",cfPerStat_);
         cfPerStat_ = jsonSub["cfPerStat"].as<int>();
         if (cfPerStat_ < 1000) {
@@ -352,6 +358,7 @@ void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
          strcmp(strTopic, strTopicAllCmdSwi_)==0) 
         && bStandard_)
     {
+      Debug(4, "");
       int lev =jsonSub["stSwLevel"];
       UpdateSwitch(SWITCH_CMD_MSG, lev, -1);
     }
@@ -362,6 +369,7 @@ void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
          strcmp(strTopic, strTopicAllCmdLed_)==0) 
         && bStandard_)
     {
+      Debug(5, "");
       int lev =jsonSub["stLdLevel"];
       UpdateSwitch(LED_CMD_MSG, lev, -1);
     }
