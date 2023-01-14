@@ -106,7 +106,7 @@ bool JuegoInfInd::GameRunning() {
 	else if ((GameStat == STAT_NEWGAME) && (FaceNumb == pEsp_->ActiveFace)) {		
 	    GameStat = STAT_NEWSET;
 	    return true;
-	}
+	}	
 
 	// nuevo set => el juego recibe el control para inicializar  debería inicializar lo que necesite
 	else if ((GameStat == STAT_NEWSET) && (FaceNumb == pEsp_->ActiveFace)) {
@@ -125,7 +125,7 @@ bool JuegoInfInd::GameRunning() {
 			    GameStat = STAT_LOST;
 				ReportStatus((char *)"Timeout, has perdido");
 			} else { // TODO INDICAR EL TIEMPO QUE QUEDA Y QUE LA PERIODICIDAD SEA CONFIGURABLE
-				ReportStatus((char *)"Quedan 300 un segundos menos");
+				;// ReportStatus((char *)"Quedan 300 un segundos menos");
 			}
 		}
 		return true; // el juego recibe el control

@@ -6,7 +6,7 @@
 #include "EspInfInd.h"
 #include "JuegoInfInd.h"
 //bool bStandard = true;
-bool bStandard = false;
+bool bStandard = false; 
 EspInfInd     oEspInfInd("esp001", bStandard);
 
 //--------- Juegos en el esp003
@@ -80,30 +80,20 @@ int countDigit(int number){
 
 
 void loop(){
-  /* variables */
   static int number = 0;
   static char strDigits[10]= "";
   static int iDigit = 0;
-
-  // objInfra.Loop(strDigits);
   oEspInfInd.Loop();
 
-  //if (!objInfra.GameRunning())
-  //  return;
   if (!oNumpad.GameRunning()) return;
-
   char key = myKeypad.getKey(); /* Recibo una tecla del numpad */
 
 sprintf(strReport, " k= %c\n", key);
 
   if ((key == CHAR_SEND) && (ans == number)){
-    /* si se pulsa enviar y la respuesta es correcta */
-    //objInfra.ReportSuccess(" "); /* Actualiza el estado a: "You won" */    
     oNumpad.ReportSuccess(strReport);
   }
   else if ((key == CHAR_SEND) && (ans != number)){
-    /* si se pulsa enviar y la respuesta es incorrecta */
-    //objInfra.ReportFailure(" "); /* Actualiza el estado a: "Failure" y suma un intento */
     oNumpad.ReportFail(strReport);
     strcpy(strDigits,"");        /* Limpio el string en Node-Red */
     number = 0; /* Reinicio el número */
