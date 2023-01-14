@@ -1,10 +1,7 @@
 
-/* Librería general de la caja  */
-//#include <infra.h>
-//#include <ArduinoJson.h>
-
 #include "EspInfInd.h"
 #include "JuegoInfInd.h"
+
 //bool bStandard = true;
 bool bStandard = false; 
 EspInfInd     oEspInfInd("esp001", bStandard);
@@ -20,16 +17,6 @@ JuegoInfInd oNumpad("Numpad", 2, &oEspInfInd);
 #include <Wire.h>
 #include <math.h>
 #include <cstring>
-
-
-/* TODO Estandarizar los nombres de topics en la infrasestructura */
-/* Ejemplo de topic que cumple: #define TOPIC_PUB_ "II3/ESP14440037/resultados_juego2" */
-//Infra objInfra;
-//char *strTopicPub = "II3/ESP002/pub/cara002"; /* topic principal para publicar contenido y lastwill */
-//char *strTopicCfg = "II3/ESP002/cfg/cara002"; /* topic para recibir parametros de configuracion */
-//char *strTopicCmd = "II3/ESP002/cmd/cara002"; /* topic para recibir peticiones de comando */
-
-
 #include <Keypad.h> /* Libreria para usar el numpad */
 #define NUM_ROWS 4  /* Tamaño del numpad (4 x 4)    */
 #define NUM_COLS 4
@@ -46,22 +33,16 @@ Keypad myKeypad = Keypad( makeKeymap(keys), rowPins, colPins, NUM_ROWS, NUM_COLS
 
 
 void setup(){
-    Serial.printf("setup  ");
-
      delay(1000);
 //     pinMode(LED_BUILTIN, OUTPUT);
      oEspInfInd.Setup(mqttCallback);
-     delay(2000);
-    Serial.printf("setup!\n");
+     delay(1000);
 }
 
 int ans = NULL; /* Resupuesta del acertijo */
 
 void mqttCallback(char* topic, byte* payload, unsigned int length){
-  Serial.printf("-mqttCallback ");
   oEspInfInd.MqttReceived(topic, payload, length);
-  Serial.printf("callback!\n");
-
 }
 
 static char strReport[50];
@@ -80,34 +61,32 @@ int countDigit(int number){
 
 
 void loop(){
-  static int number = 0;
+  //static int number = 0;
   static char strDigits[10]= "";
   static int iDigit = 0;
   oEspInfInd.Loop();
 
   if (!oNumpad.GameRunning()) return;
+  
   char key = myKeypad.getKey(); /* Recibo una tecla del numpad */
+  sprintf(strReport, "Ult tecla = %c\n", key);
 
-sprintf(strReport, " k= %c\n", key);
-
-  if ((key == CHAR_SEND) && (ans == number)){
-    oNumpad.ReportSuccess(strReport);
-  }
-  else if ((key == CHAR_SEND) && (ans != number)){
-    oNumpad.ReportFail(strReport);
-    strcpy(strDigits,"");        /* Limpio el string en Node-Red */
-    number = 0; /* Reinicio el número */
-  }
-  else if (key >= CHAR_0 && key <= CHAR_9){
-    /* Envía el número a Node-Red */
-    if(countDigit(number) < MAX_DIGITS){
-      /* Evita el overflow */
-      number = 10*number + (key-48); /* Concateno dígito a digíto para formar un número */
+  if (key == '#') {
+    strDigits[iDigit] = '\0'; // nulo al final de la secuencia de teclas pulsadas
+    sprintf(strReport, "Respuesta=%s, solucion=%s\n", strDigits, oNumpad.GameParm);    
+    if (strcmp(strDigits, oNumpad.GameParm)==0) {
+      oNumpad.ReportSuccess(strReport);
     }
-    String str = String(number);
-    str.toCharArray(strDigits, 10);
-    //objInfra.ReportStatus(strDigits);
-    sprintf(strReport, " Digits=%s", strDigits);
-    oNumpad.ReportStatus(strReport);
+    else {
+      oNumpad.ReportFail(strReport);
+      iDigit = 0; // volver a iniciar la secuencia de números pulsados desde la posición 0
+    }        
+  }
+  
+  else if (key >= '0' && key <= '9') {
+    if (iDigit <= MAX_DIGITS) {
+      strDigits[iDigit++] = key;
+    }
+    oNumpad.ReportStatus(strDigits);
   }
 }
