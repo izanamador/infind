@@ -3,6 +3,15 @@
 
 #include "EspInfInd.h"
 
+#define STAT_NEWMATCH     0 // BLANCO
+#define STAT_WAITSTART    1 // AZUL
+#define STAT_NEWGAME      11 // transitorio el juego genérico se inicaliza
+#define STAT_NEWSET       12 // transitorio el juego específico se inicializa
+#define STAT_PLAYING      2 // VERDE
+#define STAT_ONHOLD       3 // ROJO
+#define STAT_LOST         4 // NEGRO
+#define STAT_WON          5 // VIOLETA
+
 class JuegoInfInd
 {
   public:

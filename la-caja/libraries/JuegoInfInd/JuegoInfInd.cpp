@@ -2,14 +2,6 @@
 #include "JuegoInfInd.h"
 
 
-#define STAT_NEWMATCH  		0 // BLANCO
-#define STAT_WAITSTART     	1 // AZUL
-#define STAT_NEWGAME        2 // transitorio el juego genérico se inicaliza
-#define STAT_NEWSET         3 // transitorio el juego específico se inicializa
-#define STAT_PLAYING     	4 // VERDE
-#define STAT_ONHOLD     	5 // ROJO
-#define STAT_LOST     		6 // NEGRO
-#define STAT_WON      		7 // VIOLETA
 char strGameInfoOut[100];
 //#define STAT_TIMEOUT  6
 //#define STAT_END      7
@@ -53,6 +45,7 @@ bool JuegoInfInd::GameRunning() {
 
 	// todos los juegos inicializan variables, reportan a NR y pasan a esperar su turno
 	else if ((GameStat == STAT_NEWMATCH) && (pEsp_->ActiveFace!=0)) {
+		pEsp_->Debug(1, "newmatch y active face > 0");
 		msMatch_	  = millis();
 	    NumFails      = 0;
 	    msStart_      = 0;
@@ -73,6 +66,7 @@ bool JuegoInfInd::GameRunning() {
 
 	// en mitad de una partida se pide empezar otra, todos los juegos empiezan de nuevo
 	else if ((GameStat != STAT_NEWMATCH) && (pEsp_->ActiveFace==0)) {
+		pEsp_->Debug(2, "newmatch y active face > 0");
 		sprintf(strAux, "Pasando de estado %d a nueva partida", GameStat);
 		ReportStatus(strAux);
 		GameStat = STAT_NEWMATCH;
@@ -84,6 +78,7 @@ bool JuegoInfInd::GameRunning() {
 
 	// el juego se activó: resetear tiempos y copiar parámetros específicos del juego
 	else if ((GameStat == STAT_WAITSTART) && (FaceNumb == pEsp_->ActiveFace)) {		
+		pEsp_->Debug(4, "Iniciando el juego");
 		Serial.printf("Iniciando juego %d", FaceNumb);
 		msStart_ = millis();
 		msTries_ = msStart_;
@@ -104,14 +99,15 @@ bool JuegoInfInd::GameRunning() {
 
 	// nuevo set => el juego recibe el control para inicializar  debería inicializar lo que necesite
 	else if ((GameStat == STAT_NEWGAME) && (FaceNumb == pEsp_->ActiveFace)) {		
+		pEsp_->Debug(5, "Iniciando el set");
 	    GameStat = STAT_NEWSET;
 	    return true;
 	}	
 
 	// nuevo set => el juego recibe el control para inicializar  debería inicializar lo que necesite
 	else if ((GameStat == STAT_NEWSET) && (FaceNumb == pEsp_->ActiveFace)) {
+		pEsp_->Debug(5, "Inicio específico completado -> nuevo intento");
 	    GameStat = STAT_PLAYING;
-		ReportStatus((char *)"Inicio específico completado -> nuevo intento");
 		msReport = millis();
 		return true; // el juego específico debería incializar el intento (4 notas)
 	}
@@ -119,13 +115,13 @@ bool JuegoInfInd::GameRunning() {
 
 	// Estoy jugando así que reporto compruebo timeout y cada segundo
 	else if  ((GameStat == STAT_PLAYING) && (FaceNumb == pEsp_->ActiveFace)) {
-		if (millis() > msReport + 1000) {
+		if (millis() > msReport + 5000) { // TODO QUE EL TIEMPO SEA CONFIGURABLE
 			msReport = millis();
 			if (millis() > 300000) { // TODO PONER LA CONDICION DE TIMEOUT y en otro sitio la del NUMERO MAXIMO DE INTENTOS
 			    GameStat = STAT_LOST;
 				ReportStatus((char *)"Timeout, has perdido");
 			} else { // TODO INDICAR EL TIEMPO QUE QUEDA Y QUE LA PERIODICIDAD SEA CONFIGURABLE
-				;// ReportStatus((char *)"Quedan 300 un segundos menos");
+				ReportStatus((char *)"Quedan 300 un segundos menos");
 			}
 		}
 		return true; // el juego recibe el control
@@ -133,6 +129,7 @@ bool JuegoInfInd::GameRunning() {
 
 	// La cara activa ha dejado de ser la del juego => interrumpimos
 	else if  ((GameStat == STAT_PLAYING) && (FaceNumb != pEsp_->ActiveFace)) {
+		pEsp_->Debug(6, "Guardar una copia de la respuesta");
 		// copiar la respuesta solución al juego
 		strcpy(GameParm, pEsp_->jsonSub["GameParm"]);
 		Serial.printf("Parando el juego %d y dando paso a %d", FaceNumb, pEsp_->ActiveFace);
@@ -182,52 +179,53 @@ void JuegoInfInd::ReportSuccess(char* strGameInfo){
 
 
 void JuegoInfInd::ReportStatus (char *strGameInfo) {
-  strcpy(strGameInfoOut, strGameInfo);
-  char strSerialized[JSON_MESSAGE_SIZE];
+
+	// 
+	pEsp_->Debug(1, "inicializa el mensaje con los valores por defecto del ESP");
+  	pEsp_->MqttFormatMsg(pEsp_->strTopicGameStatus, strGameInfo, OPT_MSG_FORMAT);
+
+	pEsp_->Debug(2, "prepara los datos específicos del juego");
+  	pEsp_->jsonPub["gamestate"] = GameStat;
+
+	pEsp_->Debug(3, "serializa el json");
+  	char strSerialized[JSON_MESSAGE_SIZE];
+  	serializeJson(pEsp_->jsonPub,strSerialized);  	
+  	Serial.printf("Juego enviando: %s a %s\n-----\n%s\n-----\n", strGameInfo, pEsp_->strTopicGameStatus, strSerialized);
+
+  	pEsp_->Debug(4, "envía los datos por MQTT");
+  	pEsp_->ptrMqtt->publish(pEsp_->strTopicGameStatus, strSerialized);
 
 
-  int secs = GameTime - TmActive/1000; // segundos restantes
-  sprintf(Time2End, "--%02d:%02d--", secs/60, secs%60);
-  
-  Serial.printf("\nTime2End %s\n", Time2End);
 
-  pEsp_->jsonPub["Origin"] = STR_ORG_BOARD;
-  pEsp_->jsonPub["MqttId"] = "";
-  pEsp_->jsonPub["UpTime"] = millis();
+//  int secs = GameTime - TmActive/1000; // segundos restantes
+//  sprintf(Time2End, "--%02d:%02d--", secs/60, secs%60);
+//  
+//  Serial.printf("\nTime2End %s\n", Time2End);
+//
+//  //------------ Parámetros de salida
+//  pEsp_->jsonPub["NumFails"] = NumFails;
+//  pEsp_->jsonPub["TmTotPly"] = TmTotPly;
+//  pEsp_->jsonPub["TmActive"] = TmActive;
+//  pEsp_->jsonPub["TmOnHold"] = TmOnHold;
+//  pEsp_->jsonPub["TmLstTry"] = TmLstTry;
+//  pEsp_->jsonPub["GameInfo"] = strGameInfoOut;
+//  pEsp_->jsonPub["Time2End"] = (String)Time2End;
+//
+//  pEsp_->jsonPub["Origin"] = STR_ORG_BOARD;
+//  pEsp_->jsonPub["MqttId"] = "";
+//  pEsp_->jsonPub["UpTime"] = millis();
+//
+//  //------------ Datos specíficos del estado del juego
+//  pEsp_->jsonPub["FaceNumb"] = FaceNumb;
+//  pEsp_->jsonPub["GameName"] = GameName;
+//
+//  //------------ Parámetros de entrada
+//  pEsp_->jsonPub["GameTime"] = GameTime;
+//  pEsp_->jsonPub["FailTime"] = FailTime;
+//  pEsp_->jsonPub["NumTries"] = NumTries;
+//  pEsp_->jsonPub["GameParm"] = GameParm;
 
-  //------------ Datos specíficos del estado del juego
-  pEsp_->jsonPub["FaceNumb"] = FaceNumb;
-  pEsp_->jsonPub["GameName"] = GameName;
-
-  //------------ Parámetros de entrada
-  pEsp_->jsonPub["GameTime"] = GameTime;
-  pEsp_->jsonPub["FailTime"] = FailTime;
-  pEsp_->jsonPub["NumTries"] = NumTries;
-  pEsp_->jsonPub["GameParm"] = GameParm;
-
-  //------------ Parámetros de salida
-  pEsp_->jsonPub["GameStat"] = GameStat;
-  pEsp_->jsonPub["NumFails"] = NumFails;
-  pEsp_->jsonPub["TmTotPly"] = TmTotPly;
-  pEsp_->jsonPub["TmActive"] = TmActive;
-  pEsp_->jsonPub["TmOnHold"] = TmOnHold;
-  pEsp_->jsonPub["TmLstTry"] = TmLstTry;
-  pEsp_->jsonPub["========"] = "========---";
-  pEsp_->jsonPub["GameInfo"] = strGameInfoOut;
-  pEsp_->jsonPub["Time2End"] = (String)Time2End;
-
-  serializeJson(pEsp_->jsonPub,strSerialized);
-  Serial.printf("Enviando: %s a %s\n-----\n%s\n-----\n", strGameInfo, pEsp_->strTopicGameStatus, strSerialized);
-  pEsp_->ptrMqtt->publish(pEsp_->strTopicGameStatus, strSerialized);
 
 }
 
 
-
-/*
-    // parámetros de entrada
-    int             GameTime;     // Tiempo máximo de juego
-    int             FailTime;     // Tiempo máximo hasta fallar
-    int             NumTries;     // Número máximo de reintentos
-    char            GameParm[30]; // solución del juego o parámetros de entrada
-*/

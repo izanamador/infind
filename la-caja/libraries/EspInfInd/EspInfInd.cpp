@@ -73,6 +73,8 @@ EspInfInd::EspInfInd(const char *strBoardName, bool bStandard) {
 
 
 void EspInfInd::MqttConnect() {
+  Debug(1, "Entra en MqttConnect");
+
 
   const char* mqtt_user = "II3";
   const char* mqtt_pass = "qW30SImD";
@@ -81,17 +83,18 @@ void EspInfInd::MqttConnect() {
   // Loop until we're reconnected
     while (!ptrMqtt->connected()) 
     {
-      Serial.print("Attempting MQTT connection...");
-
-      //---- REQ.MQ3 LastWill
+      Debug(-1, "Attempting MQTT connection...");
+      
+      Debug(2, "Prepara el LastWill");
       char strLastWill[100];
-      sprintf(strLastWill, "{\"ChipId\": \"%s\", \"BoardName\": \"%s\", \"Online\": 0, \"Source\": \"%s\"}", 
+      sprintf(strLastWill, "{\"espid\": \"%s\", \"boardname\": \"%s\", \"online\": 0, \"source\": \"%s\"}", 
           espId, strBoardName_, STR_ORG_BOARD);
       Serial.printf("LastWill: %s", strLastWill);
 
       if (ptrMqtt->connect(espId, MQTT_USER, MQTT_PASSWORD, 
           strTopicPubConex_, 1, true, strLastWill)) 
       {
+        Debug(3, "Entra en el if");
         Serial.printf(" conectado a broker: %s\n", MQTT_SERVER);
 
         Serial.printf("Suscribiendo a %s\n", strTopicAllConfig_);
@@ -114,19 +117,23 @@ void EspInfInd::MqttConnect() {
          
         //---- REQ.BD4 conexión
           delay(1000); // dar tiempo a que llegue el mensaje de last will
-          MqttSend(strTopicPubConex_, (char *)"Connected", STR_ORG_BOARD);
+        Debug(4, "Invoca a FormatMsg con la opción de enviar");
+        MqttFormatMsg(strTopicPubConex_, "Connected");
+          //// MqttSend(, (char *), STR_ORG_BOARD);
       } 
       else 
       {
+        Debug (5, " espera al siguient reintento");
         Serial.printf("failed, rc=%d  try again in 5s\n", ptrMqtt->state());
         delay(MQTT_RETRY_DELAY); // Wait 5 seconds before retrying
       }
     } // while
+  Debug(0, "Sale de MqttConnect");
 }
 
 
 void EspInfInd::Setup(void (*MqttCallback)(char*, byte*, unsigned int)) {
-  
+  Debug(1, "Entra en setup");
   //---------------------------------------------- ESP Setup
     Serial.begin(ESP_BAUD_RATE);
     Serial.println();
@@ -169,7 +176,7 @@ void EspInfInd::Loop()
      if (millis() > stPerStat_ + (cfPerStat_ * 1000)) {
         sprintf(strStatus, "Periodic update every %d seconds\n", cfPerStat_);
         //Serial.printf("Millis %d, stPer=%d, cfPer=%d\n", millis(),stPerStat_, cfPerStat_);
-        MqttSend(strTopicPubDatos_, strStatus, STR_ORG_BOARD);
+        //MqttSend(strTopicPubDatos_, strStatus, STR_ORG_BOARD);
         //stPerStat_ =millis()+10000;
      }
 } 
@@ -199,7 +206,7 @@ void EspInfInd::UpdateSwitch(int iUpdateType, int newLevel, int newConfig) {
         cfSwLight_ = newConfig;
         highLow = (stSwLevel_==0 && cfSwLight_==0)||(stSwLevel_==1 && cfSwLight_==1)?LOW:HIGH;
         digitalWrite(PIN_COMUN_SWITCH, highLow);  // write to led pin
-        MqttSend(strTopicPubStSwi_, strStatus, STR_ORG_MQTT);
+        //MqttSend(strTopicPubStSwi_, strStatus, STR_ORG_MQTT);
       }
     } // configuración switch
 
@@ -223,7 +230,7 @@ void EspInfInd::UpdateSwitch(int iUpdateType, int newLevel, int newConfig) {
         else
           pct2val = 255;
         analogWrite(PIN_COMUN_LED, pct2val);
-        MqttSend(strTopicPubStLed_, strStatus, STR_ORG_MQTT);
+        //MqttSend(strTopicPubStLed_, strStatus, STR_ORG_MQTT);
       } // cambia la configuración
     } // configuración MQTT
   
@@ -242,7 +249,7 @@ void EspInfInd::UpdateSwitch(int iUpdateType, int newLevel, int newConfig) {
         stSwLevel_ = newLevel;
         highLow = (stSwLevel_==0 && cfSwLight_==0)||(stSwLevel_==1 && cfSwLight_==1)?LOW:HIGH;
         digitalWrite(PIN_COMUN_SWITCH, highLow);  // write to led pin
-        MqttSend(strTopicPubStSwi_, strStatus, STR_ORG_MQTT);
+        //MqttSend(strTopicPubStSwi_, strStatus, STR_ORG_MQTT);
       }  // comando MQTT
     }
 
@@ -264,24 +271,23 @@ void EspInfInd::UpdateSwitch(int iUpdateType, int newLevel, int newConfig) {
         else
           pct2val = 255;
         analogWrite(PIN_COMUN_LED, pct2val);
-        MqttSend(strTopicPubStLed_, strStatus, STR_ORG_MQTT);
+        //MqttSend(strTopicPubStLed_, strStatus, STR_ORG_MQTT);
       }  // comando MQTT
     }
   
 
 }
 
-void Debug(int i, char* msg){
-  Serial.printf("Debug %d: %s\n", i, msg);
+void EspInfInd::Debug(int iNum, const char * strAux) {
+  //char strMsg[200];
+  Serial.printf("Debug %d: %s\n", iNum, strAux);
 }
 
 
 void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
 {
-  char strStatus[100];
-
   //----- Mensaje recibido
-    Debug(1, "");
+    Debug(1, "Entra en MqttReceived");
     char *strMsg = (char *)malloc(length+1);
     strncpy(strMsg, (char*)payload, length);
     strMsg[length]='\0';
@@ -294,12 +300,14 @@ void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
 
   //----- Procesamiento de mensajes de juego
     if (strcmp(strTopic, strTopicGameCommand)==0) {
-      Debug(2, "");
-      int newGame = jsonSub["FaceNumb"].as<int>();
-      LastGameTime = jsonSub["GameTime"].as<int>();
-      LastFailTime = jsonSub["FailTime"].as<int>();
-      LastNumTries = jsonSub["NumTries"].as<int>();
-      strcpy(LastGameParm, (const char *)jsonSub["GameParm"]);
+      Debug(2, "Recibido comando de jueego");
+      //int newGame = jsonSub["FaceNumb"].as<int>();
+      int newGame = jsonSub["activeface"].as<int>();
+      
+      //LastGameTime = jsonSub["GameTime"].as<int>();
+      //LastFailTime = jsonSub["FailTime"].as<int>();
+      //LastNumTries = jsonSub["NumTries"].as<int>();
+      //strcpy(LastGameParm, (const char *)jsonSub["GameParm"]);
       Serial.printf("Pasando de juego %d a %d\n",ActiveFace, newGame);
       ActiveFace = newGame;
     }
@@ -309,7 +317,6 @@ void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
     else if ((strcmp(strTopic, strTopicSubConfig_)==0 ||
          strcmp(strTopic, strTopicAllConfig_)==0)  )
     {
-        Debug(3, "");
         Serial.printf("cfPerStat=%d -> ",cfPerStat_);
         cfPerStat_ = jsonSub["cfPerStat"].as<int>();
         if (cfPerStat_ < 1000) {
@@ -358,7 +365,6 @@ void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
          strcmp(strTopic, strTopicAllCmdSwi_)==0) 
         && bStandard_)
     {
-      Debug(4, "");
       int lev =jsonSub["stSwLevel"];
       UpdateSwitch(SWITCH_CMD_MSG, lev, -1);
     }
@@ -369,7 +375,6 @@ void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
          strcmp(strTopic, strTopicAllCmdLed_)==0) 
         && bStandard_)
     {
-      Debug(5, "");
       int lev =jsonSub["stLdLevel"];
       UpdateSwitch(LED_CMD_MSG, lev, -1);
     }
@@ -382,35 +387,44 @@ void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
     }
 }
 
-void EspInfInd::MqttSend(char* strTopic, char* strGameStatus, const char *strSrc) {
-  static char strSerialized[JSON_MESSAGE_SIZE];
+//void EspInfInd:://MqttSend(char* strTopic, char* strGameInfo, const char *strSrc) {
+void EspInfInd::MqttFormatMsg(char* strTopic, const char* strUserInfo, int iOption) {
+  static char  strUserInfoCopy[100];
+  strcpy(strUserInfoCopy, strUserInfo); // para que no pete si la variable desaparece antes de enviar
 
-  jsonPub["ChipId"] = espId;
-  jsonPub["BoardName"] = strBoardName_;
-  jsonPub["Online"] = 1; // true;
-  jsonPub["cfPerStat"] = cfPerStat_;
-  jsonPub["cfPerFota"] = cfPerFota_;
+  jsonPub["boardname"]  = strBoardName_;
+  jsonPub["online"]     = 1; // true;
+  jsonPub["activeface"] = ActiveFace;
+  jsonPub["userinfo"]   = strUserInfoCopy;
+  jsonPub["espid"]      = espId;
+  jsonPub["source"]     = "board";
+  jsonPub["uptime"]     = millis();
 
-  jsonPub["cfSwLight"] = cfSwLight_;
-  jsonPub["stSwLevel"] = stSwLevel_;
-  jsonPub["uiSwLevel"] = (stSwLevel_== cfSwLight_) ? 1 : 0;
-  
-  jsonPub["cfLdLight"] = cfLdLight_;
-  jsonPub["stLdLevel"] = stLdLevel_;
-  jsonPub["uiLdLevel"] = (stLdLevel_== cfLdLight_) ? 1 : 0;
-  jsonPub["cfLedBrig"] = cfLedBrig_;
-  jsonPub["cfLedVelo"] = cfLedVelo_;
 
-  jsonPub["Origin"] = strSrc;
-  jsonPub["MqttId"] = "PTE";
-  jsonPub["UpTime"] = millis();
-  jsonPub["Info"] = strGameStatus;
 
-  serializeJson(jsonPub,strSerialized);
-  Serial.printf("Enviando: %s a %s\n---\n%s\n---\n", strGameStatus, strTopic, strSerialized);
+//  jsonPub["cfPerStat"] = cfPerStat_;
+//  jsonPub["cfPerFota"] = cfPerFota_;
+//
+//  jsonPub["cfSwLight"] = cfSwLight_;
+//  jsonPub["stSwLevel"] = stSwLevel_;
+//  jsonPub["uiSwLevel"] = (stSwLevel_== cfSwLight_) ? 1 : 0;
+//  
+//  jsonPub["cfLdLight"] = cfLdLight_;
+//  jsonPub["stLdLevel"] = stLdLevel_;
+//  jsonPub["uiLdLevel"] = (stLdLevel_== cfLdLight_) ? 1 : 0;
+//  jsonPub["cfLedBrig"] = cfLedBrig_;
+//  jsonPub["cfLedVelo"] = cfLedVelo_;
+//
+//  jsonPub["MqttId"] = "PTE";
 
-  ptrMqtt->publish(strTopic, strSerialized);
-  stPerStat_ = millis(); // reset del tiempo desde último envío de configuración
+  if (iOption == OPT_MSG_SEND){
+    static char strSerialized[JSON_MESSAGE_SIZE];
+    serializeJson(jsonPub,strSerialized);
+    Serial.printf("Enviando: %s a %s\n---\n%s\n---\n", strUserInfo, strTopic, strSerialized);
+    ptrMqtt->publish(strTopic, strSerialized);
+  }
+
+  stPerStat_ = millis(); // reset del tiempo desde último envío
 }
 
 
@@ -419,9 +433,6 @@ EspInfInd::~EspInfInd()
   ; 
 }
 
-//----- REQ.MQ3 LastWill
-//#define MQTT_LASTWILL         "{\"online\":false}"
-//#define MQTT_LASTWILL         "{\"online\": 0}"
 
 
 

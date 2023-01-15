@@ -17,6 +17,9 @@
 #define WIFI_PASSWORD         "1518wifi"
 #define WIFI_RETRY_DELAY      200
 
+#define OPT_MSG_FORMAT 0
+#define OPT_MSG_SEND 1
+
 //--------------------------------------------- JSON
 #define JSON_MESSAGE_SIZE    1024
 
@@ -34,8 +37,9 @@ class EspInfInd
     EspInfInd(const char *strBoardName, bool bStandard);
     void Setup(void (*mqttCallback)(char*, byte*, unsigned int));
     void Loop();
+    void Debug(int iNum, const char * strAux);
     void MqttReceived(char* strTopic, byte* payload, unsigned int length);
-    void MqttSend(char* strTopic, char* strGameStatus, const char *strSrc=STR_ORG_BOARD);
+    void MqttFormatMsg(char* strTopic, const char* strUserInfo, int iOption=OPT_MSG_SEND);
     void UpdateSwitch(int iUpdateType, int newLevel, int newConfig);
     ~EspInfInd();
     
