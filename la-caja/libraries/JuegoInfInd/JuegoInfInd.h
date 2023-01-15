@@ -30,22 +30,28 @@ class JuegoInfInd
     char            TopicSub[TOPIC_NAME_MAX];
 
     // parametros del juego
-    int             FaceNumb;     // número de la cara del cubo
-    char            GameName[20]; // numpad, simon, joystick, switch, barco
     // parámetros de entrada
-    int             GameTime;     // Tiempo máximo de juego
-    int             FailTime;     // Tiempo máximo hasta fallar
-    int             NumTries;     // Número máximo de reintentos
-    char            GameParm[30]; // solución del juego o parámetros de entrada
-    char            Time2End[20]; // 15:00
+    char            gameparam[30]; // solución del juego o parámetros de entrada
+    int             maxtime;       // Tiempo máximo de juego
+    int             maxlives;      // Número máximo de reintentos
+    // parámetros de entrada/salida
+    int             activeface;    // Cara activa en cada momento
+    int             facenumb;      // número de la cara del cubo
+    char            gamename[20];  // numpad, simon, joystick, switch, barco
+    char            gameinfo[200]; // información adicional sobre el 
 
     // parámetros de salida
-    int             GameStat;     // estado actual del juego
-    int             NumFails;     // número de reintentos de juego
-    int             TmTotPly;
-    int             TmActive;
-    int             TmOnHold;
-    int             TmLstTry;
+    int             gamestate;     // estado actual del juego
+    int             remtime;       // tiempo restante en segundos
+    int             remlives;      // vidas que quedan por gastar
+    //int             TmTotPly;
+    //int             TmActive;
+    //int             TmOnHold;
+    //int             TmLstTry;
+    
+    //int             FailTime;     // Tiempo máximo hasta fallar
+    //char            Time2End[20]; // 15:00
+
     
   private:
     EspInfInd       *pEsp_;     // puntero al objeto que gestiona el chip

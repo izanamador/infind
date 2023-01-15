@@ -302,14 +302,18 @@ void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
     if (strcmp(strTopic, strTopicGameCommand)==0) {
       Debug(2, "Recibido comando de jueego");
       //int newGame = jsonSub["FaceNumb"].as<int>();
-      int newGame = jsonSub["activeface"].as<int>();
+      activefaceLast      = jsonSub["activeface"].as<int>();
+      maxtimeLast         = jsonSub["maxtime"].as<int>();
+      maxlivesLast        = jsonSub["maxlives"].as<int>();
+      strcpy(gameparamLast, (const char *) jsonSub["gameparam"]);
+      strcpy(gameinfoLast,  (const char *) jsonSub["gameparam"]);
       
       //LastGameTime = jsonSub["GameTime"].as<int>();
       //LastFailTime = jsonSub["FailTime"].as<int>();
       //LastNumTries = jsonSub["NumTries"].as<int>();
       //strcpy(LastGameParm, (const char *)jsonSub["GameParm"]);
-      Serial.printf("Pasando de juego %d a %d\n",ActiveFace, newGame);
-      ActiveFace = newGame;
+      Serial.printf("Pasando de juego %d a %d\n",ActiveFace, activefaceLast);
+      ActiveFace = activefaceLast;
     }
 
   
@@ -394,7 +398,7 @@ void EspInfInd::MqttFormatMsg(char* strTopic, const char* strUserInfo, int iOpti
 
   jsonPub["boardname"]  = strBoardName_;
   jsonPub["online"]     = 1; // true;
-  jsonPub["activeface"] = ActiveFace;
+  jsonPub["ActiveFace"] = ActiveFace;
   jsonPub["userinfo"]   = strUserInfoCopy;
   jsonPub["espid"]      = espId;
   jsonPub["source"]     = "board";

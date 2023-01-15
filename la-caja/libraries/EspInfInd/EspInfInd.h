@@ -64,12 +64,13 @@ class EspInfInd
       char strTopicGameCommand[TOPIC_NAME_MAX];
       char strTopicGameStatus[TOPIC_NAME_MAX];
 
-      int             LastGameTime;     // Tiempo máximo de juego
-      int             LastFailTime;     // Tiempo máximo hasta fallar
-      int             LastNumTries;     // Número máximo de reintentos
-      char            LastGameParm[30]; // solución del juego o parámetros de entrada
-    
-
+    //-------------------- para guardar último mensaje de petición al juego
+      int             activefaceLast;     // Tiempo máximo de juego
+      int             maxtimeLast;        // Tiempo máximo hasta fallar
+      int             maxlivesLast;;      // Número máximo de reintentos
+      char            gameparamLast[30];  // solución del juego o parámetros de entrada
+      char            gameinfoLast[100];  // mensajes específicos de juego
+      
 
     //------ REQ.IT29 Interfaz común JSON
       // StaticJsonDocument<JSON_MESSAGE_SIZE> msgPub;

@@ -35,10 +35,10 @@ void fNumpad() {
   if (key == '#') {
     // al pulsar enviar se pone un nulo al final del string para cortar la cadena
     strDigits[iDigit] = '\0'; 
-    sprintf(strReport, "Respuesta=%s, solucion=%s\n", strDigits, oNumpad.GameParm);    
+    sprintf(strReport, "Respuesta=%s, solucion=%s\n", strDigits, oNumpad.gameparam);    
     iDigit = 0; // restablecer la posición para el nuevo intento o siguiente partida
 
-    if (strcmp(strDigits, oNumpad.GameParm)==0) {
+    if (strcmp(strDigits, oNumpad.gameparam)==0) {
       oNumpad.ReportSuccess(strReport);
     } else {
       oNumpad.ReportFail(strReport);
