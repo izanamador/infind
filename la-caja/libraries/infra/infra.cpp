@@ -87,7 +87,7 @@ void Infra::ReportStatus(char* GameInfo)
   
   // report when event or periodically
   // TODO QUITAR HARDCODE DE REPORTING CADA SEGUNDO
-  if (bReport || millis() > 1000+milLsRep_)
+  if (bReport || millis() > 5000+milLsRep_)
   {
     milLsRep_ = millis(); // refresh last report timestamp
     json["gametime"] = millis()-milStart_;
