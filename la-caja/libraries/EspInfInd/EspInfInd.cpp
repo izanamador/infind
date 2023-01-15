@@ -306,7 +306,7 @@ void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
       maxtimeLast         = jsonSub["maxtime"].as<int>();
       maxlivesLast        = jsonSub["maxlives"].as<int>();
       strcpy(gameparamLast, (const char *) jsonSub["gameparam"]);
-      strcpy(gameinfoLast,  (const char *) jsonSub["gameparam"]);
+      //strcpy(gameinfoLast,  (const char *) jsonSub["gameparam"]);
       
       //LastGameTime = jsonSub["GameTime"].as<int>();
       //LastFailTime = jsonSub["FailTime"].as<int>();

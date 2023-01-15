@@ -34,6 +34,7 @@ char* fNumpad() {
   // sprintf(strReport, "Ult tecla = %c\n", key);
 
   if (key == '#') {
+    Serial.println("#");
     // reportar si se ganó o se perdió
     if (strcmp(Gamedata, oNumpad.gameparam)==0) {
       oNumpad.ReportSuccess(Gamedata);
@@ -49,10 +50,10 @@ char* fNumpad() {
     // gamedata[iDigit] = '\0'; 
   }
   else if (key >= '0' && key <= '9') {
+    Serial.println("0-9");
     if (iDigit <= MAX_DIGITS) {
       Gamedata[iDigit++] = key;
       Gamedata[iDigit] = '\0';
-      return(Gamedata);
     }
     return Gamedata; // refrescar la pantalla con lo que se lleva pulsado    
     //oNumpad.ReportStatus(strDigits);

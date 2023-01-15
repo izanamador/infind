@@ -55,7 +55,7 @@ bool JuegoInfInd::GameRunning() {
 		 		maxtime 		= pEsp_->maxtimeLast;
 		 		maxlives 		= pEsp_->maxlivesLast;
 				strcpy(gameparam, pEsp_->gameparamLast);
-				strcpy(gameinfo , pEsp_->gameinfoLast);
+				strcpy(gameinfo , ""); //! TODO REVISAR ESTO pEsp_->gameinfoLast);
 
 			//- Actualizar temporizadores
 				acttime 		= (int)((millis()-msStart_-msWaiting_)/1000);
@@ -151,6 +151,9 @@ bool JuegoInfInd::GameRunning() {
 			}
 			else if (remtime%60 == 0) {
 				sprintf(gameinfo, "%d minutes left", remtime/60);
+			}
+			else {
+				sprintf(gameinfo, "", remtime/60);
 			}
 			ReportStatus(gameinfo);			
 			return true; // el juego recibe el control

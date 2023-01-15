@@ -28,9 +28,10 @@ void loop(){
   if (oNumpad.GameRunning()) {
     strGamedata = fNumpad(); 
     if (strGamedata != NULL) {
+      Serial.println(strGamedata);
       // hay que refrescar la pantalla: copiar la secuencia y enviarla a Nodered
       strcpy(oNumpad.gamedata, strGamedata);
-      oNumpad.ReportStatus(strGamedata);
+      oNumpad.ReportStatus(oNumpad.gameinfo);
     }
     
   }
