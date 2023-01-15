@@ -12,6 +12,7 @@ JuegoInfInd::JuegoInfInd(const char *gameName, int faceNumb, EspInfInd *pEspInfI
     //------- Inicialización de variables del objeto
 		pEsp_ = pEspInfInd; //---  puntero al ESP donde está implementado el juego
 		activeface = 0;
+		acttime = 0;
     	gamestate = STAT_NEWMATCH;
 		strcpy(gameparam, "");
 		maxtime = 0;
@@ -37,6 +38,10 @@ void JuegoInfInd::Setup() {
 }
 
 
+
+#define REPORT_MSG_STARTGAME "%s starting, you have %d lives %d minutes and %d seconds to solve it"
+#define REPORT_MSG_TIMEOUT   "Timeout. You lost %s but can try another game"
+
 bool JuegoInfInd::GameRunning() {
 	char strAux[100];
 	bool bJugando = false;
@@ -44,133 +49,135 @@ bool JuegoInfInd::GameRunning() {
 	static int stLast = -1;
 
 	activeface = pEsp_->ActiveFace; 
+	//- si se está jugando mi juego, refrescar los parámetros de configuración y temporizadores
+ 	if (activeface == facenumb) {
+	 		//- Refrescar parámetros
+		 		maxtime 		= pEsp_->maxtimeLast;
+		 		maxlives 		= pEsp_->maxlivesLast;
+				strcpy(gameparam, pEsp_->gameparamLast);
+				strcpy(gameinfo , pEsp_->gameinfoLast);
 
-	if (stLast != gamestate) {Serial.printf("%d->%d\n", stLast, gamestate);stLast=gamestate;}
+			//- Actualizar temporizadores
+				acttime 		= (int)((millis()-msStart_-msWaiting_)/1000);
+				remtime 		= maxtime-acttime;
+				//activefaceLast      = jsonSub["activeface"].as<int>();
+	 	}
 
-	// esperar a que empiece una partida
+	//- esperar a que empiece una partida
 	if ((gamestate== STAT_NEWMATCH) && (activeface==0))
-		;
+			;
 
-	// todos los juegos inicializan variables, reportan a NR y pasan a esperar su turno
-	else if ((gamestate== STAT_NEWMATCH) && (activeface!=0)) {
-		pEsp_->Debug(1, "newmatch y active face > 0");
-		msMatch_	  = millis();
-	    //NumFails      = 0;
-	    msStart_      = 0;
-	    msTries_      = 0;
-	    msHold_       = 0;
-		msGameHolded_ = 0;
-	 	msTryHolded_  = 0; 
-	 	//TmTotPly 	  = 0;
-		//TmActive	  = 0;
-		//TmOnHold	  = 0;
-		//TmLstTry	  = 0;
+	//- si hay una nueva partida cada juego debe reinicializar
+	else if ((gamestate == STAT_NEWMATCH) && (activeface!=0)) {		
+			pEsp_->Debug(30, "newmatch y active face > 0");
+			msMatch_	  = millis();
+    		gamestate     = STAT_WAITSTART;
+	 		// msTryHolded_  = 0; 
+			// msGameHolded_ = 0;
+			// ReportStatus((char *)"NewMatch -> WaitStart");
+	    	// NumFails      = 0;
+	    	// msStart_      = 0;
+	    	// msTries_      = 0;
+	    	// msHold_       = 0;		
+		}
 
-		//------ Cambiar estado y reportarlo
-	    gamestate     = STAT_WAITSTART;
-		ReportStatus((char *)"NewMatch -> WaitStart");
-		// return false; // salir para no volver a modificar los tiempos
-	} 
+	//- en mitad de una partida se pide empezar otra => enviar el último estado
+	else if (((gamestate==STAT_PLAYING) || (gamestate==STAT_ONHOLD)) && (activeface==0)) {
+			sprintf(gameinfo, "%s aborted", gamename);
+			ReportStatus(gameinfo);
+			gamestate= STAT_NEWMATCH;
+		}
 
-	// en mitad de una partida se pide empezar otra, todos los juegos empiezan de nuevo
-	else if ((gamestate!= STAT_NEWMATCH) && (activeface==0)) {
-		pEsp_->Debug(2, "newmatch y active face > 0");
-		sprintf(strAux, "Pasando de estado %d a nueva partida", gamestate);
-		ReportStatus(strAux);
-		gamestate= STAT_NEWMATCH;
-	}
-
-	// esperar a que empiece el juego
+	//- la partida ha empezado pero hay que esperar a que se active el juego
 	else if ((gamestate== STAT_WAITSTART) && (facenumb != activeface))
 		;
 
-	// el juego se activó: resetear tiempos y copiar parámetros específicos del juego
+	//- el juego se activó por primera vez: resetear temporizadores y reportar inicio
 	else if ((gamestate== STAT_WAITSTART) && (facenumb == activeface)) {
 		//--- resetear temporizadores
-			pEsp_->Debug(4, "Iniciando el juego");
-			Serial.printf("Iniciando juego %d", facenumb);
-			msStart_ = millis();
-			msTries_ = msStart_;
-			msHold_   = 0;
-
-		//- copiar los parámetros específicos que se guardaron cuando llegó el último mensaje
-			maxtime 	= 		pEsp_->maxtimeLast;
-			maxlives 	= 		pEsp_->maxlivesLast;
-			strcpy(gameparam, 	pEsp_->gameparamLast);
-			strcpy(gameinfo, 	pEsp_->gameinfoLast);			
-			//NumTries = pEsp_->LastNumTries; // TODO EN LUGAR DE NUMTRIES SERÍA MAXSETS NUMSETS
-
-		//- inicializar el tiempo y número de vidas
+			gamestate= STAT_NEWGAME;
+			sprintf(gameinfo, REPORT_MSG_STARTGAME, gamename, maxlives, maxtime/60, maxtime%60);
+			ReportStatus(gameinfo);
+			acttime 	= 0;
 			remtime 	= maxtime;
 			remlives 	= maxlives;
-
-		//------ Cambiar estado para que el juego pueda inicializarse y reportarlo
-		    gamestate= STAT_NEWGAME;
-			pEsp_->Debug(5, "Inicio genérico completado -> nuevo intento");
-			// msReport = millis();
+			msStart_ 	= millis();
+			msHold_   	= 0;
+			msWaiting_  = 0;
 			return true; // el juego específico debería inicializar el juego (melodía simón)
-	}
 
-	// nuevo set => el juego recibe el control para inicializar  debería inicializar lo que necesite
-	else if ((gamestate== STAT_NEWGAME) && (facenumb == activeface)) {		
-		pEsp_->Debug(5, "Iniciando el set");
-	    gamestate= STAT_NEWSET;
-	    return true;
-	}	
-
-	// nuevo set => el juego recibe el control para inicializar  debería inicializar lo que necesite
-	else if ((gamestate== STAT_NEWSET) && (facenumb == activeface)) {
-		pEsp_->Debug(5, "Inicio específico completado -> nuevo intento");
-	    gamestate= STAT_PLAYING;
-		msReport = millis();
-		return true; // el juego específico debería incializar el intento (4 notas)
-	}
-
-
-	// Estoy jugando así que reporto compruebo timeout y cada segundo
-	else if  ((gamestate== STAT_PLAYING) && (facenumb == activeface)) {
-		if (millis() > msReport + 5000) { // TODO QUE EL TIEMPO SEA CONFIGURABLE
-			msReport = millis();
-			if (millis() > 300000) { // TODO PONER LA CONDICION DE TIMEOUT y en otro sitio la del NUMERO MAXIMO DE INTENTOS
-			    gamestate= STAT_LOST;
-				ReportStatus((char *)"Timeout, has perdido");
-			} else { // TODO INDICAR EL TIEMPO QUE QUEDA Y QUE LA PERIODICIDAD SEA CONFIGURABLE
-				ReportStatus((char *)"Quedan 300 un segundos menos");
-			}
+			// //- copiar los parámetros específicos que se guardaron cuando llegó el último mensaje
+				//msTries_ 	= msStart_;
+				// 	maxtime 	= 		pEsp_->maxtimeLast;
+				// 	maxlives 	= 		pEsp_->maxlivesLast;
+				// 	strcpy(gameparam, 	pEsp_->gameparamLast);
+				// 	strcpy(gameinfo, 	pEsp_->gameinfoLast);			
+				// 	//NumTries = pEsp_->LastNumTries; // TODO EN LUGAR DE NUMTRIES SERÍA MAXSETS NUMSETS
+				//- inicializar el tiempo y número de vidas
 		}
-		return true; // el juego recibe el control
-	}
 
-	// La cara activa ha dejado de ser la del juego => Cambiar estado y reportarlo
-	else if  ((gamestate== STAT_PLAYING) && (facenumb != activeface)) {
-		msHold_ = millis();
+	//- nueva partida => el juego recibe el control para inicializar lo que necesite
+	else if ((gamestate== STAT_NEWGAME) && (facenumb == activeface)) {		
+			pEsp_->Debug(5, "Iniciando el set");
+		    gamestate= STAT_NEWSET;
+		    return true;
+		}	
 
-		sprintf(gameinfo, "%d: paro para dar paso a %d", facenumb, activeface);
-	    gamestate= STAT_ONHOLD;
-		ReportStatus(gameinfo);
+	//- nueva vida => el juego recibe el control para inicializar lo que necesite
+	else if ((gamestate== STAT_NEWSET) && (facenumb == activeface)) {
+			pEsp_->Debug(5, "Inicio específico completado -> nuevo intento");
+		    gamestate= STAT_PLAYING;
+			//msReport = millis();
+			return true; // el juego específico debería incializar el intento (4 notas)
+		}
 
-		//pEsp_->Debug(6, "Otro juego => onhold");
-		// copiar la respuesta solución al juego
-		//!strcpy(GameParm, pEsp_->jsonSub["GameParm"]);
-	}
+	//- si se acabe el tiempo durante el juego hay que parar y pasar el control al crono
+	else if  ((gamestate== STAT_PLAYING) && (facenumb == activeface) && (remtime <=0)) {
+			sprintf(gameinfo, REPORT_MSG_TIMEOUT, gamename);
+		    gamestate= STAT_LOST;
+			ReportStatus(gameinfo);
+		}
+
+	// TODO QUE EL TIEMPO SEA CONFIGURABLE
+	//- durante el juego hay que informar periódicamente y detectar si se acabó el tiempo
+	else if  ((gamestate== STAT_PLAYING) && (facenumb == activeface) && millis()>msReport+5000) {
+			msReport = millis();
+			remtime = maxtime - (int)((msStart_-msWaiting_)/1000);
+			if (remtime <= 10) {
+				sprintf(gameinfo, "%d", remtime);
+			}
+			else if (remtime%60 == 0) {
+				sprintf(gameinfo, "%d minutes left", remtime/60);
+			}
+			ReportStatus(gameinfo);			
+			return true; // el juego recibe el control
+		}
+
+	//- La cara deja de estar activa => Cambiar estado y reportarlo
+	else if ((gamestate== STAT_PLAYING) && (facenumb != activeface)) {
+			sprintf(gameinfo, "%d: espera y da paso a %d", facenumb, activeface);
+			msHold_ = millis();
+		    gamestate= STAT_ONHOLD;
+			ReportStatus(gameinfo);
+			//pEsp_->Debug(6, "Otro juego => onhold");
+			// copiar la respuesta solución al juego
+			//!strcpy(GameParm, pEsp_->jsonSub["GameParm"]);
+		}
 
 	// La cara estaba parada y vuelve a estar activa => reanudamos
-	else if  ((gamestate== STAT_ONHOLD) && (facenumb == activeface)) {
-		msGameHolded_ += (millis()-msHold_);
-		msTryHolded_ += (millis()-msHold_);
+	else if ((gamestate== STAT_ONHOLD) && (facenumb == activeface)) {
+		msWaiting_ += (millis()-msHold_);
 		msHold_ = 0;
+		//msTryHolded_ += (millis()-msHold_);
 
-		sprintf(gameinfo, "%d: reanudo después de parar", facenumb);
+		sprintf(gameinfo, "resuming %s", gamename);
 		gamestate= STAT_PLAYING;
-		ReportStatus((char *)"Vuelta onhold -> play");
-		bJugando = true;
-
-	    //Serial.printf("Reanundadndo el juego %d", facenumb);
+		ReportStatus(gameinfo);
+		//return = true;
 	} 
 	//TmTotPly = (millis()-msStart_);
 	//TmOnHold = msGameHolded_;
 	//TmActive = TmTotPly - TmOnHold;
-
 	return false; // el juego específico no recibe el control
 }
 
@@ -203,7 +210,7 @@ void JuegoInfInd::ReportFail(char* strGameInfo){
 	ReportStatus(strGameInfoOut);
 
     msTries_ = millis();
-    msTryHolded_ = 0;
+    //msTryHolded_ = 0;
 }
 
 

@@ -300,7 +300,7 @@ void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
 
   //----- Procesamiento de mensajes de juego
     if (strcmp(strTopic, strTopicGameCommand)==0) {
-      Debug(2, "Recibido comando de jueego");
+      Debug(2, "Recibido comando de juego");
       //int newGame = jsonSub["FaceNumb"].as<int>();
       activefaceLast      = jsonSub["activeface"].as<int>();
       maxtimeLast         = jsonSub["maxtime"].as<int>();
@@ -314,6 +314,7 @@ void EspInfInd::MqttReceived(char* strTopic, byte* payload, unsigned int length)
       //strcpy(LastGameParm, (const char *)jsonSub["GameParm"]);
       Serial.printf("Pasando de juego %d a %d\n",ActiveFace, activefaceLast);
       ActiveFace = activefaceLast;
+      Debug(3, "Salida del comando de juego");
     }
 
   
