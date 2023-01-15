@@ -87,7 +87,7 @@ void Infra::ReportStatus(char* GameInfo)
   
   // report when event or periodically
   // TODO QUITAR HARDCODE DE REPORTING CADA SEGUNDO
-  if (bReport || millis() > 1000+milLsRep_)
+  if (bReport || millis() > 5000+milLsRep_)
   {
     milLsRep_ = millis(); // refresh last report timestamp
     json["gametime"] = millis()-milStart_;
@@ -95,9 +95,9 @@ void Infra::ReportStatus(char* GameInfo)
     json["numtries"] = numTries_;
 
 
-    if (GameInfo==NULL)
-      json["gameinfo"] = "";
-    else
+    /* if (GameInfo==NULL) */
+    /*   json["gameinfo"] = ""; */
+    /* else */
       json["gameinfo"] = GameInfo;
     
     serializeJson(json,message);
@@ -245,7 +245,7 @@ void Infra::PrintConfig()
   Serial.println(strAux);
 }
 
-int Infra::Loop(char* GameInfo = NULL)
+int Infra::Loop()
 {
   // TODO QUITAR HARDCODE DE TIEMPO DE PARTIDA Y/O JUEGO
   if ((currStat_== STAT_PLAY) && 
@@ -253,13 +253,13 @@ int Infra::Loop(char* GameInfo = NULL)
       ((millis()-milStart_) > 60000*60) )
   {
     currStat_ = STAT_TIMEOUT;
-    ReportStatus(GameInfo); // reporte periódico
+    ReportStatus(NULL); // reporte periódico
     currStat_ = STAT_END;
   }
   else
   {
     ptrMqtt->loop(); // para que la librería recupere el control
-    ReportStatus(GameInfo); // reporte periódico
+    ReportStatus(NULL); // reporte periódico
   }
 
   return 0;

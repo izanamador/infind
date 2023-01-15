@@ -18,9 +18,9 @@ Correct number: 17
 //#include "Arduino.h"
 #include <Button.h>
 Infra objInfra;
-char *strTopicPub = "II3/ESP002/pub/cara005"; // topic principal para publicar contenido y lastwill
-char *strTopicCfg = "II3/ESP002/cfg/cara005"; // topic para recibir parametros de configuracion
-char *strTopicCmd = "II3/ESP002/cmd/cara005"; // topic para recibir peticiones de comando
+char *strTopicPub = "II3/ESP005/pub/cara005"; // topic principal para publicar contenido y lastwill
+char *strTopicCfg = "II3/ESP005/cfg/cara005"; // topic para recibir parametros de configuracion
+char *strTopicCmd = "II3/ESP005/cmd/cara005"; // topic para recibir peticiones de comando
 // Variables para enviar y recibir datos por MQTT
 #define MESSAGE_SIZE_ 300
 static char message[MESSAGE_SIZE_];
@@ -91,7 +91,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length)
 void loop() 
 {
   static char strSwitches[]="_____";
-  objInfra.Loop(strSwitches);
+  objInfra.Loop(NULL);
   if (!objInfra.GameRunning())
     return;
 

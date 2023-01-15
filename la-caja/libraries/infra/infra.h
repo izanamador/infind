@@ -81,8 +81,9 @@ class Infra
   public:
     Infra();
     int Setup(void (*mqttCallback)(char*, byte*, unsigned int));
-    int Loop(char* GameInfo);
-    ~Infra();
+    /* int Loop(char* GameInfo); */
+  int Loop();
+  ~Infra();
     
     // esp board
       char          espId[40];

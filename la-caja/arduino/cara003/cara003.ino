@@ -1,8 +1,10 @@
 // Infraestructura común de la caja
 #include <infra.h>
-char *strTopicPub = "II3/ESP14440037/resultados_juego2"; // topic principal para publicar contenido y lastwill
+char *strTopicPub = "II3/ESP003/pub/cara003";
+//char *strTopicPub = "II3/ESP14440037/resultados_juego2"; // topic principal para publicar contenido y lastwill
 char *strTopicCfg = "II3/ESP002/cfg/cara002"; // topic para recibir parametros de configuracion
-char *strTopicCmd = "II3/ESP14440037/datos_juego2"; // topic para recibir peticiones de comando
+char *strTopicCmd = "II3/ESP003/cmd/cara003";
+////char *strTopicCmd = "II3/ESP14440037/datos_juego2"; // topic para recibir peticiones de comando
 
 // Variables globales
 Infra objInfra;
@@ -135,7 +137,7 @@ void loop()
 
 
   // Invocación a la infraestructura y salida si el juego no está activo
-    objInfra.Loop("");
+    objInfra.Loop();
     if (!objInfra.GameRunning())
       return;
       if (estado != STAT_ESPERA)
