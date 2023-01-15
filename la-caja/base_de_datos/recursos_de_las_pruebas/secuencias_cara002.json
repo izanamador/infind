@@ -1,20 +1,20 @@
-[ {
+[{
 "numero": "1",
 "content": "Se ha perdido un pequeño número de cartas de una baraja completa. Si reparto entre cuatro personas, quedan tres cartas. Si reparto entre tres personas, quedan dos y si reparto entre cinco personas, quedan dos cartas. ¿Cuántas cartas hay?",
 "ans": 47
 },
 {
 "numero": "2",
-"content": "La respuesta es 23",
-"ans": 23
+"content": "Un pastor no sabe cuántas cabras tiene pero sabe que la mitad serán sacrificadas, una tercera parte de las sacrificadas serán vendidas y que una quinta parte de las que no sacrifique las regalará. ¿Cuál es el mínimo número de cabras que puede tener el pastor?",
+"ans": 30
 },
 {
 "numero": "3",
-"content": "La respuesta es 32",
-"ans": 32
+"content": "A un cerezo me subí, donde cerezas había, donde cerezas no comí, donde cerezas no dejé. ¿Cuántas cerezas hallé?",
+"ans": 2
 },
 {
 "numero": "4",
-"content": "La respuesta es 2888",
-"ans": 2888
+"content": "A una señora se le cayó al suelo la cesta de los huevos, y alguien quería saber cuántos huevos había en la cesta. <br /> - ¿Cuantos huevos llevaba? - le preguntaron. <br /> - No lo sé, recuerdo que al contarlos en grupos de 2, 3, 4 y 5, sobraban 1, 2, 3 y 4 respectivamente",
+"ans": 59
 }]

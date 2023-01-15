@@ -1,22 +1,15 @@
 [ {
 "numero": "1",
-"content": "Secuence: 3 5 7 11 13",
+"content": "Secuencia: 3 5 7 11 13 ...",
 "ans": 17
 },
 {
 "numero": "2",
-"content": "Secuence: ans 13",
-"ans": 13
+"content": "Secuencia: 10 45 15 38 20 ...",
+"ans": 31
 },
 {
 "numero": "3",
-"content": "Secuence: ans 12",
-"ans": 12
-},
-{
-"numero": "4",
-"content": "Secuence: ans 14",
-"ans": 14
+"content": "Secuence: 1 1 2 3 5 ...",
+"ans": 10
 }]
-
-
