@@ -116,7 +116,7 @@ void loop(){
   static int iDigit = 0;
 
   display.clearDisplay();       /* Refresca la pantalla */
-  objInfra.Loop(strDigits);
+  objInfra.Loop();
 
   if (!objInfra.GameRunning())
     return;
