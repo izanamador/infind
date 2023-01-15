@@ -21,8 +21,18 @@ void mqttCallback(char* topic, byte* payload, unsigned int length){
   oEspInfInd.MqttReceived(topic, payload, length);
 }
 
+char *strGamedata;
+
 void loop(){
   oEspInfInd.Loop();
-  if (oNumpad.GameRunning())
-    fNumpad();
+  if (oNumpad.GameRunning()) {
+    strGamedata = fNumpad(); 
+    if (strGamedata != NULL) {
+      // hay que refrescar la pantalla: copiar la secuencia y enviarla a Nodered
+      strcpy(oNumpad.gamedata, strGamedata);
+      oNumpad.ReportStatus(strGamedata);
+    }
+    
+  }
+    
 }

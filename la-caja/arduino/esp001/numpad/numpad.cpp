@@ -22,32 +22,41 @@ Keypad myKeypad = Keypad( makeKeymap(keys), rowPins, colPins, NUM_ROWS, NUM_COLS
 static char strReport[50];
 
 
+
 #define MAX_DIGITS 10
+char Gamedata[MAX_DIGITS] = ""; // String que se va componiendo con el numpad
 
 
-void fNumpad() {
-  static char strDigits[MAX_DIGITS]; // string para ir guardando el número
+char* fNumpad() {
   static int iDigit = 0; // posición donde pondré el siguiente caracter
 
   char key = myKeypad.getKey(); // lectura asíncrona del numpad
-  sprintf(strReport, "Ult tecla = %c\n", key);
+  // sprintf(strReport, "Ult tecla = %c\n", key);
 
   if (key == '#') {
-    // al pulsar enviar se pone un nulo al final del string para cortar la cadena
-    strDigits[iDigit] = '\0'; 
-    sprintf(strReport, "Respuesta=%s, solucion=%s\n", strDigits, oNumpad.gameparam);    
-    iDigit = 0; // restablecer la posición para el nuevo intento o siguiente partida
-
-    if (strcmp(strDigits, oNumpad.gameparam)==0) {
-      oNumpad.ReportSuccess(strReport);
+    // reportar si se ganó o se perdió
+    if (strcmp(Gamedata, oNumpad.gameparam)==0) {
+      oNumpad.ReportSuccess(Gamedata);
     } else {
-      oNumpad.ReportFail(strReport);
-    }        
+      oNumpad.ReportFail(Gamedata);
+    }
+    // preparar el juego para la siguiente vida
+    iDigit = 0; 
+    Gamedata[iDigit] = '\0';
+    return Gamedata; // refrescar la pantalla con blancos
+    //sprintf(strReport, "Respuesta=%s, solucion=%s\n", strDigits, oNumpad.gameparam);    
+    // al pulsar enviar se pone un nulo al final del string para cortar la cadena
+    // gamedata[iDigit] = '\0'; 
   }
   else if (key >= '0' && key <= '9') {
     if (iDigit <= MAX_DIGITS) {
-      strDigits[iDigit++] = key;
+      Gamedata[iDigit++] = key;
+      Gamedata[iDigit] = '\0';
+      return(Gamedata);
     }
-    oNumpad.ReportStatus(strDigits);
+    return Gamedata; // refrescar la pantalla con lo que se lleva pulsado    
+    //oNumpad.ReportStatus(strDigits);
   }
+  return NULL; // no se pulsó nada y no hay nada que actualizar
+
 }

@@ -39,7 +39,7 @@ void JuegoInfInd::Setup() {
 
 
 
-#define REPORT_MSG_STARTGAME "%s starting, you have %d lives %d minutes and %d seconds to solve it"
+#define REPORT_MSG_STARTGAME "%s starting, you have %d lives and %d minutes to solve it"
 #define REPORT_MSG_TIMEOUT   "Timeout. You lost %s but can try another game"
 
 bool JuegoInfInd::GameRunning() {
@@ -95,9 +95,12 @@ bool JuegoInfInd::GameRunning() {
 	//- el juego se activó por primera vez: resetear temporizadores y reportar inicio
 	else if ((gamestate== STAT_WAITSTART) && (facenumb == activeface)) {
 		//--- resetear temporizadores
+
 			gamestate= STAT_NEWGAME;
-			sprintf(gameinfo, REPORT_MSG_STARTGAME, gamename, maxlives, maxtime/60, maxtime%60);
+			sprintf(gameinfo, REPORT_MSG_STARTGAME, gamename, maxlives, maxtime/60);
 			ReportStatus(gameinfo);
+			pEsp_->Debug(1,gameinfo);
+
 			acttime 	= 0;
 			remtime 	= maxtime;
 			remlives 	= maxlives;
@@ -155,7 +158,7 @@ bool JuegoInfInd::GameRunning() {
 
 	//- La cara deja de estar activa => Cambiar estado y reportarlo
 	else if ((gamestate== STAT_PLAYING) && (facenumb != activeface)) {
-			sprintf(gameinfo, "%d: espera y da paso a %d", facenumb, activeface);
+			sprintf(gameinfo, ""); // %d: espera y da paso a %d", facenumb, activeface);
 			msHold_ = millis();
 		    gamestate= STAT_ONHOLD;
 			ReportStatus(gameinfo);
@@ -223,6 +226,7 @@ void JuegoInfInd::ReportStatus (char *strGameInfo) {
 
 	//- datos epsecíficos del juego
 		pEsp_->Debug(2, "prepara los datos específicos del juego");
+		pEsp_->jsonPub["gamedata"] 		= gamedata;	  	
 	  	pEsp_->jsonPub["gameinfo"] 		= gameinfo;
 	  	pEsp_->jsonPub["maxlives"] 		= maxlives;
 	  	pEsp_->jsonPub["remlives"] 		= remlives;
