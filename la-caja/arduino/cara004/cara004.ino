@@ -48,6 +48,7 @@ StaticJsonDocument<MESSAGE_SIZE_> json_recibido;
 
 void mqttCallback(char* topic, byte* payload, unsigned int length)
 {
+  String command, commandValue; 
   char *mensaje = (char *)malloc(length+1);
   strncpy(mensaje, (char*)payload, length);
   mensaje[length]='\0';
@@ -65,8 +66,24 @@ void mqttCallback(char* topic, byte* payload, unsigned int length)
       /* json["clock"] = CLOCK_START; */
       /* serializeJson(json,message); */
       /* objInfra.MqttPublish(message); */
+      Serial.println(ans);      
     }
-  Serial.println(ans);
+  
+    if (strcmp(topic, strTopicCfg)==0)
+    {
+      /* Serial.println("El mensaje ha llegado aquí!"); */
+      deserializeJson(json_recibido,mensaje);
+      command = json_recibido["comando"].as<String>();
+      commandValue = json_recibido["value"].as<String>();
+      
+      if (command == "/reset"){
+        objInfra.RestartBoard();
+      }else if (command == "/changeIP"){
+        objInfra.setOTAAddress(commandValue.c_str());
+        Serial.println("IP cambiada!");
+      }
+    }
+
   free(mensaje);
 }
 

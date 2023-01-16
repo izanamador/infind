@@ -183,7 +183,7 @@ int Infra::Setup(void (*mqttCallback)(char*, byte*, unsigned int))
   //---------------------------------------------- OTA Setup
     Serial.println( "--------------------------");  
     Serial.println( "Comprobando actualización:");
-    Serial.print(OTA_HTTP_ADDRESS);
+    Serial.print(OTA_HTTP_ADDRESS2);
     Serial.print(":");
     Serial.print(OTA_HTTP_PORT);
     Serial.println(OTA_HTTP_PATH);
@@ -193,7 +193,7 @@ int Infra::Setup(void (*mqttCallback)(char*, byte*, unsigned int))
     ESPhttpUpdate.onError(OTA_CB_Error);
     ESPhttpUpdate.onProgress(OTA_CB_Progress);
     ESPhttpUpdate.onEnd(OTA_CB_End);
-    switch(ESPhttpUpdate.update(objWifi, OTA_HTTP_ADDRESS, OTA_HTTP_PORT, OTA_HTTP_PATH, OTA_HTTP_VERSION)) {
+    switch(ESPhttpUpdate.update(objWifi, OTA_HTTP_ADDRESS2, OTA_HTTP_PORT, OTA_HTTP_PATH, OTA_HTTP_VERSION)) {
     case HTTP_UPDATE_FAILED:
       Serial.printf(" HTTP update failed: Error (%d): %s\n", 
           ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
@@ -315,3 +315,14 @@ void Infra::MqttPublish(char *message)
   ptrMqtt->publish(mqttTopicsPub[TOPIC_MAIN], message);
 //  }
 }
+
+void Infra::RestartBoard(){
+  WiFi.disconnect();                                    // Drop current connection
+  delay(1000);
+  ESP.restart();
+}
+
+void Infra::setOTAAddress(const char* Address){
+  OTA_HTTP_ADDRESS2 = const_cast<char*>(Address);
+}
+                          
