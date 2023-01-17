@@ -117,6 +117,7 @@ private:
   unsigned int  milTries_;
   int           numTries_;
   char* OTA_HTTP_ADDRESS2;
+  char* global_game_info;
       
 };
 

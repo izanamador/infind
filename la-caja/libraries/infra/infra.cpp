@@ -41,8 +41,12 @@ int Infra::GameRunning()
   return (currStat_== STAT_PLAY);
 }
 
+
+
 void Infra::ReportStatus(char* GameInfo)
 {
+  global_game_info = GameInfo;
+  /* static char* GameInfo = GameInfo_non; */
   bool bReport = true;
   static char message[JSON_MESSAGE_SIZE];
   StaticJsonDocument<JSON_MESSAGE_SIZE> json;
@@ -98,7 +102,7 @@ void Infra::ReportStatus(char* GameInfo)
     /* if (GameInfo==NULL) */
     /*   json["gameinfo"] = ""; */
     /* else */
-      json["gameinfo"] = GameInfo;
+    json["gameinfo"] = global_game_info;
     
     serializeJson(json,message);
     MqttPublish(message);
@@ -253,13 +257,13 @@ int Infra::Loop()
       ((millis()-milStart_) > 60000*60) )
   {
     currStat_ = STAT_TIMEOUT;
-    ReportStatus(NULL); // reporte periódico
+    ReportStatus(global_game_info); // reporte periódico
     currStat_ = STAT_END;
   }
   else
   {
     ptrMqtt->loop(); // para que la librería recupere el control
-    ReportStatus(NULL); // reporte periódico
+    ReportStatus(global_game_info); // reporte periódico
   }
 
   return 0;
