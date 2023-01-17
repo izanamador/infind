@@ -76,7 +76,7 @@ void loop(){
   static char strDigits[10]= "";
   static int iDigit = 0;
 
-  objInfra.Loop(strDigits);
+  objInfra.Loop();
 
   if (!objInfra.GameRunning())
     return;
