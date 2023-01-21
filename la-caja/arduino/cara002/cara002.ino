@@ -15,7 +15,7 @@
 /* Ejemplo de topic que cumple: #define TOPIC_PUB_ "II3/ESP14440037/resultados_juego2" */
 Infra objInfra;
 char *strTopicPub = "II3/ESP002/pub/cara002"; /* topic principal para publicar contenido y lastwill */
-char *strTopicCfg = "II3/ESP002/cfg/cara002"; /* topic para recibir parametros de configuracion */
+//char *strTopicCfg = "II3/ESP002/cfg/cara002"; /* topic para recibir parametros de configuracion */
 char *strTopicCmd = "II3/ESP002/cmd/cara002"; /* topic para recibir peticiones de comando */
 
 
@@ -37,7 +37,7 @@ Keypad myKeypad = Keypad( makeKeymap(keys), rowPins, colPins, NUM_ROWS, NUM_COLS
 void setup(){
   /* Setup de la infraestructura */
   objInfra.mqttTopicsPub[TOPIC_MAIN] = strTopicPub;
-  objInfra.mqttTopicsSub[TOPIC_NUM_CFG] = strTopicCfg;
+  //objInfra.mqttTopicsSub[TOPIC_NUM_CFG] = strTopicCfg;
   objInfra.mqttTopicsSub[TOPIC_NUM_CMD] = strTopicCmd;
   objInfra.Setup(mqttCallback);
 }
@@ -101,6 +101,6 @@ void loop(){
     }
     String str = String(number);
     str.toCharArray(strDigits, 10);
-    objInfra.ReportStatus(strDigits);
+    objInfra.ReportStatus2(strDigits);
   }
 }
