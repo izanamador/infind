@@ -100,6 +100,7 @@ public:
   char          *mqttTopicsPub[TOPIC_NUM_MAX];
   char          *mqttTopicsSub[TOPIC_NUM_MAX];
   int           GameRunning();
+  void          ReportStatus2(char* GameInfo);
   void          ReportStatus(char* GameInfo);
   void          ReportStart(char* GameInfo);
   void          ReportFailure(char* GameInfo);

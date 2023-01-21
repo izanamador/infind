@@ -47,7 +47,7 @@ void Infra::ReportStatus(char* GameInfo)
 {
   global_game_info = GameInfo;
   /* static char* GameInfo = GameInfo_non; */
-  bool bReport = true;
+  bool bReport = false;
   static char message[JSON_MESSAGE_SIZE];
   StaticJsonDocument<JSON_MESSAGE_SIZE> json;
 
@@ -63,7 +63,7 @@ void Infra::ReportStatus(char* GameInfo)
   // report periodically if the game is waiting to start
   else if (currStat_ == STAT_WAIT)
   {
-    bReport = false;
+    /* bReport = true; */
     json["state"] = "Waiting to start game";
   }
 
@@ -74,39 +74,52 @@ void Infra::ReportStatus(char* GameInfo)
   // report periodically or forced if info about the game
   else if (currStat_ == STAT_PLAY)
   {
-    bReport = (GameInfo!=NULL); 
+    /* bReport = (GameInfo!=NULL); */
     json["state"] = "Playing";
   }
-
   // report lost and retry
-  else if (currStat_ == STAT_LOST)
+  else if (currStat_ == STAT_LOST){
+    bReport = true;
     json["state"] = "You lose";
 
-  // win
-  else if (currStat_ == STAT_WON)
+    // win
+  }else if (currStat_ == STAT_WON){
+    bReport = true;
     json["state"] = "You won";
   
-  else if (currStat_ == STAT_TIMEOUT)
+  }else if (currStat_ == STAT_TIMEOUT){
+    bReport = true;
     json["state"] = "Timeout! You lost";
+  }
   
   // report when event or periodically
   // TODO QUITAR HARDCODE DE REPORTING CADA SEGUNDO
+  /* if (bReport || millis() > 5000+milLsRep_) */
+  /* { */
   if (bReport || millis() > 5000+milLsRep_)
   {
     milLsRep_ = millis(); // refresh last report timestamp
     json["gametime"] = millis()-milStart_;
     json["trytime"]  = millis()-milTries_;
     json["numtries"] = numTries_;
-
-
-    /* if (GameInfo==NULL) */
-    /*   json["gameinfo"] = ""; */
-    /* else */
-    json["gameinfo"] = global_game_info;
-    
+    json["gameinfo"] = global_game_info;   
     serializeJson(json,message);
     MqttPublish(message);
+    bReport = false;
   }
+}
+
+void Infra::ReportStatus2(char* GameInfo){
+  global_game_info = GameInfo;
+  static char message[JSON_MESSAGE_SIZE];
+  StaticJsonDocument<JSON_MESSAGE_SIZE> json;
+  milLsRep_ = millis(); // refresh last report timestamp
+  json["gametime"] = millis()-milStart_;
+  json["trytime"]  = millis()-milTries_;
+  json["numtries"] = numTries_;
+  json["gameinfo"] = global_game_info;
+  serializeJson(json,message);
+  MqttPublish(message);
 }
 
 void Infra::ReportStart(char* GameInfo)
