@@ -12,6 +12,74 @@
   const char* MQTT_PASS       = "qW30SImD"; // "zancudo";
   const int   MQTT_MAX_BUFFER = 512;
 
+void decodeMorse(char* strSymbols, char *strPhrase)
+{
+  // Morse code lookup table
+  const char morseTable[26][6] = {
+      ".- ",   // A
+      "-... ", // B
+      "-.-. ", // C
+      "-.. ",  // D
+      ". ",    // E
+      "..-. ", // F
+      "--. ",  // G
+      ".... ", // H
+      ".. ",   // I
+      ".--- ", // J
+      "-.- ",  // K
+      ".-.. ", // L
+      "-- ",   // M
+      "-. ",   // N
+      "--- ",  // O
+      ".--. ", // P
+      "--.- ", // Q
+      ".-. ",  // R
+      "... ",  // S
+      "- ",    // T
+      "..- ",  // U
+      "...- ", // V
+      ".-- ",  // W
+      "-..- ", // X
+      "-.-- ", // Y
+      "--.. "  // Z
+  };
+
+  int iPositionIn = 0;
+  int iPositionOut = 0;
+  int j;
+  Serial.printf("--------->>>>>>>>>> Decodificando %s\n", strSymbols);
+
+  while (true) {
+    Serial.printf("Buscando en %s\n", (char*)(strSymbols+iPositionIn));
+    for (j=0; j<26; j++) {
+      if (strncmp(strSymbols+iPositionIn, morseTable[j], strlen(morseTable[j]))==0) {
+        Serial.printf("%s=%c\t", morseTable[j], (char)('A'+j));
+        strPhrase[iPositionOut++] = (char)('A'+j);
+        iPositionIn += strlen(morseTable[j]);
+        break;
+      }
+    }
+    if (j>=26)  {
+      strPhrase[iPositionOut++] = '?';
+      
+      while ((strSymbols[iPositionIn] != ' ') && (strSymbols[iPositionIn] != '\0')) {
+        Serial.printf("%c", strSymbols[iPositionIn]);
+        iPositionIn++;
+      }
+      Serial.printf("=?\t");        
+    }
+
+    if (strSymbols[iPositionIn] == '\0') {
+      strPhrase[iPositionOut] = '\0';
+      Serial.printf("\n---------<<<<<<<<<<[%s] = [%s]\n", strSymbols, strPhrase);
+      return;
+    }
+    else if (strSymbols[iPositionIn] ==' ')
+      iPositionIn++;
+  }
+}
+
+
 //--------------------------------------------------------------------------- TM1637
   #ifndef IIFLASH_
   #define IIFLASH_
@@ -45,15 +113,11 @@
       unsigned int currdurs_    = 0;  // duración de la señal actual
       unsigned int prevduri_    = 0;  // duración del intervalo anterior
       unsigned int currduri_    = 0;  // duración del intervalo actual
-      
-      char prevsign             = IIBUTTON_SIGN_INIT; // clasificación de la duración del último intervalo I=inicial, s=signo, L=letter, W=word
-      char currsign             = IIBUTTON_SIGN_INIT; // ídem del signo actual
-      char previntv             = IIBUTTON_INTV_INIT; // clasificación de la duración del último intervalo I=inicial, s=signo, L=letter, W=word
-      char currintv             = IIBUTTON_INTV_INIT; // ídem del signo actual
-
+    
       int currvalu_ = HIGH;
       int nextvalu_ = HIGH;
       unsigned int msTransit  = 0;
+      int iSymbol_, iPhrase_;
 
       void getNextValu() {
         if (pinmod_ == IIBUTTON_MODE_BINARY) {
@@ -65,6 +129,13 @@
       }
   
     public:
+      char prevsign             = IIBUTTON_SIGN_INIT; // clasificación de la duración del último intervalo I=inicial, s=signo, L=letter, W=word
+      char currsign             = IIBUTTON_SIGN_INIT; // ídem del signo actual
+      char previntv             = IIBUTTON_INTV_INIT; // clasificación de la duración del último intervalo I=inicial, s=signo, L=letter, W=word
+      char currintv             = IIBUTTON_INTV_INIT; // ídem del signo actual
+      char strSymbols[40]; // W...L---L...W
+      char strPhrase[10];  // SOS SE ACABO
+
       
       // inicializa el botón y el modo digital o analógico;
         void Setup(int pinNum=D3_GPIO00_FLASH, int pinMod = IIBUTTON_MODE_BINARY) { 
@@ -72,7 +143,11 @@
             pinnum_ = pinNum;
             pinmod_ = pinMod;
             getNextValu();
-            currvalu_ = nextvalu_;              
+            currvalu_ = nextvalu_;      
+            iSymbol_ = 0;
+            iPhrase_ = 0;
+            strSymbols[iSymbol_] = '\0';
+            strPhrase[iPhrase_] = '\0';
         }         
       // Setup
       
@@ -107,12 +182,30 @@
               currsign   = (currdurs_ < 500) ? IIBUTTON_SIGN_DOT    : ((currdurs_ < 1000) ? IIBUTTON_SIGN_DASH   : IIBUTTON_SIGN_LONG );              
               currintv   = (currduri_ < 500) ? IIBUTTON_INTV_SIGNAL : ((currduri_ < 1000) ? IIBUTTON_INTV_LETTER : IIBUTTON_INTV_WORD );
               Serial.printf("%c%c ", currintv, currsign);
+              if (currintv==IIBUTTON_INTV_WORD) { // poner un espacio antes si estamos empezando una palabra
+                strSymbols[iSymbol_++] = ' ';
+                strSymbols[iSymbol_+1] = '\0';
+              }
+              if (currsign==IIBUTTON_SIGN_DOT) {
+                strSymbols[iSymbol_++] = '.';
+                strSymbols[iSymbol_+1] = '\0';
+              }                
+              else if (currsign==IIBUTTON_SIGN_DASH) {
+                strSymbols[iSymbol_++] = '-';
+                strSymbols[iSymbol_+1] = '\0';
+              }
+              Serial.println(strSymbols);
+              decodeMorse(strSymbols, strPhrase);
+              Serial.println(strPhrase);
+              
+              
               return true;
             }
           }
           return false;
         }         
        // HasChanged
+       
 
 
   
