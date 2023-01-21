@@ -19,7 +19,7 @@ Correct number: 17
 #include <Button.h>
 Infra objInfra;
 char *strTopicPub = "II3/ESP005/pub/cara005"; // topic principal para publicar contenido y lastwill
-char *strTopicCfg = "II3/ESP005/cfg/cara005"; // topic para recibir parametros de configuracion
+//char *strTopicCfg = "II3/ESP005/cfg/cara005"; // topic para recibir parametros de configuracion
 char *strTopicCmd = "II3/ESP005/cmd/cara005"; // topic para recibir peticiones de comando
 // Variables para enviar y recibir datos por MQTT
 #define MESSAGE_SIZE_ 300
@@ -62,7 +62,7 @@ void setup()
 
     /* setup de infrastructura */
     objInfra.mqttTopicsPub[TOPIC_MAIN] = strTopicPub;
-    objInfra.mqttTopicsSub[TOPIC_NUM_CFG] = strTopicCfg;
+  //  objInfra.mqttTopicsSub[TOPIC_NUM_CFG] = strTopicCfg;
     objInfra.mqttTopicsSub[TOPIC_NUM_CMD] = strTopicCmd;
     objInfra.Setup(mqttCallback);
 }
@@ -91,7 +91,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length)
 void loop() 
 {
   static char strSwitches[]="_____";
-  objInfra.Loop(NULL);
+  objInfra.Loop();
   if (!objInfra.GameRunning())
     return;
 

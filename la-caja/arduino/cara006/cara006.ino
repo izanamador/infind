@@ -21,7 +21,7 @@ SOS is ...---...
 // Infra setup
 Infra objInfra;
 char *strTopicPub = "II3/ESP006/pub/cara006"; // topic principal para publicar contenido y lastwill
-char *strTopicCfg = "II3/ESP006/cfg/cara006"; // topic para recibir parametros de configuracion
+//char *strTopicCfg = "II3/ESP006/cfg/cara006"; // topic para recibir parametros de configuracion
 char *strTopicCmd = "II3/ESP006/cmd/cara006"; // topic para recibir peticiones de comando
 
 // Pin Definitions
@@ -52,7 +52,7 @@ void setup()
   pushButton.init();
   /* setup de infrastructura */
   objInfra.mqttTopicsPub[TOPIC_MAIN] = strTopicPub;
-  objInfra.mqttTopicsSub[TOPIC_NUM_CFG] = strTopicCfg;
+//  objInfra.mqttTopicsSub[TOPIC_NUM_CFG] = strTopicCfg;
   objInfra.mqttTopicsSub[TOPIC_NUM_CMD] = strTopicCmd;
   objInfra.Setup(mqttCallback);
 }
@@ -139,8 +139,8 @@ Serial.println(pushButtonVal);
       }
     }
     morseCode = ""; // Clear the Morse code string for the next character
-  }
   Serial.println(message); // Print the message to the serial monitor
+}
 }
 
 
