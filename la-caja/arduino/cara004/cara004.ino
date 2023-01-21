@@ -31,7 +31,7 @@ Joystick joystick(x_channel,y_channel);
 /* Create objInfra */
 Infra objInfra;
 char *strTopicPub = "II3/ESP004/pub/cara004"; // topic principal para publicar contenido y lastwill
-char *strTopicCfg = "II3/ESP004/cfg/cara004"; // topic para recibir parametros de configuracion
+//char *strTopicCfg = "II3/ESP004/cfg/cara004"; // topic para recibir parametros de configuracion
 char *strTopicCmd = "II3/ESP004/cmd/cara004"; // topic para recibir peticiones de comando
 
 
@@ -69,20 +69,20 @@ void mqttCallback(char* topic, byte* payload, unsigned int length)
       Serial.println(ans);      
     }
   
-    if (strcmp(topic, strTopicCfg)==0)
-    {
-      /* Serial.println("El mensaje ha llegado aquí!"); */
-      deserializeJson(json_recibido,mensaje);
-      command = json_recibido["comando"].as<String>();
-      commandValue = json_recibido["value"].as<String>();
+    // if (strcmp(topic, strTopicCfg)==0)
+    // {
+    //   /* Serial.println("El mensaje ha llegado aquí!"); */
+    //   deserializeJson(json_recibido,mensaje);
+    //   command = json_recibido["comando"].as<String>();
+    //   commandValue = json_recibido["value"].as<String>();
       
-      if (command == "/reset"){
-        objInfra.RestartBoard();
-      }else if (command == "/changeIP"){
-        objInfra.setOTAAddress(commandValue.c_str());
-        Serial.println("IP cambiada!");
-      }
-    }
+    //   if (command == "/reset"){
+    //     objInfra.RestartBoard();
+    //   }else if (command == "/changeIP"){
+    //     objInfra.setOTAAddress(commandValue.c_str());
+    //     Serial.println("IP cambiada!");
+    //   }
+    // }
 
   free(mensaje);
 }
@@ -103,7 +103,7 @@ void setup(void){
 
   /* setup de infrastructura */
   objInfra.mqttTopicsPub[TOPIC_MAIN] = strTopicPub;
-  objInfra.mqttTopicsSub[TOPIC_NUM_CFG] = strTopicCfg;
+  //objInfra.mqttTopicsSub[TOPIC_NUM_CFG] = strTopicCfg;
   objInfra.mqttTopicsSub[TOPIC_NUM_CMD] = strTopicCmd;
   objInfra.Setup(mqttCallback);
 
