@@ -167,6 +167,6 @@ void loop(){
       number = 10*number + joystick_value;
     String str = String(joystick_value);
     str.toCharArray(strDigits, 10);
-    objInfra.ReportStatus(strDigits);
+    objInfra.ReportStatus2(strDigits);
   }
 }
