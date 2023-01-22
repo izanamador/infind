@@ -1,3 +1,4 @@
+#include <Arduino.h>
 void decodeMorse(char* strSymbols, char *strPhrase)
 {
   // Morse code lookup table
@@ -149,14 +150,14 @@ void decodeMorse(char* strSymbols, char *strPhrase)
       }
       
       // Comprueba si ha habido un flanco de subida o bajada
-        bool HasChanged(void) {         
+        int HasChanged(void) {         
           unsigned int now = millis();
           getNextValu();
                       
           if (currvalu_ == nextvalu_) // aún no ha pasado nada, esperamos a una transición
             msTransit = now;
           else if (now - msTransit < 30) // aún no han pasado 100 milisegundos en el nuevo estado, esperar
-            ;
+            Serial.println("Ricardo ;");
           else { // se confirma la transición después de 100 ms
             if (currvalu_ == HIGH && nextvalu_== LOW) { // flanco positivo, se ha pulsado el botón (REVISAR)
               currvalu_ = LOW;
@@ -196,10 +197,10 @@ void decodeMorse(char* strSymbols, char *strPhrase)
               Serial.println(strPhrase);
               
               
-              return true;
+              return 1;
             }
           }
-          return false;
+          return 0;
         }         
        // HasChanged
        
@@ -235,8 +236,8 @@ SOS is ...---...
 
 // Infra setup
 Infra objInfra;
-char *strTopicPub = "II3/ESP006/pub/cara006"; // topic principal para publicar contenido y lastwill
-char *strTopicCmd = "II3/ESP006/cmd/cara006"; // topic para recibir peticiones de comando
+char *strTopicPub = "II3/ESP002/pub/cara002"; // topic principal para publicar contenido y lastwill
+char *strTopicCmd = "II3/ESP002/cmd/cara002"; // topic para recibir peticiones de comando
 
 // Pin Definitions
 #define LDR_PIN A0 // Pin for the LDR sensor
@@ -251,40 +252,38 @@ char* GameAns = "SOS";
 void setup()
 {
   objFlash.Setup(A0,IIBUTTON_MODE_ANALOG);     
-  /* setup de infrastructura */
   objInfra.mqttTopicsPub[TOPIC_MAIN] = strTopicPub;
   objInfra.mqttTopicsSub[TOPIC_NUM_CMD] = strTopicCmd;
   objInfra.Setup(mqttCallback);
 }
 
-void mqttCallback(char *topic, byte *payload, unsigned int length)
-{
-  char *mensaje = (char *)malloc(length + 1);
-  strncpy(mensaje, (char *)payload, length);
-  mensaje[length] = '\0';
-  Serial.printf("Mensaje recibido [%s] %s\n", topic, mensaje);
-
-  if (strcmp(topic, strTopicCmd) == 0)
-  {
-    objInfra.ReportStart(NULL);
-  }
+void mqttCallback(char* topic, byte* payload, unsigned int length){
+  /* Procesa los mensajes enviados por Node-red */
+  char *mensaje = (char *)malloc(length+1);
+  strncpy(mensaje, (char*)payload, length);
+  mensaje[length]='\0';
+  if (strcmp(topic, strTopicCmd)==0){
+    objInfra.ReportStart(NULL);}
   free(mensaje);
 }
+
  static char strDigits[10]= "";
  
 void loop()
 {
- 
+
+  int bchgFlash = objFlash.HasChanged();
+  /* static unsigned int msLastReport = millis(); */
+  
   objInfra.Loop();
   if (!objInfra.GameRunning())
     return;
 
-  bool bchgFlash = objFlash.HasChanged();
-  static unsigned int msLastReport = millis();
+
   // comprobamos si han pasado los 15 segundos desde la última vez
-    if ((millis() > msLastReport + 15000) && (bchgFlash)) {
-      msLastReport = millis(); // reseteamos para no enviar más hasta dentro de 15 segundos
-    }
+    /* if ((millis() > msLastReport + 15000) && (bchgFlash)) { */
+    /*   msLastReport = millis(); // reseteamos para no enviar más hasta dentro de 15 segundos */
+    /* } */
     
      // if (GameAns == strPhrase)
     //  {
