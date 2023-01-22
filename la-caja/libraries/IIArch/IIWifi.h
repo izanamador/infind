@@ -29,7 +29,7 @@ public:
 	// Propiedades
 	WiFiClient WClient;	    // puntero a la variable global WiFiClient que necesita Mqtt
 	char Ssid[40]; 			// parámetros de la wifi para usar en los mensajes de estado
-	unsigned int Rssi;
+	int Rssi;
 	char Ip[40];
 	
 private:
