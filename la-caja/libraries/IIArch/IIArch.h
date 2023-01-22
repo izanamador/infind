@@ -12,5 +12,6 @@ La librería IIArch encapsula la funcionalidad contenida en las especificaciones
 #define IIARCH_
 
 #include "IIWifi.h"
+#include "IIMqtt.h"
 
 #endif
