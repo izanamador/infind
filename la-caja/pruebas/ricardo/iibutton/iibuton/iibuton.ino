@@ -4,6 +4,7 @@
 IIWifi  obWifi;
 IIMqtt  obMqtt;
 IIDht11 obDht11;
+IILed   obLed;
 
 
 //------ librerías utilizadas
@@ -367,6 +368,7 @@ void setup() {
     
   //--- inicialización del hardware específico montado en el ESP
     objFlash.Setup();     
+    obLed.Setup(2);
  
 }
 
@@ -376,6 +378,7 @@ void loop() {
   bool hcWifi  = obWifi.HasChanged();
   bool hcMqtt  = obMqtt.HasChanged();
   bool hcDht11 = obDht11.HasChanged();
+  bool blLed   = obLed.HasChanged();
 
   //--- si ya había conexión o se ha reconectado invocamos a loop para recibir posibles mensajes
     //mqtt_con_sub();

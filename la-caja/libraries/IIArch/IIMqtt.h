@@ -7,8 +7,6 @@ Clase IIMQtt: Gestión del broker MQTT
 Requisitos: 
 - R05-Dispositivos IoT.1 - Medición de temperatura y humedad
 - R05-Dispositivos IoT.1 - Envío periódico de sensores
-- R46-Mensajes MQTT.4 Topic: IIX/ESPX/config
-
 - R10-Dispositivos IoT.6 - ChipId
 - R12-Aplicación de control y supervisión.2 - Actuación en grupo
 - R14-Aplicación de control y supervisión.4 - Conexión a MQTT
@@ -16,6 +14,7 @@ Requisitos:
 - R39-Dashboard.7 - Alamras de temperatura y humedad
 - R43-Mensajes MQTT.1 - Identificadores únicos
 - R44-Mensajes MQTT.2 - Conexión y LastWill
+- R46-Mensajes MQTT.4 Topic: IIX/ESPX/config
 - R52-Mensajes MQTT.10 - Desdoblamiento topics de suscripción
 - R53-Mensajes MQTT.11 - Orden de campos en nombres de topic
 

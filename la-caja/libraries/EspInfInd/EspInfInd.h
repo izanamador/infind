@@ -42,6 +42,20 @@ class EspInfInd
     void MqttFormatMsg(char* strTopic, const char* strUserInfo, int iOption=OPT_MSG_SEND);
     void UpdateSwitch(int iUpdateType, int newLevel, int newConfig);
     ~EspInfInd();
+
+    //-------------------- multi dispositivo
+      int ActiveFace;        // cada juego en unca cara, 1=> está activa
+      char strTopicGameCommand[TOPIC_NAME_MAX];
+      char strTopicGameStatus[TOPIC_NAME_MAX];
+
+    //-------------------- para guardar último mensaje de petición al juego
+      int             activefaceLast;     // Tiempo máximo de juego
+      int             maxtimeLast;        // Tiempo máximo hasta fallar
+      int             maxlivesLast;;      // Número máximo de reintentos
+      char            gameparamLast[30];  // solución del juego o parámetros de entrada
+      char            gameinfoLast[100];  // mensajes específicos de juego
+
+
     
     // REQ.MQ1 
       char          espId[40];
@@ -59,17 +73,6 @@ class EspInfInd
       void          MqttConnect();
 
 
-    //-------------------- multi dispositivo
-      int ActiveFace;        // cada juego en unca cara, 1=> está activa
-      char strTopicGameCommand[TOPIC_NAME_MAX];
-      char strTopicGameStatus[TOPIC_NAME_MAX];
-
-    //-------------------- para guardar último mensaje de petición al juego
-      int             activefaceLast;     // Tiempo máximo de juego
-      int             maxtimeLast;        // Tiempo máximo hasta fallar
-      int             maxlivesLast;;      // Número máximo de reintentos
-      char            gameparamLast[30];  // solución del juego o parámetros de entrada
-      char            gameinfoLast[100];  // mensajes específicos de juego
       
 
     //------ REQ.IT29 Interfaz común JSON
