@@ -1,4 +1,17 @@
-#include <Arduino.h>
+//------ librerías utilizadas
+  #include <ESP8266WiFi.h>   // WIFI
+  #include <PubSubClient.h>  // MQTT
+  #include "ArduinoJson.h"   // JSON
+  
+
+//------- parámetros de configuración constantes (en MAYUSCULAS)
+  const char* WIFI_SSID       = "infind";
+  const char* WIFI_PASS       = "1518wifi";
+  const char* MQTT_SERVER     = "iot.ac.uma.es";
+  const char* MQTT_USER       = "II3"; // "infind";
+  const char* MQTT_PASS       = "qW30SImD"; // "zancudo";
+  const int   MQTT_MAX_BUFFER = 512;
+
 void decodeMorse(char* strSymbols, char *strPhrase)
 {
   // Morse code lookup table
@@ -111,38 +124,22 @@ void decodeMorse(char* strSymbols, char *strPhrase)
       unsigned int msTransit  = 0;
       int iSymbol_, iPhrase_;
 
-  void getNextValu() {
-        static int serialCount = 0;
+      void getNextValu() {
         if (pinmod_ == IIBUTTON_MODE_BINARY) {
           nextvalu_ = digitalRead(pinnum_);
         } else {
-          if (serialCount == 100) {
-            nextvalu_ = analogRead(pinnum_);
-            nextvalu_ = (nextvalu_ < thresh_) ? LOW : HIGH;
-            serialCount = 0;
-          } else {
-            serialCount ++;
-          }
-          
+          nextvalu_ = analogRead(pinnum_);
+          nextvalu_ = (nextvalu_ < thresh_) ? LOW : HIGH;
         }
       }
-
-//void getNextValu() {
-//        if (pinmod_ == IIBUTTON_MODE_BINARY) {
-//          nextvalu_ = digitalRead(pinnum_);
-//        } else {
-//          nextvalu_ = analogRead(pinnum_);
-//          nextvalu_ = (nextvalu_ < thresh_) ? LOW : HIGH;
-//        }
-//      }
-//  
+  
     public:
       char prevsign             = IIBUTTON_SIGN_INIT; // clasificación de la duración del último intervalo I=inicial, s=signo, L=letter, W=word
       char currsign             = IIBUTTON_SIGN_INIT; // ídem del signo actual
       char previntv             = IIBUTTON_INTV_INIT; // clasificación de la duración del último intervalo I=inicial, s=signo, L=letter, W=word
       char currintv             = IIBUTTON_INTV_INIT; // ídem del signo actual
       char strSymbols[40]; // W...L---L...W
-      char strPhrase[3];  // SOS SE ACABO
+      char strPhrase[10];  // SOS SE ACABO
 
       
       // inicializa el botón y el modo digital o analógico;
@@ -230,92 +227,168 @@ void decodeMorse(char* strSymbols, char *strPhrase)
 
 //--------------------------------------------------------------------------- TM1637
 
-/*******************************************************
-The player has to send the message SOS with morse code.
-If the LDR is light up close by a phone light will send a dot.
-If not, it will send a dash.
 
-If the player clicks the button it will add the letter of the morse code to the message
-To reset the message the player must pulse the button for a longer time.
-
-SOS is ...---...
-********************************************************/
-
-/****************************/
-/* Includes and definitions */
-/****************************/
-
-// Include Libraries
-#include <infra.h>
-#include <ezButton.h>
-
-// Infra setup
-Infra objInfra;
-char *strTopicPub = "II3/ESP006/pub/cara006"; // topic principal para publicar contenido y lastwill
-char *strTopicCmd = "II3/ESP006/cmd/cara006"; // topic para recibir peticiones de comando
-
-// Pin Definitions
-#define LDR_PIN A0 // Pin for the LDR sensor
-#define PUSHBUTTON_PIN 15
-
-ezButton button(PUSHBUTTON_PIN);  
-
-// String Inicialization
-char GameAns[3] = {'S', 'O', 'S'};
+//------- variables globales (empiezan en mayúsculas)
+  char EspId[20];
+  WiFiClient WifiClient;                        // cliente wifi necesario para el constructor de PubSubClient
+  PubSubClient Mqtt_client(WifiClient);         // cliente mqtt
+  int Reintentos = 0;
+  char Topic_Pub[100], Topic_Sub[100];
 
 
-/****************************/
-/*          Game            */
-/****************************/
-void setup()
-{
-  objFlash.Setup(A0,IIBUTTON_MODE_ANALOG);     
-  objInfra.mqttTopicsPub[TOPIC_MAIN] = strTopicPub;
-  objInfra.mqttTopicsSub[TOPIC_NUM_CMD] = strTopicCmd;
-  objInfra.Setup(mqttCallback);
 
-  button.setDebounceTime(100);
+//------- función para conectarse a la Wifi
+void conecta_wifi() {
+    // Comment("conecta_wifi", 1, "inicialización a partir de los parámetros de conexión");
+      Serial.printf("\nConectando a la Wifi %s:\n", WIFI_SSID); 
+      WiFi.mode(WIFI_STA);                    // WiFi y WIFI_STA vienen de la librería
+      WiFi.begin(WIFI_SSID, WIFI_PASS);  
+
+  //--- reintento de conexión cada 0.2 segundos
+    while (WiFi.status() != WL_CONNECTED) {   // WL_CONNECTED también viene de la librería
+      delay(200);                             // espera bloqueante!!!
+      Serial.print(".");                      // feedback al usuario
+    
+      if (Reintentos++ % 100 == 0) {        
+        Serial.printf("\nReintento número %02d : ", Reintentos);
+      }
+    }
+
+  //--- conexión WiFi disponible para MQTT
+    Serial.printf("\nConectado a Wifi %s con éxito.\n Dirección IP: %s\n",  WIFI_SSID, WiFi.localIP().toString().c_str());
+
 }
 
-void mqttCallback(char* topic, byte* payload, unsigned int length){
-  /* Procesa los mensajes enviados por Node-red */
-  char *mensaje = (char *)malloc(length+1);
-  strncpy(mensaje, (char*)payload, length);
-  mensaje[length]='\0';
-  if (strcmp(topic, strTopicCmd)==0){
-    objInfra.ReportStart(NULL);}
-  free(mensaje);
-}
 
- static char strDigits[10]= "";
- 
-void loop()
-{
-   button.loop();
-  bool bchgFlash = objFlash.HasChanged();
-   static unsigned int msLastReport = millis(); 
+//------- función para conectar o reconectar a MQTT y suscribirse/resuscribirse a los topics y recibir mensajes mqtt 
+void mqtt_con_sub() {
   
-  objInfra.Loop();
-  if (!objInfra.GameRunning())
-    return;
+  //Comment("mqtt_con_sub", 1, "inicio");
 
+  //--- antes de cada envío hay que comprobar que no se cayó la conexión y reintentar recuperarla
+    Reintentos = 0; // resetea el contador de reintentos de conexión
+
+  //--- mientras no haya  conexión hay que reintentar conectar las veces que hagan falta
+
+    while (!Mqtt_client.connected()) {
+      
+        // damos feedback del estado de la conexión y reintentamos conectar
+          Serial.printf("\n\nIntento %d de conexión al servidor MQTT %s\n", ++Reintentos, MQTT_SERVER);
+
+        // Comment("mqtt_con_sub", 22, "sólo podemos suscribirnos a topics cuando tenemos una conexión válida");
+          if (Mqtt_client.connect(EspId, MQTT_USER, MQTT_PASS)) {
+
+            //Comment("mqtt_con_sub", 23, "si la conexión fue bien ya se pueden hacer suscripciones");
+            Serial.printf("Conexión al broker %s con éxito.\n Suscribiendo a topics: %s\n", MQTT_SERVER, Topic_Sub);
+
+            // nos suscribimos al mismo topic por el que publicamos para cambiar el led cada vez que publiquemos
+            Mqtt_client.subscribe(Topic_Sub);
+            //Comment("mqtt_con_sub", 24, "Topic_Sub");
+
+          }
+        //Comment("mqtt_con_sub", 2, "sólo podemos suscribirnos a topics cuando tenemos una conexión válida");
+        //--- si la conexión falló hay que visualizar el mensaje de error (rc)
+          else {
+            Serial.printf("Conexión fallida. Error de salida rc=%d. Reintento dentro de 5 segundos\n", Mqtt_client.state());
+            delay(5000); // espera bloqueante durante 5 segundos antes de reintentar
+          }
+      } 
+
+}
+
+//------- función que se invocará cada vez que llegue un mensaje 
+void procesa_mensaje(char* strTopicMsg, byte* payload, unsigned int length) {
+  // Comment("procesa_mensaje", 25, "inicio");
+
+
+  //--- copio el mensaje recibido (para que no pete) y le pongo un nulo al final
+    char *mensaje = (char *)malloc(length+1); // reservo memoria para copia del mensaje
+    strncpy(mensaje, (char*)payload, length); // copio el mensaje en cadena de caracteres
+    mensaje[length]='\0'; // caracter cero marca el final de la cadena
+    Serial.printf("Mensaje recibido desde el topic [%s]\n---------%s\n\n", Topic_Sub, mensaje);
+
+  //--- compruebo de qué topic vino para decidir qué hacer con él
+    if(strcmp(strTopicMsg, Topic_Sub)==0)  {
+      // por ejemplo, apago/enciendo el led dependiendo del primer byte del mensaje
+      // digitalWrite(D4_GPIO02_TXD1_LED1, (mensaje[0]=='1'? LOW : HIGH)); 
+      ;
+    }
+
+  //--- antes de salir hay que liberar la memoria              
+    free(mensaje);
+  
+}
+
+//------- función que se invocará una sola vez al inicio del sketch
+void setup() {
+  //--- informar de que la placa ha arrancado
+    Serial.begin(115200);
+    Serial.println();
+    Serial.println("Empieza setup...");
+
+  
+  //Comment("setup", 1, "Inicialización de variables globales");
+    //--------------------------------------------------------------------------
+    sprintf(EspId, "ESP_%d", ESP.getChipId());
+    sprintf(Topic_Pub, "II3/GAME/STATUS/chrono/ESP%d", ESP.getChipId()); // ejemplo examen/ejercicio2/ESP1126590 ,
+    sprintf(Topic_Sub, "II3/GAME/COMMAND/ALL", ESP.getChipId()); // ejemplo examen/ejercicio2/ESP1126590 ,
+    ///strcpy(Topic_Sub, Topic_Pub); // nos auto-suscribimos
+
+  //Comment("setup", 2, "Imprimimos la configuración");
+      Serial.printf("Identificador placa: %s\n", EspId );
+      Serial.printf("Topic publicacion  : %s\n", Topic_Pub);
+      Serial.printf("Topic subscripcion : %s\n", Topic_Sub);
+      Serial.printf("Termina setup en %lu ms\n\n",millis());
+
+  //Comment("setup", 3, "Conectamos a la wifi");
+    //--- Conectamos a la wifi    
+      conecta_wifi();
+
+    //Comment("setup", 3, "Y preparamos las conexiones a Mqtt a partir de parámetros de las primeras líneas");
+//      Mqtt_client.setServer(MQTT_SERVER, 1883);
+//      Mqtt_client.setBufferSize(MQTT_MAX_BUFFER); 
+//      Mqtt_client.setCallback(procesa_mensaje);
+      //mqtt_con_sub_loop();
+//      mqtt_con_sub();
+    
+  //--- inicialización del hardware específico montado en el ESP
+    objFlash.Setup(A0,IIBUTTON_MODE_ANALOG);     
+ 
+}
+
+
+//------- función principal que que se invoca periódicamente
+void loop() {  
+  
+  //--- si ya había conexión o se ha reconectado invocamos a loop para recibir posibles mensajes
+//    mqtt_con_sub();
+//    Mqtt_client.loop(); 
+    bool bchgFlash = objFlash.HasChanged();
+    
+    static unsigned int msLastReport = millis();
 
   // comprobamos si han pasado los 15 segundos desde la última vez
-     if ((millis() > msLastReport + 1000) && (bchgFlash)) { 
-       msLastReport = millis(); // reseteamos para no enviar más hasta dentro de 15 segundos 
-     } 
+    if ((millis() > msLastReport + 15000) && (bchgFlash)) {
+      msLastReport = millis(); // reseteamos para no enviar más hasta dentro de 15 segundos
 
-if (button.isReleased() && (strcmp(GameAns, objFlash.strPhrase) == 0)){
-    objInfra.ReportSuccess(" "); 
-  }
-  else if (button.isReleased()){
-    objInfra.ReportFailure(" "); /* Actualiza el estado a: "Failure" y suma un intento */
-    objFlash.Reset();
-    /* LIMPIA EL STRING */
-    objInfra.ReportStatus2(objFlash.strPhrase); /* Por si las dudas */
-  }
-  else if (bchgFlash){
-    objInfra.ReportStatus2(objFlash.strPhrase);
-  }
+      //--- construimos el documento sobre el que vamos a reportar
+        StaticJsonDocument<300> doc;
+        doc["esp"]["uptime"]        = millis(); // "2509853";
+        doc["esp"]["vcv"]           = ESP.getVcc()/1000; // batería de alimentación en voltios
+        doc["wifi"]["ssid"]         = WiFi.SSID();
+        doc["wifi"]["rssi"]         = WiFi.RSSI();
+        doc["wifi"]["ip"]           = WiFi.localIP().toString();
+        
+      // imprimimos el mensaje formateado para que sea más fácil de ver
+        char strSerialized[1000];
+        serializeJsonPretty(doc, strSerialized);
+        //Serial.printf("Enviando por %s\n---------\n%s\n---------\n", Topic_Pub, strSerialized);
+        Serial.println();
+
+      // serializamos sin formato para que ocupe menos al enviarlo por la wifi
+        serializeJson(doc,strSerialized);
+//        Mqtt_client.publish(Topic_Pub, strSerialized);
+        doc.clear();
+        
+    }
 }
-   

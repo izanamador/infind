@@ -111,38 +111,28 @@ void decodeMorse(char* strSymbols, char *strPhrase)
       unsigned int msTransit  = 0;
       int iSymbol_, iPhrase_;
 
-  void getNextValu() {
+      void getNextValu() {
         static int serialCount = 0;
         if (pinmod_ == IIBUTTON_MODE_BINARY) {
           nextvalu_ = digitalRead(pinnum_);
         } else {
-          if (serialCount == 100) {
+          if (serialCount == 10000) {
             nextvalu_ = analogRead(pinnum_);
-            nextvalu_ = (nextvalu_ < thresh_) ? LOW : HIGH;
             serialCount = 0;
           } else {
             serialCount ++;
           }
-          
+          nextvalu_ = (nextvalu_ < thresh_) ? LOW : HIGH;
         }
       }
-
-//void getNextValu() {
-//        if (pinmod_ == IIBUTTON_MODE_BINARY) {
-//          nextvalu_ = digitalRead(pinnum_);
-//        } else {
-//          nextvalu_ = analogRead(pinnum_);
-//          nextvalu_ = (nextvalu_ < thresh_) ? LOW : HIGH;
-//        }
-//      }
-//  
+  
     public:
       char prevsign             = IIBUTTON_SIGN_INIT; // clasificación de la duración del último intervalo I=inicial, s=signo, L=letter, W=word
       char currsign             = IIBUTTON_SIGN_INIT; // ídem del signo actual
       char previntv             = IIBUTTON_INTV_INIT; // clasificación de la duración del último intervalo I=inicial, s=signo, L=letter, W=word
       char currintv             = IIBUTTON_INTV_INIT; // ídem del signo actual
       char strSymbols[40]; // W...L---L...W
-      char strPhrase[3];  // SOS SE ACABO
+      char strPhrase[10];  // SOS SE ACABO
 
       
       // inicializa el botón y el modo digital o analógico;
@@ -166,14 +156,14 @@ void decodeMorse(char* strSymbols, char *strPhrase)
       }
       
       // Comprueba si ha habido un flanco de subida o bajada
-        bool HasChanged(void) {         
+        int HasChanged(void) {         
           unsigned int now = millis();
           getNextValu();
                       
           if (currvalu_ == nextvalu_) // aún no ha pasado nada, esperamos a una transición
             msTransit = now;
           else if (now - msTransit < 30) // aún no han pasado 100 milisegundos en el nuevo estado, esperar
-            ;
+            Serial.println("Ricardo ;");
           else { // se confirma la transición después de 100 ms
             if (currvalu_ == HIGH && nextvalu_== LOW) { // flanco positivo, se ha pulsado el botón (REVISAR)
               currvalu_ = LOW;
@@ -213,10 +203,10 @@ void decodeMorse(char* strSymbols, char *strPhrase)
               Serial.println(strPhrase);
               
               
-              return true;
+              return 1;
             }
           }
-          return false;
+          return 0;
         }         
        // HasChanged
        
@@ -229,6 +219,8 @@ void decodeMorse(char* strSymbols, char *strPhrase)
   #endif  
 
 //--------------------------------------------------------------------------- TM1637
+
+
 
 /*******************************************************
 The player has to send the message SOS with morse code.
@@ -247,7 +239,6 @@ SOS is ...---...
 
 // Include Libraries
 #include <infra.h>
-#include <ezButton.h>
 
 // Infra setup
 Infra objInfra;
@@ -256,12 +247,9 @@ char *strTopicCmd = "II3/ESP006/cmd/cara006"; // topic para recibir peticiones d
 
 // Pin Definitions
 #define LDR_PIN A0 // Pin for the LDR sensor
-#define PUSHBUTTON_PIN 15
-
-ezButton button(PUSHBUTTON_PIN);  
 
 // String Inicialization
-char GameAns[3] = {'S', 'O', 'S'};
+char* GameAns = "SOS";
 
 
 /****************************/
@@ -273,8 +261,6 @@ void setup()
   objInfra.mqttTopicsPub[TOPIC_MAIN] = strTopicPub;
   objInfra.mqttTopicsSub[TOPIC_NUM_CMD] = strTopicCmd;
   objInfra.Setup(mqttCallback);
-
-  button.setDebounceTime(100);
 }
 
 void mqttCallback(char* topic, byte* payload, unsigned int length){
@@ -291,9 +277,9 @@ void mqttCallback(char* topic, byte* payload, unsigned int length){
  
 void loop()
 {
-   button.loop();
-  bool bchgFlash = objFlash.HasChanged();
-   static unsigned int msLastReport = millis(); 
+
+  int bchgFlash = objFlash.HasChanged();
+  static unsigned int msLastReport = millis();
   
   objInfra.Loop();
   if (!objInfra.GameRunning())
@@ -301,21 +287,14 @@ void loop()
 
 
   // comprobamos si han pasado los 15 segundos desde la última vez
-     if ((millis() > msLastReport + 1000) && (bchgFlash)) { 
-       msLastReport = millis(); // reseteamos para no enviar más hasta dentro de 15 segundos 
-     } 
-
-if (button.isReleased() && (strcmp(GameAns, objFlash.strPhrase) == 0)){
-    objInfra.ReportSuccess(" "); 
-  }
-  else if (button.isReleased()){
-    objInfra.ReportFailure(" "); /* Actualiza el estado a: "Failure" y suma un intento */
-    objFlash.Reset();
-    /* LIMPIA EL STRING */
-    objInfra.ReportStatus2(objFlash.strPhrase); /* Por si las dudas */
-  }
-  else if (bchgFlash){
-    objInfra.ReportStatus2(objFlash.strPhrase);
-  }
+    if ((millis() > msLastReport + 15000) && (bchgFlash)) {
+      msLastReport = millis(); // reseteamos para no enviar más hasta dentro de 15 segundos
+    }
+    
+     // if (GameAns == strPhrase)
+    //  {
+    //    Serial.println("YOU WON");
+    //    objInfra.ReportSuccess(" ");  // Cast the const char* to a char*
+    //  }
 }
    
