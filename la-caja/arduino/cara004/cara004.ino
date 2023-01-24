@@ -31,19 +31,14 @@ Joystick joystick(x_channel,y_channel);
 /* Create objInfra */
 Infra objInfra;
 char *strTopicPub = "II3/ESP004/pub/cara004"; // topic principal para publicar contenido y lastwill
-//char *strTopicCfg = "II3/ESP004/cfg/cara004"; // topic para recibir parametros de configuracion
 char *strTopicCmd = "II3/ESP004/cmd/cara004"; // topic para recibir peticiones de comando
 
 
-/* Stuff needed */
-/* String teststr = "rhyloo"; */
 /* Resupuesta del acertijo */
 int ans = NULL;
 String hour = "00:00";
 
 #define MESSAGE_SIZE_ 300
-static char message[MESSAGE_SIZE_];
-StaticJsonDocument<MESSAGE_SIZE_> json;
 StaticJsonDocument<MESSAGE_SIZE_> json_recibido;
 
 void mqttCallback(char* topic, byte* payload, unsigned int length)
@@ -60,61 +55,28 @@ void mqttCallback(char* topic, byte* payload, unsigned int length)
       hour = json_recibido["content"].as<String>(); // leo de JSON
       ans = json_recibido["ans"]; // leo de JSON
       objInfra.ReportStart(NULL);
-      /* json["state"] = 1;        /\* Comentar después *\/ */
-      /* json["intentos"] = 0; */
-      /* json["tiempo"] = 0; */
-      /* json["clock"] = CLOCK_START; */
-      /* serializeJson(json,message); */
-      /* objInfra.MqttPublish(message); */
-      Serial.println(ans);      
     }
   
-    // if (strcmp(topic, strTopicCfg)==0)
-    // {
-    //   /* Serial.println("El mensaje ha llegado aquí!"); */
-    //   deserializeJson(json_recibido,mensaje);
-    //   command = json_recibido["comando"].as<String>();
-    //   commandValue = json_recibido["value"].as<String>();
-      
-    //   if (command == "/reset"){
-    //     objInfra.RestartBoard();
-    //   }else if (command == "/changeIP"){
-    //     objInfra.setOTAAddress(commandValue.c_str());
-    //     Serial.println("IP cambiada!");
-    //   }
-    // }
-
   free(mensaje);
 }
 
 void setup(void){
-  /****************************************************************************/
-  /* Las siguientes lineas son muy importantes, desconozco el motivo, mi idea */
-  /*    es que si no las pones intenta leer el bus I2C más rápido de lo que   */
-  /*    puede y peta, o que directamente se lo salta y hace un clean display  */
-  /*    al aire.                                                              */
-  /****************************************************************************/
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
-    Serial.println("Display setup failed");
     while (true);
   }
-  Serial.println("Display is good to go");
-  /****************************************************************************/
 
   /* setup de infrastructura */
   objInfra.mqttTopicsPub[TOPIC_MAIN] = strTopicPub;
-  //objInfra.mqttTopicsSub[TOPIC_NUM_CFG] = strTopicCfg;
   objInfra.mqttTopicsSub[TOPIC_NUM_CMD] = strTopicCmd;
   objInfra.Setup(mqttCallback);
 
-  /* Initialize joystick*/
   joystick.Setup();
   
   display.clearDisplay();
   display.setTextSize(4);
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(5, 20);
-  /****************************************************************************/
+
   display.print(hour);
   display.display();
 }
@@ -138,19 +100,13 @@ void loop(){
   if (!objInfra.GameRunning())
     return;
 
-  /****************************************************************************/
-  /* Por alguna extraña razón, la placa se bloquea si las siguientes líneas   */
-  /*    de codigo si hay código de por medio antes del print, no estoy muy    */
-  /*    seguro  del problema, mientras escribía esto he pensado en el hecho   */
-  /*    de que la clase Joystick hereda de una libreria que usa la            */
-  /*    comunicación I2C, puede ocurrir algo parecido                         */
-  /****************************************************************************/
+  /* Pantalla */
   display.setTextSize(4);
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(5, 20);
-  /****************************************************************************/
   display.print(hour);
   display.display();
+  
   joystick_value = joystick.Loop();
   
   if ((countDigit(number) == 4) && (ans == number)){
