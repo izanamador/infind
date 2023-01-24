@@ -2,17 +2,30 @@
 #define MQTT_
 
 /*
-Clase IIWifi: Conexión a la WIFI
+Clase IIMQtt: Gestión del broker MQTT
 
 Requisitos: 
+- R05-Dispositivos IoT.1 - Medición de temperatura y humedad
+- R05-Dispositivos IoT.1 - Envío periódico de sensores
 - R10-Dispositivos IoT.6 - ChipId
 - R12-Aplicación de control y supervisión.2 - Actuación en grupo
 - R14-Aplicación de control y supervisión.4 - Conexión a MQTT
 - R15-Aplicación de control y supervisión.5 - Datos para conexión
+- R39-Dashboard.7 - Alamras de temperatura y humedad
 - R43-Mensajes MQTT.1 - Identificadores únicos
 - R44-Mensajes MQTT.2 - Conexión y LastWill
+- R46-Mensajes MQTT.4 Topic: IIX/ESPX/config
 - R52-Mensajes MQTT.10 - Desdoblamiento topics de suscripción
 - R53-Mensajes MQTT.11 - Orden de campos en nombres de topic
+
+R05-Dispositivos IoT.1 - Medición de temperatura y humedad
+  Utilizando el método RefreshDht11, el comunica periódicamente (cada 30 seg) la última medida de temperatura y humedad
+  MQTT guarda estos valores y los utiliza en los mensajes periódicos (cada 5 min) 
+  El envío del mensaje se realiza en el método PublishDataE que recibe como parámetro immediate par los casos en que no se pueda esperar
+
+
+R05-Dispositivos IoT.1 - Envío periódico de sensores
+  El envío periódico de sensores se implementa en el método PublishDataE que a su vez se invoca desde HasChanged
 
 R10-Dispositivos IoT.6 - ChipId
   Para cumplir este requisito, los dispositivos se conectan a MQTT utilizando el chipId, aunque éste se
@@ -33,6 +46,15 @@ R15-Aplicación de control y supervisión.5 - Datos para conexión
   Los valores de la dirección IP, puerto, usuario y contraseña para acceder a Mosquito están definidos
   en variables protegidas de la clase para que sean fácilmente mantenibles
 
+R39-Dashboard.7 - Alamras de temperatura y humedad
+  Las variables [dht11Tempmin_, dht11Tempmax_, dht11Hummin_, dht11Hummax_] determinan los rangos de temperatura por fuera de los 
+  cuales se tiene que enviar una señal de alarma. 
+  Estos valores se pueden modificar con el mismo mensaje de configuración que el de la periodicidad deL envío de datos.
+  Cada vez que el sensor invoca al método RefreshDht11, se comparan las lecturas de los sensores con los umbrales y se determina si
+  se ha producido alguna alarma, especificando de qué sensor y si es por valor demasiado bajo o demasiado alto.
+  En el texto de la alarma se incluyen los valores del sensor y del umbral que se ha sobrepasado
+  
+
 R43-Mensajes MQTT.1 - Identificadores únicos
   Esta clase implementa la comunicación a través de MQTT incluyendo la utilización de identificadores
   únicos para los topics.
@@ -44,10 +66,22 @@ R44-Mensajes MQTT.2 - Conexión y LastWill
   mensaje retenido.
   Los mensajes online/offline que contienen el chipID se preparan y envían en este método
 
-
 - R45-Mensajes MQTT.3 Topic: IIX/ESPX/datos
 
-- R46-Mensajes MQTT.4 Topic: IIX/ESPX/config
+R46-Mensajes MQTT.4 Topic: IIX/ESPX/config
+  En el método Setup de la clase IIMqtt se debe indicar la función que recibirá los mensajes
+  El prototipo de esta función es: void procesa_mensaje(char* strTopicMsg, byte* payload, unsigned int length)
+  Para que los mensajes lleguen al objeto obMqtt, es necesaario añadir una única línea en el cuerpo de la función
+    bool mrMqtt = obMqtt.Message(strTopicMsg, payload, length);
+  Cuando llega un mensaje por MQTT, la función procesa_mensaje invoca a al método IIMqtt::Message
+  Este método es el que realmente hace el trabajo:
+  - Reserva memoria y copia el mensaje
+  - Formatea el contenido para visualizarlo por el puerto serie
+  - Comprueba a qué topic está dirigido y realiza el procesamiento correspondiente
+  Para el caso concreto de los mensajes de configuración:
+  - Hay dos posibles topics: TopicConfA y TopicConfE, según sea un mensaje genérico (All=Todos) o específico (para un ESP)
+  - Los valores de configuración se copian a variables internas: [dataeperiod, dht11Tempmin_, dht11Tempmax_, dht11Hummin_, dht11Hummax_]
+
 
 - R47-Mensajes MQTT.5 Topic: IIX/ESPX/led/cmd
 
@@ -104,6 +138,7 @@ R53-Mensajes MQTT.11 - Orden de campos en nombres de topic
 
 #include "IIWifi.h"
 #include <PubSubClient.h>  // MQTT
+#include "ArduinoJson.h"   // JSON
 
 class IIMqtt {
 public:
@@ -114,6 +149,13 @@ public:
 		);	
 	bool HasChanged();   				// Cada iteración hay que comprobar si llegaron mensajes
 	void Subscribe(char* strTopic);
+  bool Message(char* strTopic, byte* payload, unsigned int length);
+  void RefreshDht11(int pinSda, float fltTemp, float fltHum);
+  void PublishDataE(bool immediate=false);
+
+  // Parámetros de configuración recibidos y valores por defecto
+  int     dataeperiod = 300;     // inicialmente los mensajes se envían cada 5 minutos
+  
 
 	// Propiedades
 	PubSubClient MClient; 
@@ -143,12 +185,25 @@ public:
 	void Subsribe(char *strTopic);
 
 private:
+  IIWifi *ptWifi_; 
  	const char* MQTT_SERVER     = "iot.ac.uma.es";
-  	const char* MQTT_USER       = "II3"; // "infind";
-  	const char* MQTT_PASS       = "qW30SImD"; // "zancudo";  	
-  	char  espid_[15];
+	const char* MQTT_USER       = "II3"; // "infind";
+	const char* MQTT_PASS       = "qW30SImD"; // "zancudo";  	
+	char  espid_[15];
 
+
+  // almacena la última medición del dht11 para cuando toque enviar
+  int   dht11Pinsda_;    
+  float dht11Temp_;  
+  float dht11Hum_;  
+  char  dht11AlarmTemp_[40];
+  char  dht11AlarmHum_ [40];
+  float dht11Tempmin_ = 15;
+  float dht11Tempmax_ = 25;
+  float dht11Hummin_  = 45;
+  float dht11Hummax_  = 55;
 };
+
 
 // PubSubClient Mqtt_client(ptWifi.Client);         // cliente mqtt
 #endif

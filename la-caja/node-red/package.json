@@ -13,7 +13,8 @@
         "node-red-contrib-ui-svg": "2.3.1",
         "node-red-contrib-ui-digital-display": "1.0.3",
         "node-red-node-ui-iframe": "0.2.1",
-        "node-red-contrib-timer": "1.0.4"
+        "node-red-contrib-timer": "1.0.4",
+        "node-red-contrib-md5": "1.0.4"
     },
     "node-red": {
         "settings": {
