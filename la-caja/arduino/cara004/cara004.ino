@@ -61,6 +61,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length)
 }
 
 void setup(void){
+  
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
     while (true);
   }
@@ -95,19 +96,19 @@ void loop(){
   static int iDigit = 0;
 
   display.clearDisplay();       /* Refresca la pantalla */
-  objInfra.Loop();
+  objInfra.Loop();              /* Loop infrastructura */
 
   if (!objInfra.GameRunning())
     return;
 
   /* Pantalla */
-  display.setTextSize(4);
-  display.setTextColor(SSD1306_WHITE);
-  display.setCursor(5, 20);
-  display.print(hour);
+  display.setTextSize(4);       /* Tamaño del texto - OLed */
+  display.setTextColor(SSD1306_WHITE); /* Color del texto */
+  display.setCursor(5, 20);            /* Mover el cursor */
+  display.print(hour);                 /* Imprime el texto por pantalla */
   display.display();
   
-  joystick_value = joystick.Loop();
+  joystick_value = joystick.Loop(); /* Joystick Loop */
   
   if ((countDigit(number) == 4) && (ans == number)){
     /* si la respuesta es correcta */
