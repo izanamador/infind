@@ -1,3 +1,0 @@
-(sym_lib_table
-  (lib (name "numpad")(type "KiCad")(uri "${KIPRJMOD}/numpad.kicad_sym")(options "")(descr ""))
-)
