@@ -8,10 +8,10 @@ Joystick::Joystick(char x_channel, char y_channel){
 
 /* Destructor */
 Joystick::~Joystick(){
-  
+  ;  
 }
 
-void Joystick::Direction(){
+void Joystick::Direction(){     /*Calcula la direccion posible*/
   
   angle =  atan2(coordenada.y.joystickValueFixed,coordenada.x.joystickValueFixed);
   
@@ -34,7 +34,7 @@ void Joystick::Direction(){
   }
 }
 
-void Joystick::Calibration(){
+void Joystick::Calibration(){   /* Función de calibración */
   for (int i = 0; i <= CALIBRATION_VALUE; i++) {
 
     if(coordenada.x.joystickValue-(coordenada.x.joystickValueOffset+i) == 0){
@@ -51,7 +51,7 @@ void Joystick::Calibration(){
   }
 }
 
-void Joystick::Setup(){
+void Joystick::Setup(){         /*Inicialización del joystick + calibración*/
   begin();
   coordenada.x.joystickValue = readADC_SingleEnded(coordenada.x.channel);
   coordenada.y.joystickValue = readADC_SingleEnded(coordenada.y.channel);
@@ -60,19 +60,8 @@ void Joystick::Setup(){
   Serial.println("Calibración terminada!");
 }
 
-
-
-
-
 int Joystick::Loop(){
-  /* int value; */
-  // unsigned long lastcalibration = 0;
-  // unsigned long now = millis();
 
-  // if (now - lastcalibration >= CALIBRATION_TIME) {
-  //   this->Calibration();
-  //   lastcalibration = now;
-  // }
 	if ( (millis()-startTime) > DEBOUNCE_TIME ) {
     startTime = millis();
     
@@ -85,8 +74,7 @@ int Joystick::Loop(){
     coordenada.x.joystickValueFixed = coordenada.x.joystickValue - coordenada.x.joystickValueOffset;
     coordenada.y.joystickValueFixed = coordenada.y.joystickValue - coordenada.y.joystickValueOffset;
 
-
-  
+    /* Debouncer umbral arriba */
     if(abs(coordenada.x.joystickValueFixed - coordenada.x.previousJoystickValue) > DIFFERENCE_ERROR_VALUE_MAX){
       coordenada.x.previousJoystickValue = coordenada.x.joystickValueFixed;
     }
@@ -94,35 +82,27 @@ int Joystick::Loop(){
     if(abs(coordenada.y.joystickValueFixed - coordenada.y.previousJoystickValue) > DIFFERENCE_ERROR_VALUE_MAX){
       coordenada.y.previousJoystickValue = coordenada.y.joystickValueFixed;
     }
-
+    /* Debouncer umbral abajo */
     if(abs(coordenada.x.joystickValueFixed) < DIFFERENCE_ERROR_VALUE_MIN){
       coordenada.x.joystickValueFixed = 0;
       coordenada.x.previousJoystickValue = coordenada.x.joystickValueFixed;
-      // Serial.println("x = 0");
     }
 
     if(abs(coordenada.y.joystickValueFixed) < DIFFERENCE_ERROR_VALUE_MIN){
       coordenada.y.joystickValueFixed = 0;
       coordenada.y.previousJoystickValue = 0;
       coordenada.y.previousJoystickValue = coordenada.y.joystickValueFixed;
-      // Serial.println("y = 0");
     }
-
-    // Serial.printf("joystick x value: %d \n", coordenada.x.joystickValueFixed);
-    // Serial.printf("joystick y value: %d \n", coordenada.y.joystickValueFixed);
 
     this->Direction();
   
     if(lastdirection == direction){
-      /* value = -1; */
       return -1;    
     }else{
       lastdirection = direction;
       return direction;
-      /* value = direction; */
     }
   }
-  /* return value; */
 }
 
 

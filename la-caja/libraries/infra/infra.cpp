@@ -11,22 +11,10 @@
 #define STAT_END      7
 
 
-
-
 Infra::Infra()
 {
-  // hardcodes relacionados con la placa
+
     sprintf(espId, "ESP_%d", ESP.getChipId());
-
-  // hardcodes relacionados con el wifi
-    // sprintf(_wifiSsid, "infind");
-    // sprintf(_wifiPassword, "1518wifi");
-    
-  // hardcodes relacionados con MQTT  
-    // sprintf(_mqttServer, MQTT_SERVER);
-    // sprintf(_mqttUser, MQTT_USER);
-    // sprintf(_mqttPassword, MQTT_PASSWORD);
-
     ptrMqtt = new PubSubClient(objWifi);
     for (int i=0; i<TOPIC_NUM_MAX; i++)
     {
@@ -46,7 +34,6 @@ int Infra::GameRunning()
 void Infra::ReportStatus(char* GameInfo)
 {
   global_game_info = GameInfo;
-  /* static char* GameInfo = GameInfo_non; */
   bool bReport = false;
   static char message[JSON_MESSAGE_SIZE];
   StaticJsonDocument<JSON_MESSAGE_SIZE> json;
@@ -92,10 +79,6 @@ void Infra::ReportStatus(char* GameInfo)
     json["state"] = "Timeout! You lost";
   }
   
-  // report when event or periodically
-  // TODO QUITAR HARDCODE DE REPORTING CADA SEGUNDO
-  /* if (bReport || millis() > 5000+milLsRep_) */
-  /* { */
   if (bReport || millis() > 5000+milLsRep_)
   {
     milLsRep_ = millis(); // refresh last report timestamp
@@ -264,7 +247,7 @@ void Infra::PrintConfig()
 
 int Infra::Loop()
 {
-  // TODO QUITAR HARDCODE DE TIEMPO DE PARTIDA Y/O JUEGO
+
   if ((currStat_== STAT_PLAY) && 
       ((millis()-milTries_) > 60000*15) || 
       ((millis()-milStart_) > 60000*60) )
@@ -319,18 +302,15 @@ void Infra::MqttConnect()
 
 void Infra::MqttPublish(char *message)
 {
-  //char Buffer[MQTT_MAX_MESSAGE];
 
   if (!ptrMqtt->connected())
     MqttConnect();
 
-//  if (strlen(message) < MQTT_MAX_MESSAGE)
-//  {
   Serial.print("MqttPublish: ");
   Serial.print(message);
   Serial.print("\n");    
   ptrMqtt->publish(mqttTopicsPub[TOPIC_MAIN], message);
-//  }
+
 }
 
 void Infra::RestartBoard(){

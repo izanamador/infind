@@ -48,9 +48,9 @@
 
 //--------------------------------------------- OTA
 #include <ESP8266httpUpdate.h>
-/* #define OTA_HTTP_ADDRESS      F("iot.ac.uma.es")         // Address of OTA update server */
-#define OTA_HTTP_PATH         F("/lacaja/update") // Path to update firmware
-#define OTA_HTTP_PORT         1880                     // Port of update server                                                       // Name of firmware
+#define OTA_HTTP_ADDRESS      F("192.168.1.15")         // Address of OTA update server
+#define OTA_HTTP_PATH         F("/lacaja/update")       // Path to update firmware
+#define OTA_HTTP_PORT         1880                      // Port of update 
 #define OTA_HTTP_VERSION      String(__FILE__).substring(String(__FILE__).lastIndexOf('\\')+1) + ".nodemcu" 
 
 //--------------------------------------------- MQTT
@@ -65,7 +65,6 @@
 #define MQTT_CONNECT_MSG      "{\"online\":true}"
 
 #define TOPIC_MAIN            0 // publicacion y lastwill
-//#define TOPIC_NUM_CFG         1 // configuración
 #define TOPIC_NUM_CMD         1 // ejecución de comandos
 #define TOPIC_NUM_MAX         2
 
@@ -82,7 +81,6 @@ class Infra
 public:
   Infra();
   int Setup(void (*mqttCallback)(char*, byte*, unsigned int));
-  /* int Loop(char* GameInfo); */
   int Loop();
   ~Infra();
     
@@ -109,10 +107,10 @@ public:
   void          setOTAAddress(const char* Address);
   // JSON
   StaticJsonDocument<JSON_MESSAGE_SIZE> objConfig;
+  
 private:
   void          PrintConfig();
   int           currStat_;
-  //int           lastStat_;
   unsigned int  milLsRep_;
   unsigned int  milStart_;
   unsigned int  milTries_;
