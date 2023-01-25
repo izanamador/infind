@@ -29,31 +29,19 @@ https://github.com/users/izanamador/projects/1/views/1
 ### Estructura Github
 
 - la-caja: carpeta raíz
-- la-caja/pruebas: fuentes para compartir pruebas
-  - la-caja/pruebas/irene
-  - la-caja/pruebas/jorge
-  - la-caja/pruebas/izan
-  - la caja/pruebas/ricardo
 - la-caja/arduino: fuentes de Arduino
   - la-caja/arduino/libraries: librerías de Arduino (infra.h/cpp) 
-  - la-caja/arduino/cara001: fuentes de dispositivos comunes (altavoz)/crono (si se hace)
-  - la-caja/arduino/cara002: fuentes de acertijo
-  - la-caja/arduino/cara003: fuentes de simon
-  - la-caja/arduino/cara004: fuentes del barco
-  - la-caja/arduino/cara005: fuentes del joystick
-  - la-caja/arduino/cara006: fuentes del 
+  - la-caja/arduino/cara002: fuentes del nivel: acertijo
+  - la-caja/arduino/cara003: fuentes del nivel: simon
+  - la-caja/arduino/cara004: fuentes del nivel: joystick
+  - la-caja/arduino/cara005: fuentes del nivel: switches
+  - la-caja/arduino/cara006: fuentes del nivel: barco
 - la-caja/base_de_datos: contiene toda la información que será rescatada o almacenada, cada carpeta es una colleción de la base de datos II3.
-  - la-caja/base_de_datos/recursos_de_las_pruebas: Información necesaria para el funcionamiento de las pruebas
+  - la-caja/base_de_datos/recursos_de_las_pruebas: archivos json con preguntas y respuestas
+  - la-caja/base_de_datos/historia: json con los mensajes para telegram
 - la-caja/kicad: Esquemáticos del proyecto
   - la-caja/kicad/librerías: Recursos necesarios para realizar los esquemáticos
 - la-caja/nodered: Flujo del proyecto
-- la-caja/doc: documentación en Markdown
-  - la-caja/doc/hardware: esquemáticos, sensores, actuadores, BOM...
-  - la-caja/doc/software: documentación técnica de desarrollo (hardware, base de datos, arquitectura, topics ...)
-  - la-caja/doc/usuario: documentación orientada a quienes organizan el juego (parametrización, organización de partidas, estadísticas...)
-  - la-caja/doc/jugador: documentación orientada a los jugadores (p. ej. Telegram)
-  
-  
   
 ### Estructura Google Drive
  - la-caja/web: landing page en google sites
@@ -61,19 +49,15 @@ https://github.com/users/izanamador/projects/1/views/1
     - la-caja/storyline/telegram
       - la-caja/storyline/texto: diálogos del ChiquiBot
       - la-caja/storyline/audio: archivos de audios en FakeYou
-    - la-caja/storyline/dashboard
-      - la-caja/storyline/dashboard/imagenes: recursos gráficos para animación dashboard
 - la-caja/presupuesto: excel para generar pdf a incluir en memoria
 - la-caja/memoria: pdfs e imágenes vectorizadas para documento final
   - la-caja/memoria/figuras
   - la-caja/memoria/anexos
 - la-caja/doc: documentación en pdf
-
-  - la-caja/doc/hardware: esquemáticos KiCAD y Circuit.io
-  - la-caja/doc/software: diagramas de desarrollo para memoria (hardware, base de datos, arquitectura, topics ...)
-  - la-caja/doc/usuario: manual organizadores de juego (parametrización, organización de partidas, estadísticas...)
-  - la-caja/doc/jugador: manual para jugadores en Canva
-
+  - la-caja/doc/datasheets
+  - la-caja/doc/estudio tiempo y consumicion
+  - la-caja/doc/planos:esquematico del proyecto
+  - la-caja/doc/usuario: manual de usuario
 - la-caja/branding: recursos gráficos sobre el juego a ser usados en planos, web, documentación etc.
 
   
